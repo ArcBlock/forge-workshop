@@ -23,7 +23,7 @@ defmodule AbtDidWorkshop.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: { AbtDidWorkshop.Application, []},
+      mod: {AbtDidWorkshop.Application, []},
       extra_applications: [:logger]
     ]
   end

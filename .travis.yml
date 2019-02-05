@@ -15,7 +15,8 @@ before_deploy: make travis-deploy
 deploy:
   - provider: releases
     skip_cleanup: true
-    api_key: run this command "echo $GITHUB_TOKEN | travis encrypt --add deploy.api_key".
+    api_key:
+      secure: WAJHloLqvj1iQOXVm2Dn56ZXNCrnoWRl7erBKtEw4v0FOBY20+IuJ/FX9jqbZMu83iIn9ikMDPK9LEVpL/w1szcuimBQMFZ9uzQPLgImdnCpMdELu09IqBD50kE76sZGtRAiKh4PTpaZ+y/rEJDWi7W86DgOeNYWPF87SIsTqG2/t1AUiSYtcxOhvyZZf0B0ygYulW2fjrI034L2ty8HVJcgqinfGWiGQR6yAarYmejp1G55u2PbF5ehHf84A1c4BIpeVVJP3VlHikWMahN9zyXUiTSjUh/VFiMJPtirhZOvPRd6ZWAulng+z95DYyIcQFPEswA8d2U7cY2lM+Aw/UGahlrWOT1MKWRRhjSgW2TF/usaTpQXhFJoP640NGEYsLq/pkPAPaI5O0ZzrAqQ7ayTrXmgCEweE6cuhDXdOdDHyNkMu2HR1Vj1iALg/jx8K8UkmIFIS0QJpGf+gC+65LENnHlciYMGnSsDBkC3et2yj2u2Qv34l5AaNW8TFhIm44XHRs1Viyj7P9jIHJQyvhY86ARZM7XRJXFCGNFJ1Kg+Oi2GNXFblWvyv28eQcLEgqHYB9cSN/BLdGwtL9Kb3Iel5QdVC/jS7D7imn4SWeQYc7ec6HiwnMGSkhxO9YdMOGNJqIzk8II6HYcbLw9A5spBTNMHxN8fazp/KAqXmOQ=
     file_glob: true
     file: src/_build/releases/*
     on:
@@ -23,4 +24,4 @@ deploy:
       branch: master
 notifications:
   slack:
-    secure:
+    secure: 
