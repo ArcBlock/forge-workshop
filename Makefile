@@ -64,7 +64,7 @@ watch:
 
 run:
 	@echo "Running the software..."
-	@cd src; iex -S mix
+	@cd src; iex -S mix phx.server
 
 submodule:
 	@git submodule update --init --recursive
