@@ -51,10 +51,11 @@ defmodule AbtDidWorkshop.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
+      {:eqrcode, "~> 0.1.5"},
 
       # ArcBlock
-      {:abt_did, git: "git@github.com:arcblock/abt-did-elixir.git", tag: "v0.1.9"},
-      # {:abt_did_elixir, path: "~/Documents/GitHub/ArcBlock/abt-did-elixir"},
+      {:abt_did, git: "git@github.com:arcblock/abt-did.git", tag: "v0.1.13"},
+      # {:abt_did, path: "~/Documents/GitHub/ArcBlock/abt-did"},
 
       # utility tools for error logs and metrics
       {:ex_datadog_plug, "~> 0.5.0"},

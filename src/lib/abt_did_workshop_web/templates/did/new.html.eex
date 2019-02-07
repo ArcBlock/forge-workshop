@@ -1,0 +1,32 @@
+<table>
+  <tr>
+    <td>Secret Key</td>
+    <td><%= @sk |> Base.encode16(case: :lower) %></td>
+  </tr>
+  <tr>
+    <td>Public Key</td>
+    <td><%= @pk |> Base.encode16(case: :lower) %></td>
+  </tr>
+  <tr>
+    <td>DID</td>
+    <td><%= @did %></td>
+  </tr>
+  <tr>
+    <td>url</td>
+    <td><%= @url %></td>
+  </tr>
+</table>
+<div>
+<table>
+  <tr>
+    <td><%= raw(@qr_code) %></td>
+    <td>
+      <table>
+        <tr>The QR Code contains following JSON object.</tr>
+        <tr><pre><%= Jason.Formatter.pretty_print(@jason) %></pre></tr>
+      <table>
+    </td>
+  </tr>
+</table>
+
+</div>
