@@ -1,4 +1,5 @@
-<table>
+<br>
+<table class="striped">
   <tr>
     <td>Secret Key</td>
     <td><%= @sk |> Base.encode16(case: :lower) %></td>
@@ -12,7 +13,7 @@
     <td><%= @did %></td>
   </tr>
   <tr>
-    <td>url</td>
+    <td>Callback</td>
     <td><%= @url %></td>
   </tr>
 </table>

@@ -9,9 +9,11 @@ defmodule AbtDidWorkshop.Application do
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository
-      AbtDidWorkshop.Repo,
+      # AbtDidWorkshop.Repo,
       # Start the endpoint when the application starts
-      AbtDidWorkshopWeb.Endpoint
+      AbtDidWorkshopWeb.Endpoint,
+      AbtDidWorkshop.UserDb,
+      AbtDidWorkshop.AppState
       # Starts a worker by calling: AbtDidWorkshop.Worker.start_link(arg)
       # {AbtDidWorkshop.Worker, arg},
     ]

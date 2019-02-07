@@ -1,4 +1,3 @@
-<script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/select.js") %>"></script>
 <section class="phx-hero">
   <h1><%= gettext "Welcome to %{name}!", name: "ABT DID Workshop" %></h1>
   <p>A simple workshop for developers to quickly develop, design and debug the DID flow.</p>
@@ -6,9 +5,30 @@
 
 <section class="row">
   <article class="column">
-    <row>Start by creating a new DID</row>
     <row>
       <%= form_for @conn, Routes.did_path(@conn, :create), fn f -> %>
+          Step 1: Choose your claims
+        <div class="form-group">
+          <p>
+            <label>
+              <%= checkbox f, :claim_full_name  %>
+              <span>Full Name</span>
+            </label>
+          </p>
+          <p>
+            <label>
+              <%= checkbox f, :claim_ssn  %>
+              <span>Social Security No.</span>
+            </label>
+          </p>
+          <p>
+            <label>
+              <%= checkbox f, :claim_birthday  %>
+              <span>Date of Birth</span>
+            </label>
+          </p>
+        </div>
+          Step 2: Choose how to create a DID.
         <div class="form-group">
           <label>DSA algorithm</label>
           <%= select f, :key_type, ["ed25519", "secp256k1"] %>
