@@ -2,6 +2,12 @@
 
 Simple workshop for developers to quickly develop, design and debug the DID flow.
 
+## Initialize
+
+```bash
+make init
+```
+
 ## Run 
 
 ```bash
