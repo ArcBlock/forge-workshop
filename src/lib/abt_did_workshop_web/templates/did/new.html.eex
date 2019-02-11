@@ -1,12 +1,12 @@
 <br>
-<table class="striped">
+<table class="striped" >
   <tr>
     <td>Secret Key</td>
-    <td><%= @sk |> Base.encode16(case: :lower) %></td>
+    <td><%= Multibase.encode!(@sk, :base58_btc) %></td>
   </tr>
   <tr>
     <td>Public Key</td>
-    <td><%= @pk |> Base.encode16(case: :lower) %></td>
+    <td><%= Multibase.encode!(@pk, :base58_btc) %></td>
   </tr>
   <tr>
     <td>DID</td>
