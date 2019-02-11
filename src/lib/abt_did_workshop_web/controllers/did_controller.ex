@@ -11,7 +11,10 @@ defmodule AbtDidWorkshopWeb.DidController do
     render(conn, "index.html")
   end
 
-  def create(conn, %{"hash_type" => hash_type, "key_type" => key_type} = params) do
+  def create(
+        conn,
+        %{"hash_type" => hash_type, "key_type" => key_type, "role_type" => role_type} = params
+      ) do
     store_claims(params)
 
     {pk, sk} =
@@ -21,7 +24,7 @@ defmodule AbtDidWorkshopWeb.DidController do
       end
 
     did_type = %DidType{
-      role_type: :application,
+      role_type: String.to_atom(role_type),
       key_type: String.to_atom(key_type),
       hash_type: String.to_atom(hash_type)
     }
