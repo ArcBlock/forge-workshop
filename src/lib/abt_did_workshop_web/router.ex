@@ -5,7 +5,7 @@ defmodule AbtDidWorkshopWeb.Router do
     plug(:accepts, ["html"])
     plug(:fetch_session)
     plug(:fetch_flash)
-    # plug(:protect_from_forgery)
+    plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
   end
 
@@ -15,16 +15,12 @@ defmodule AbtDidWorkshopWeb.Router do
 
   scope "/", AbtDidWorkshopWeb do
     pipe_through(:browser)
-
-    # get("/", PageController, :index)
-    # get("/pages", PageController, :new)
-    # post("/post", PageController, :create)
-    # post("/did", DidController, :new)
-    # get("/did/new", DidController, :create)
-    # get "/did/new" DidController, :new
-    # resources("/", DidController)
     get("/", DidController, :index)
     post("/did", DidController, :create)
+  end
+
+  scope "/api", AbtDidWorkshopWeb do
+    pipe_through(:api)
     post("/logon", LogonController, :logon)
   end
 

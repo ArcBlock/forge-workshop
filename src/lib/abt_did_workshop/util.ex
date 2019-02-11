@@ -1,4 +1,5 @@
 defmodule AbtDidWorkshop.Util do
+  @moduledoc false
   def get_ip do
     {:ok, ip_list} = :inet.getif()
     ips = List.first(ip_list)
