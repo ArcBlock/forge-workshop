@@ -17,6 +17,8 @@ defmodule AbtDidWorkshopWeb.Router do
     pipe_through(:browser)
     get("/", DidController, :index)
     post("/did", DidController, :create)
+    get("/did/show", DidController, :show)
+    get("/did/new", DidController, :new)
   end
 
   scope "/api", AbtDidWorkshopWeb do

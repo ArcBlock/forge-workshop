@@ -2,13 +2,41 @@ defmodule AbtDidWorkshopWeb.DidController do
   use AbtDidWorkshopWeb, :controller
 
   alias AbtDid.Type, as: DidType
+  alias AbtDidWorkshop.AppState
   alias AbtDidWorkshop.Util
 
   @ed25519 %Mcrypto.Signer.Ed25519{}
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
 
   def index(conn, _params) do
-    render(conn, "index.html")
+    state = AppState.get()
+
+    case Map.get(state, :did) do
+      nil ->
+        render(conn, "create.html", header: true)
+
+      _ ->
+        render(conn, "index.html", did: state.did)
+    end
+  end
+
+  def show(conn, _) do
+    state = AppState.get()
+    url = Util.get_callback()
+    {jason, qr_code} = gen_qr_code(state.did, url)
+
+    render(conn, "show.html",
+      sk: state.sk,
+      pk: state.pk,
+      did: state.did,
+      url: url,
+      qr_code: qr_code,
+      jason: jason
+    )
+  end
+
+  def new(conn, _) do
+    render(conn, "create.html")
   end
 
   def create(
@@ -30,11 +58,11 @@ defmodule AbtDidWorkshopWeb.DidController do
     }
 
     did = AbtDid.pk_to_did(did_type, pk)
-    AbtDidWorkshop.AppState.add_key(sk, pk, did)
+    AppState.add_key(sk, pk, did)
     url = Util.get_callback()
     {jason, qr_code} = gen_qr_code(did, url)
 
-    render(conn, "new.html", sk: sk, pk: pk, did: did, url: url, qr_code: qr_code, jason: jason)
+    render(conn, "show.html", sk: sk, pk: pk, did: did, url: url, qr_code: qr_code, jason: jason)
   end
 
   defp gen_qr_code(did, url) do
