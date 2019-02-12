@@ -53,24 +53,17 @@ defmodule AbtDidWorkshopWeb.LogonController do
 
   defp get_claim("full_name"),
     do: %{
-      id: "FullName",
-      tile: "Full Name (with suffix)",
-      type: "string"
+      id: "fullName"
     }
 
   defp get_claim("ssn"),
     do: %{
-      id: "SSN",
-      title: "Social Security No.",
-      type: "string",
-      format: "###-##-####"
+      id: "SSN"
     }
 
   defp get_claim("birthday"),
     do: %{
-      id: "birthday",
-      title: "Birthday (must be over 21)",
-      type: "date"
+      id: "birthday"
     }
 
   defp hex_to_bin("0x" <> hex), do: hex_to_bin(hex)
