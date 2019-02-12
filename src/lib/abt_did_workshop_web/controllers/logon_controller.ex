@@ -9,7 +9,7 @@ defmodule AbtDidWorkshopWeb.LogonController do
     pk_bin = hex_to_bin(pk)
 
     if false === AbtDid.Jwt.verify(challenge, pk_bin) do
-      json(conn, %{result: "invalid pk challenge"})
+      send_resp(conn, 422, "The signature of the challenge does not match the public key.")
     else
       body =
         challenge
@@ -27,6 +27,9 @@ defmodule AbtDidWorkshopWeb.LogonController do
       end
     end
   end
+
+  def logon(conn, _),
+    do: send_resp(conn, 400, "The request must contain valid public key and challenge.")
 
   defp request_reg() do
     state = AppState.get()

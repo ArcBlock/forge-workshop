@@ -54,7 +54,7 @@ defmodule AbtDidWorkshop.MixProject do
       {:eqrcode, "~> 0.1.5"},
 
       # ArcBlock
-      {:abt_did, git: "git@github.com:arcblock/abt-did.git", tag: "v0.1.13"},
+      {:abt_did, git: "git@github.com:arcblock/abt-did.git", tag: "v0.1.14"},
       # {:abt_did, path: "~/Documents/GitHub/ArcBlock/abt-did"},
 
       # utility tools for error logs and metrics
