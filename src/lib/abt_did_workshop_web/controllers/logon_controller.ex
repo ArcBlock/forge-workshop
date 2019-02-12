@@ -18,9 +18,6 @@ defmodule AbtDidWorkshopWeb.LogonController do
         |> Base.url_decode64!(padding: false)
         |> Jason.decode!()
 
-      # did = body["iss"]
-      # iat = body["iat"]
-      # nbf = body["nbf"]
       case UserDb.get(body["iss"]) do
         nil -> json(conn, request_reg())
         _ -> json(conn, gen_and_sign())

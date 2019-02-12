@@ -2,6 +2,7 @@ defmodule AbtDidWorkshopWeb.DidController do
   use AbtDidWorkshopWeb, :controller
 
   alias AbtDid.Type, as: DidType
+  alias AbtDid.Jwt
   alias AbtDidWorkshop.AppState
   alias AbtDidWorkshop.Util
 
@@ -23,15 +24,16 @@ defmodule AbtDidWorkshopWeb.DidController do
   def show(conn, _) do
     state = AppState.get()
     url = Util.get_callback()
-    {jason, qr_code} = gen_qr_code(state.did, url)
+    {qr_code, body, head} = gen_qr_code(state.sk, state.pk, state.did, url)
 
     render(conn, "show.html",
       sk: state.sk,
       pk: state.pk,
       did: state.did,
       url: url,
-      qr_code: qr_code,
-      jason: jason
+      body: body,
+      head: head,
+      qr_code: qr_code
     )
   end
 
@@ -60,25 +62,34 @@ defmodule AbtDidWorkshopWeb.DidController do
     did = AbtDid.pk_to_did(did_type, pk)
     AppState.add_key(sk, pk, did)
     url = Util.get_callback()
-    {jason, qr_code} = gen_qr_code(did, url)
+    {qr_code, body, head} = gen_qr_code(sk, pk, did, url)
 
-    render(conn, "show.html", sk: sk, pk: pk, did: did, url: url, qr_code: qr_code, jason: jason)
+    render(conn, "show.html",
+      sk: sk,
+      pk: pk,
+      did: did,
+      url: url,
+      body: body,
+      head: head,
+      qr_code: qr_code
+    )
   end
 
-  defp gen_qr_code(did, url) do
-    jason =
+  defp gen_qr_code(sk, pk, did, url) do
+    did_type = AbtDid.get_did_type(did)
+    challenge = Jwt.gen_and_sign(did_type, sk, %{"exp" => nil, "uri" => url})
+
+    qrcode =
       %{
-        app_did: did,
-        callback: url
+        app_pk: Multibase.encode!(pk, :base58_btc),
+        challenge: challenge
       }
       |> Jason.encode!()
 
-    qr_code =
-      jason
-      |> EQRCode.encode()
-      |> EQRCode.svg()
-
-    {jason, qr_code}
+    [head, body, _] = String.split(challenge, ".")
+    head = Base.url_decode64!(head, padding: false)
+    body = Base.url_decode64!(body, padding: false)
+    {qrcode, body, head}
   end
 
   defp store_claims(params) do

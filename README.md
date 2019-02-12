@@ -58,7 +58,7 @@ The challenge is decoded as:
 curl -H "Content-Type: application/json" \
     -X POST \
     -d '{"user_pk":"5a2c9a8bbf97fc96293d03b1ecf134a6682da9b6da518ad4d7b337311cae90d2","challenge":"eyJhbGciOiJFZDI1NTE5IiwidHlwIjoiSldUIn0.eyJleHAiOiIxNTQ5NTY3NDk1IiwiaWF0IjoiMTU0OTU2NTY5NSIsImlzcyI6ImRpZDphYnQ6ejFYbUcxN3EzRFRqY3BIUEN4MlZ5ZXBhVjE2dmhDdHJkZmQiLCJuYmYiOiIxNTQ5NTY1Njk1In0.kwPUzhKt79uiOHao9tvuPrhNwSM5jeTry2laoLqbO6dVMfsQGizJqpyJ7qhVPsuwqXXZm4K_nDlc3iU8ssZGBg"}' \
-    http://192.168.1.8:4000/logon/
+    http://192.168.1.8:4000/api/logon/
 ```
 6. After send the logon request, you will get a response like following. If you decode the above challenge, you will find the requested claims inside of it.
 ```json

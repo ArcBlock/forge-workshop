@@ -1,5 +1,5 @@
 %{
-  "abt_did": {:git, "git@github.com:arcblock/abt-did.git", "f4a32bcb7036ae93c57621b05bf66489bfa8cd4d", [tag: "v0.1.14"]},
+  "abt_did": {:git, "git@github.com:arcblock/abt-did.git", "8422208d9696cc1b54bd2e196dc0759a3cd357f2", [tag: "v0.1.15"]},
   "base1": {:hex, :base1, "0.1.0", "493a46bb5b34bf38d3b69ea6eaff33416d222f1621231cb1a04af42a351117ea", [:mix], [], "hexpm"},
   "base2": {:hex, :base2, "0.1.0", "bc9e19f1578e1439010d26b1bee456f3ac980481a46c3643b24e15c40e1db0ed", [:mix], [], "hexpm"},
   "basefiftyeight": {:hex, :basefiftyeight, "0.1.0", "3d48544743bf9aab7ab02aed803ac42af77acf268c7d8c71d4f39e7fa85ee8d3", [:mix], [], "hexpm"},

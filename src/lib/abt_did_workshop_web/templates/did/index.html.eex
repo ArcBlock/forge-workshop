@@ -11,12 +11,12 @@
   </section>
   <section class="row">
     <section class="column" align="center">
-      <%= form_for @conn, Routes.did_path(@conn, :show), [method: "get"], fn f -> %>
+      <%= form_for @conn, Routes.did_path(@conn, :show), [method: "get"], fn _ -> %>
         <%= submit "Continue", class: "btn btn-primary" %>
       <% end %>
     </section>
     <section class="column" align="center">
-      <%= form_for @conn, Routes.did_path(@conn, :new), [method: "get"], fn f -> %>
+      <%= form_for @conn, Routes.did_path(@conn, :new), [method: "get"], fn _ -> %>
         <%= submit "Regenerate", class: "btn btn-primary" %>
       <% end %>
     </section>

@@ -1,33 +1,28 @@
+<input id="qrValue" type="hidden" value="<%= @qr_code %>"></input>
 <br>
-<table class="striped" >
-  <tr>
-    <td>Secret Key</td>
-    <td><%= Multibase.encode!(@sk, :base58_btc) %></td>
-  </tr>
-  <tr>
-    <td>Public Key</td>
-    <td><%= Multibase.encode!(@pk, :base58_btc) %></td>
-  </tr>
-  <tr>
-    <td>DID</td>
-    <td><%= @did %></td>
-  </tr>
-  <tr>
-    <td>Callback</td>
-    <td><%= @url %></td>
-  </tr>
-</table>
-<div>
-<table>
-  <tr>
-    <td><%= raw(@qr_code) %></td>
-    <td>
-      <table>
-        <tr>The QR Code contains following JSON object.</tr>
-        <tr><pre><%= Jason.Formatter.pretty_print(@jason) %></pre></tr>
-      <table>
-    </td>
-  </tr>
-</table>
+<div align="center">
+<canvas id="canvas"></canvas>
+</div>
 
+<p>
+  The QR Code contains following JSON object.
+  <br>
+  <pre><%= Jason.Formatter.pretty_print(@qr_code) %></pre>
+</p>
+
+<p>
+  The challenge further decoded as:
+  <br>
+  <pre>
+    <%= Jason.Formatter.pretty_print(@head) %>
+  </pre>
+  <pre>
+    <%= Jason.Formatter.pretty_print(@body) %>
+  </pre>
+</p>
+
+<p>
+    The challenge is signed by Secret Key:
+   <pre><%= Multibase.encode!(@sk, :base58_btc) %></pre>
+</p>
 </div>
