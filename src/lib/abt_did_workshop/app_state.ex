@@ -12,8 +12,12 @@ defmodule AbtDidWorkshop.AppState do
     GenServer.call(__MODULE__, {:add_key, sk, pk, did})
   end
 
-  def add_claims(claims) do
-    GenServer.call(__MODULE__, {:add_claims, claims})
+  def add_profile(claims) do
+    GenServer.call(__MODULE__, {:add_profile, claims})
+  end
+
+  def add_agreements(claims) do
+    GenServer.call(__MODULE__, {:add_agreements, claims})
   end
 
   def get() do
@@ -34,8 +38,12 @@ defmodule AbtDidWorkshop.AppState do
     {:reply, :ok, state}
   end
 
-  def handle_call({:add_claims, claims}, _from, state) do
-    {:reply, :ok, Map.put(state, :claims, claims)}
+  def handle_call({:add_profile, claims}, _from, state) do
+    {:reply, :ok, Map.put(state, :profile, claims)}
+  end
+
+  def handle_call({:add_agreements, claims}, _from, state) do
+    {:reply, :ok, Map.put(state, :agreements, claims)}
   end
 
   def handle_call(:get, _from, state) do

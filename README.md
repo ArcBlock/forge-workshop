@@ -55,16 +55,17 @@ The challenge is decoded as:
 ```
 5. In stead of using a mobile app to send the logon request as in step 4, you can directly `curl` it like: 
 ```bash
-curl -H "Content-Type: application/json" \
-    -X POST \
-    -d '{"user_pk":"5a2c9a8bbf97fc96293d03b1ecf134a6682da9b6da518ad4d7b337311cae90d2","challenge":"eyJhbGciOiJFZDI1NTE5IiwidHlwIjoiSldUIn0.eyJleHAiOiIxNTQ5NTY3NDk1IiwiaWF0IjoiMTU0OTU2NTY5NSIsImlzcyI6ImRpZDphYnQ6ejFYbUcxN3EzRFRqY3BIUEN4MlZ5ZXBhVjE2dmhDdHJkZmQiLCJuYmYiOiIxNTQ5NTY1Njk1In0.kwPUzhKt79uiOHao9tvuPrhNwSM5jeTry2laoLqbO6dVMfsQGizJqpyJ7qhVPsuwqXXZm4K_nDlc3iU8ssZGBg"}' \
-    http://192.168.1.8:4000/api/logon/
+curl http://192.168.1.8:4000/api/logon?user_did=did:abt:z1XmG17q3DTjcpHPCx2VyepaV16vhCtrdfd
 ```
 6. After send the logon request, you will get a response like following. If you decode the above challenge, you will find the requested claims inside of it.
 ```json
 {
-  "app_pk":"15a5621ffcf7bd3aba7459b6ce4bdd5acd2f1ca0bd59d86076c32bc5ea8a180e",
-  "challenge":"eyJhbGciOiJFZDI1NTE5IiwidHlwIjoiSldUIn0.eyJjYWxsYmFjayI6Imh0dHA6Ly8xOTIuMTY4LjEuOC9sb2dvbi8iLCJyZXF1ZXN0ZWQiOlt7ImlkIjoiYmlydGhkYXkiLCJ0aXRsZSI6IkJpcnRoZGF5IChtdXN0IGJlIG92ZXIgMjEpIiwidHlwZSI6ImRhdGUifSx7ImZvcm1hdCI6IiMjIy0jIy0jIyMjIiwiaWQiOiJTU04iLCJ0aXRsZSI6IlNvY2lhbCBTZWN1cml0eSBOby4iLCJ0eXBlIjoic3RyaW5nIn1dLCJleHAiOiIxNTQ5NTc4NjA3IiwiaWF0IjoiMTU0OTU3NjgwNyIsImlzcyI6ImRpZDphYnQ6ek5LRzliYmFNbVJSWHNiRW1teENITDlBZkVWazZCcUI4SFBOIiwibmJmIjoiMTU0OTU3NjgwNyJ9._soIgZ2bRa_ACqnitIzld86a3qH1rwzf67GaVmu9BZf9iaIZsYJmhzn-McQvFgNqwjtcVjZAvptiTiDPthSgCg"
+  "app_pk":"572551333538aef80fa67ec6ba2a7bfe483611d0847892065d868c74fc7ea7ec","challenge":"eyJhbGciOiJFZDI1NTE5IiwidHlwIjoiSldUIn0.eyJyZXF1ZXN0ZWRDbGFpbXMiOlt7Im1ldGEiOnsiZGVzY3JpcHRpb24iOiJQbGVhc2UgcHJvdmlkZSB5b3VyIHByb2ZpbGUgaW5mb3JtYXRpb24uIn0sInBhcmFtZXRlcnMiOlsiYmlydGhkYXkiLCJmdWxsTmFtZSIsInNzbiJdLCJ0eXBlIjoicHJvZmlsZSJ9XSwicmVzcG9uc2VBdXRoIjoiaHR0cDovLzE5Mi4xNjguMS44L2FwaS9sb2dvbi8iLCJleHAiOiIxNTUwMDI1NDc2IiwiaWF0IjoiMTU1MDAyMzY3NiIsImlzcyI6ImRpZDphYnQ6ejExTFNRQzVaOG9UeVZSa05RYnNnZ2VxR1REYlgxTWsxRjhrIiwibmJmIjoiMTU1MDAyMzY3NiJ9.fmQVqtSXGKZfz2fI4r5dPCaHVu3Jg5y_EL-XJcop24UC2PlJbwXWzb7GNyKUXZgnVYocPCgsPQsom1oGlGFBBw"
 }
 ```
 7. Now render the requested claims and show them to users.
+
+8. Send claims back
+```bash
+curl -H "Content-Type: application/json" -X POST -d '{"user_pk":"f5bcf626df396d566f193a5684a2d6e7df724bae4e544930d300b205021c3369","challenge":"eyJhbGciOiJFZDI1NTE5IiwidHlwIjoiSldUIn0.eyJyZXF1ZXN0ZWRDbGFpbXMiOlt7ImJpcnRoZGF5IjoiMTk5My0wOS0yNyIsImZ1bGxOYW1lIjoiQWxpY2UgWHUiLCJzc24iOiIxMjM0NTYiLCJ0eXBlIjoicHJvZmlsZSJ9XSwiZXhwIjoiMTU1MDAzNDk1OSIsImlhdCI6IjE1NTAwMzMxNTkiLCJpc3MiOiJkaWQ6YWJ0OnoxVWJMWGVXaE5YSkozRTE1YWJuVEQxcW40SmdMTEVTMnh0IiwibmJmIjoiMTU1MDAzMzE1OSJ9.9nQfpvCcM3ZbfTSggwjPXZ6NJJpZXN5iYjKMTEpkrtiMC_sqUuC0NYP4jXL9mgoGuXFCgO2ktmbi510I_7_VAg"}' http://192.168.1.8:4000/api/logon/
+```

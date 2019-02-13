@@ -23,7 +23,8 @@ defmodule AbtDidWorkshopWeb.Router do
 
   scope "/api", AbtDidWorkshopWeb do
     pipe_through(:api)
-    post("/logon", LogonController, :logon)
+    get("/logon", LogonController, :request)
+    post("/logon", LogonController, :auth)
   end
 
   # Other scopes may use custom stacks.

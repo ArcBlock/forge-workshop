@@ -5,7 +5,17 @@ defmodule AbtDidWorkshopWeb.LogonController do
   alias AbtDidWorkshop.UserDb
   alias AbtDidWorkshop.Util
 
-  def logon(conn, %{"user_pk" => pk, "challenge" => challenge}) do
+  def request(conn, %{"user_did" => did}) do
+    case UserDb.get(did) do
+      nil -> json(conn, request_reg())
+      _ -> json(conn, gen_and_sign())
+    end
+  end
+
+  def request(conn, _),
+    do: send_resp(conn, 400, "The request must contain valid DID.")
+
+  def auth(conn, %{"user_pk" => pk, "challenge" => challenge}) do
     pk_bin = hex_to_bin(pk)
 
     if false === AbtDid.Jwt.verify(challenge, pk_bin) do
@@ -18,22 +28,86 @@ defmodule AbtDidWorkshopWeb.LogonController do
         |> Base.url_decode64!(padding: false)
         |> Jason.decode!()
 
-      cond do
-        AppState.get().claims == [] -> json(conn, gen_and_sign())
-        UserDb.get(body["iss"]) == nil -> json(conn, request_reg())
-        true -> json(conn, gen_and_sign())
+      case match_claims?(body) do
+        true ->
+          add_user(pk, body)
+          json(conn, gen_and_sign())
+
+        false ->
+          send_resp(conn, 422, "Authentication failed.")
       end
     end
   end
 
-  def logon(conn, _),
+  def auth(conn, _),
     do: send_resp(conn, 400, "The request must contain valid public key and challenge.")
 
+  defp add_user(pk, body) do
+    user = %{
+      did: body["iss"],
+      pk: pk
+    }
+
+    profile =
+      body
+      |> get_profile()
+      |> Map.delete("type")
+      |> Map.delete("meta")
+
+    UserDb.add(Map.merge(user, profile))
+  end
+
+  defp match_claims?(body) do
+    expected = AppState.get().profile |> IO.inspect(label: "%% expected %%")
+    actual = get_profile(body) |> IO.inspect(label: "%% actual %%")
+    check_profile(expected, actual)
+  end
+
+  defp get_profile(body) do
+    IO.inspect(binding())
+
+    body
+    |> Map.get("requestedClaims", [])
+    |> Enum.filter(fn claim -> claim["type"] == "profile" end)
+    |> List.first() || %{}
+  end
+
+  defp check_profile([], _), do: true
+
+  defp check_profile(expected, actual) do
+    Enum.reduce(expected, true, fn claim, acc -> acc and check_profile_item(claim, actual) end)
+  end
+
+  defp check_profile_item(_, nil), do: false
+
+  defp check_profile_item("fullName", actual) do
+    case actual["fullName"] do
+      nil -> false
+      "" -> false
+      _ -> true
+    end
+  end
+
+  defp check_profile_item("birthday", actual) do
+    case actual["birthday"] do
+      nil -> false
+      "" -> false
+      _ -> true
+    end
+  end
+
+  defp check_profile_item("ssn", actual) do
+    case actual["ssn"] do
+      nil -> false
+      "" -> false
+      _ -> true
+    end
+  end
+
   defp request_reg() do
-    state = AppState.get()
-    claims = gen_claims(state.claims)
+    claims = gen_claims()
     callback = Util.get_callback()
-    gen_and_sign(%{callback: callback, requested: claims})
+    gen_and_sign(%{responseAuth: callback, requestedClaims: claims})
   end
 
   defp gen_and_sign(extra \\ %{}) do
@@ -47,25 +121,37 @@ defmodule AbtDidWorkshopWeb.LogonController do
     }
   end
 
-  defp gen_claims(claims) do
-    claims
-    |> Enum.map(fn "claim_" <> claim -> get_claim(claim) end)
+  defp gen_claims() do
+    profile = AppState.get().profile
+    agreements = AppState.get().agreements
+
+    profile_claim =
+      case profile do
+        [] ->
+          nil
+
+        profile ->
+          %{
+            type: "profile",
+            meta: %{
+              description: "Please provide your profile information."
+            },
+            parameters: profile
+          }
+      end
+
+    agreement_claims =
+      case agreements do
+        [] -> []
+        _ -> Enum.map(agreements, &get_agreement/1)
+      end
+
+    [profile_claim] ++ agreement_claims
   end
 
-  defp get_claim("full_name"),
-    do: %{
-      id: "fullName"
-    }
-
-  defp get_claim("ssn"),
-    do: %{
-      id: "SSN"
-    }
-
-  defp get_claim("birthday"),
-    do: %{
-      id: "birthday"
-    }
+  def get_agreement(_) do
+    %{}
+  end
 
   defp hex_to_bin("0x" <> hex), do: hex_to_bin(hex)
   defp hex_to_bin(hex), do: Base.decode16!(hex, case: :mixed)

@@ -5,24 +5,41 @@
 </div>
 
 <p>
-  The QR Code contains following JSON object.
+  The QR Code contains following URL.
   <br>
-  <pre><%= Jason.Formatter.pretty_print(@qr_code) %></pre>
+  <pre><%= @qr_code %></pre>
 </p>
 
 <p>
-  The challenge further decoded as:
-  <br>
-  <pre>
-    <%= Jason.Formatter.pretty_print(@head) %>
-  </pre>
-  <pre>
-    <%= Jason.Formatter.pretty_print(@body) %>
-  </pre>
-</p>
-
-<p>
-    The challenge is signed by Secret Key:
+    The Secret Key of the DID is:
    <pre><%= Multibase.encode!(@sk, :base58_btc) %></pre>
 </p>
+
+<%= users = AbtDidWorkshop.UserDb.get_all(); if [] != users do %>
+  Known users:
+  <table border="1" width="50%">
+    <thead>
+    <tr>
+      <th>DID</th>
+      <th>Public Key</th>
+      <th>Profile</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%= for user <- users do %>
+    <tr>
+      <td><%= user.did %></td>
+      <td><%= user.pk %></td>
+      <td>
+        <%= user["fullName"] %>
+        <br>
+        <%= user["ssn"] %>
+        <br>
+        <%= user["birthday"] %>
+      </td>
+    </tr>
+    <% end %>
+    </tbody>
+  </table>
+<% end %>
 </div>

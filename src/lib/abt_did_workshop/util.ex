@@ -8,6 +8,6 @@ defmodule AbtDidWorkshop.Util do
   end
 
   def get_callback do
-    "http://#{get_ip()}/logon/"
+    "http://#{get_ip()}/api/logon/"
   end
 end

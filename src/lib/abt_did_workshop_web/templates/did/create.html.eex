@@ -3,7 +3,7 @@
     <h1><%= gettext "Welcome to %{name}!", name: "ABT DID Workshop" %></h1>
     <p>A simple workshop for developers to quickly develop, design and debug the DID flow.</p>
   </section>
-<%= end %>
+<% end %>
 <br>
 <section class="row">
   <row>
@@ -12,19 +12,19 @@
       <div class="form-group">
         <p>
           <label>
-            <%= checkbox f, :claim_full_name  %>
+            <%= checkbox f, :claim_profile_fullName  %>
             <span>Full Name</span>
           </label>
         </p>
         <p>
           <label>
-            <%= checkbox f, :claim_ssn  %>
+            <%= checkbox f, :claim_profile_ssn  %>
             <span>Social Security No.</span>
           </label>
         </p>
         <p>
           <label>
-            <%= checkbox f, :claim_birthday  %>
+            <%= checkbox f, :claim_profile_birthday  %>
             <span>Date of Birth</span>
           </label>
         </p>
