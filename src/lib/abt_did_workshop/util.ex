@@ -8,7 +8,13 @@ defmodule AbtDidWorkshop.Util do
   end
 
   def get_callback do
-    "http://#{get_ip()}/api/logon/"
+    port =
+      :abt_did_workshop
+      |> Application.get_env(AbtDidWorkshopWeb.Endpoint)
+      |> Keyword.get(:http)
+      |> Keyword.get(:port)
+
+    "http://#{get_ip()}:#{port}/api/logon/"
   end
 
   def shorten(str, pre_len, post_len) do
