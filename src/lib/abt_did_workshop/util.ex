@@ -10,4 +10,10 @@ defmodule AbtDidWorkshop.Util do
   def get_callback do
     "http://#{get_ip()}/api/logon/"
   end
+
+  def shorten(str, pre_len, post_len) do
+    {pre, _} = String.split_at(str, pre_len - 1)
+    {_, post} = String.split_at(str, String.length(str) - post_len)
+    pre <> "..." <> post
+  end
 end
