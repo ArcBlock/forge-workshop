@@ -2,7 +2,6 @@ defmodule AbtDidWorkshopWeb.DidController do
   use AbtDidWorkshopWeb, :controller
 
   alias AbtDid.Type, as: DidType
-  alias AbtDid.Jwt
   alias AbtDidWorkshop.AppState
   alias AbtDidWorkshop.Util
 
@@ -73,7 +72,7 @@ defmodule AbtDidWorkshopWeb.DidController do
     path = String.trim_trailing(path, "/")
     app_pk = Multibase.encode!(pk, :base58_btc)
     url = URI.encode_www_form(url)
-    "#{path}?app_pk=#{app_pk}&app_did=#{did}&action=request-auth&url=#{url}"
+    "#{path}?appPk=#{app_pk}&appDid=#{did}&action=requestAuth&url=#{url}"
   end
 
   defp store_claims(params) do
