@@ -24,7 +24,7 @@ defmodule AbtDidWorkshopWeb.DidController do
   def show(conn, _) do
     state = AppState.get()
     url = Util.get_callback()
-    qr_code = gen_qr_code(state.pk, state.did, url)
+    qr_code = gen_qr_code(state.path, state.pk, state.did, url)
 
     render(conn, "show.html",
       sk: state.sk,
@@ -39,28 +39,26 @@ defmodule AbtDidWorkshopWeb.DidController do
     render(conn, "create.html")
   end
 
-  def create(
-        conn,
-        %{"hash_type" => hash_type, "key_type" => key_type, "role_type" => role_type} = params
-      ) do
+  def create(conn, params) do
     store_claims(params)
 
     {pk, sk} =
-      case key_type do
+      case params["key_type"] do
         "ed25519" -> Mcrypto.keypair(@ed25519)
         "secp256k1" -> Mcrypto.keypair(@secp256k1)
       end
 
     did_type = %DidType{
-      role_type: String.to_atom(role_type),
-      key_type: String.to_atom(key_type),
-      hash_type: String.to_atom(hash_type)
+      role_type: String.to_atom(params["role_type"]),
+      key_type: String.to_atom(params["key_type"]),
+      hash_type: String.to_atom(params["hash_type"])
     }
 
     did = AbtDid.pk_to_did(did_type, pk)
     AppState.add_key(sk, pk, did)
+    AppState.add_path(params["path"])
     url = Util.get_callback()
-    qr_code = gen_qr_code(pk, did, url)
+    qr_code = gen_qr_code(params["path"], pk, did, url)
 
     render(conn, "show.html",
       sk: sk,
@@ -71,8 +69,11 @@ defmodule AbtDidWorkshopWeb.DidController do
     )
   end
 
-  defp gen_qr_code(pk, did, url) do
-    "https://arcwallet.io/i?app_pk=#{Multibase.encode!(pk, :base58_btc)}&app_did=#{did}&uri=#{url}"
+  defp gen_qr_code(path, pk, did, url) do
+    path = String.trim_trailing(path, "/")
+    app_pk = Multibase.encode!(pk, :base58_btc)
+    url = URI.encode_www_form(url)
+    "#{path}?app_pk=#{app_pk}&app_did=#{did}&action=request-auth&url=#{url}"
   end
 
   defp store_claims(params) do

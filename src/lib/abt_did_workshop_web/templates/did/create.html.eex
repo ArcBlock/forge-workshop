@@ -8,6 +8,14 @@
 <section class="row">
   <row>
     <%= form_for @conn, Routes.did_path(@conn, :create), fn f -> %>
+        Step 1: Input your deep link path
+      <div class="form-group">
+        <p>
+          <label>
+            <%= text_input(f, :path, value: "https://arcwallet.io/i/") %>
+          </label>
+        </p>
+      </div>
         Step 1: Choose your claims
       <div class="form-group">
         <p>

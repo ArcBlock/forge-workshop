@@ -5,7 +5,7 @@ defmodule AbtDidWorkshopWeb.LogonController do
   alias AbtDidWorkshop.UserDb
   alias AbtDidWorkshop.Util
 
-  def request(conn, %{"user_did" => did}) do
+  def request(conn, %{"userDid" => did}) do
     case UserDb.get(did) do
       nil -> json(conn, request_reg())
       _ -> json(conn, gen_and_sign())
@@ -15,32 +15,40 @@ defmodule AbtDidWorkshopWeb.LogonController do
   def request(conn, _),
     do: send_resp(conn, 400, "The request must contain valid DID.")
 
-  def auth(conn, %{"user_pk" => pk, "challenge" => challenge}) do
+  def auth(conn, %{"userPk" => pk, "userInfo" => user_info}) do
     pk_bin = hex_to_bin(pk)
 
-    if false === AbtDid.Jwt.verify(challenge, pk_bin) do
+    if false === AbtDid.Jwt.verify(user_info, pk_bin) do
       send_resp(conn, 422, "The signature of the challenge does not match the public key.")
     else
-      body =
-        challenge
-        |> String.split(".")
-        |> Enum.at(1)
-        |> Base.url_decode64!(padding: false)
-        |> Jason.decode!()
-
-      case match_claims?(body) do
-        true ->
-          add_user(pk, body)
-          json(conn, gen_and_sign())
-
-        false ->
-          send_resp(conn, 422, "Authentication failed.")
-      end
+      user_info
+      |> String.split(".")
+      |> Enum.at(1)
+      |> Base.url_decode64!(padding: false)
+      |> Jason.decode!()
+      |> do_auth(pk, conn)
     end
   end
 
   def auth(conn, _),
     do: send_resp(conn, 400, "The request must contain valid public key and challenge.")
+
+  defp do_auth(user_info, pk, conn) do
+    case UserDb.get(user_info["iss"]) do
+      nil ->
+        case match_claims?(user_info) do
+          true ->
+            add_user(pk, user_info)
+            json(conn, gen_and_sign())
+
+          false ->
+            send_resp(conn, 422, "Authentication failed.")
+        end
+
+      _ ->
+        json(conn, gen_and_sign())
+    end
+  end
 
   defp add_user(pk, body) do
     user = %{
@@ -58,14 +66,12 @@ defmodule AbtDidWorkshopWeb.LogonController do
   end
 
   defp match_claims?(body) do
-    expected = AppState.get().profile |> IO.inspect(label: "%% expected %%")
-    actual = get_profile(body) |> IO.inspect(label: "%% actual %%")
+    expected = AppState.get().profile
+    actual = get_profile(body)
     check_profile(expected, actual)
   end
 
   defp get_profile(body) do
-    IO.inspect(binding())
-
     body
     |> Map.get("requestedClaims", [])
     |> Enum.filter(fn claim -> claim["type"] == "profile" end)
@@ -107,17 +113,30 @@ defmodule AbtDidWorkshopWeb.LogonController do
   defp request_reg() do
     claims = gen_claims()
     callback = Util.get_callback()
-    gen_and_sign(%{responseAuth: callback, requestedClaims: claims})
+
+    appInfo = %{
+      "name" => "ABT DID Workshop",
+      "description" =>
+        "A simple workshop for developers to quickly develop, design and debug the DID flow.",
+      "logo" => "https://example-application/logo"
+    }
+
+    gen_and_sign(%{
+      url: callback,
+      action: "responseAuth",
+      requestedClaims: claims,
+      appInfo: appInfo
+    })
   end
 
   defp gen_and_sign(extra \\ %{}) do
     state = AppState.get()
     did_type = AbtDid.get_did_type(state.did)
-    challenge = AbtDid.Jwt.gen_and_sign(did_type, state.sk, extra)
+    auth_info = AbtDid.Jwt.gen_and_sign(did_type, state.sk, extra)
 
     %{
-      app_pk: state.pk |> Base.encode16(case: :lower),
-      challenge: challenge
+      appPk: state.pk |> Base.encode16(case: :lower),
+      authInfo: auth_info
     }
   end
 
@@ -136,7 +155,7 @@ defmodule AbtDidWorkshopWeb.LogonController do
             meta: %{
               description: "Please provide your profile information."
             },
-            parameters: profile
+            items: profile
           }
       end
 

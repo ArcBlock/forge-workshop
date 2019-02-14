@@ -8,6 +8,10 @@ defmodule AbtDidWorkshop.AppState do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
+  def add_path(path) do
+    GenServer.call(__MODULE__, {:add_path, path})
+  end
+
   def add_key(sk, pk, did) do
     GenServer.call(__MODULE__, {:add_key, sk, pk, did})
   end
@@ -26,6 +30,10 @@ defmodule AbtDidWorkshop.AppState do
 
   def init(:ok) do
     {:ok, %{}}
+  end
+
+  def handle_call({:add_path, path}, _from, state) do
+    {:reply, :ok, Map.put(state, :path, path)}
   end
 
   def handle_call({:add_key, sk, pk, did}, _from, state) do
