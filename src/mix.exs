@@ -55,8 +55,8 @@ defmodule AbtDidWorkshop.MixProject do
       {:httpoison, "~> 1.4"},
 
       # ArcBlock
-      # {:abt_did, git: "git@github.com:arcblock/abt-did.git", tag: "v0.1.15"},
-      {:abt_did, path: "~/Documents/GitHub/ArcBlock/abt-did"},
+      {:abt_did, git: "git@github.com:arcblock/abt-did.git", tag: "v0.1.16"},
+      # {:abt_did, path: "~/Documents/GitHub/ArcBlock/abt-did"},
 
       # utility tools for error logs and metrics
       {:ex_datadog_plug, "~> 0.5.0"},
