@@ -16,22 +16,19 @@ defmodule AbtDidWorkshopWeb.LogonController do
     do: send_resp(conn, 400, "The request must contain valid DID.")
 
   def auth(conn, %{"userPk" => pk, "userInfo" => user_info}) do
-    pk_bin = hex_to_bin(pk)
+    pk_bin = Util.str_to_bin(pk)
 
-    if false === AbtDid.Jwt.verify(user_info, pk_bin) do
-      send_resp(conn, 422, "The signature of the challenge does not match the public key.")
+    if false === AbtDid.Signer.verify(user_info, pk_bin) do
+      send_resp(conn, 422, "The signature of the user info does not match the public key.")
     else
       user_info
-      |> String.split(".")
-      |> Enum.at(1)
-      |> Base.url_decode64!(padding: false)
-      |> Jason.decode!()
+      |> Util.get_body()
       |> do_auth(pk, conn)
     end
   end
 
   def auth(conn, _),
-    do: send_resp(conn, 400, "The request must contain valid public key and challenge.")
+    do: send_resp(conn, 400, "The request must contain valid public key and user info.")
 
   defp do_auth(user_info, pk, conn) do
     case UserDb.get(user_info["iss"]) do
@@ -132,10 +129,10 @@ defmodule AbtDidWorkshopWeb.LogonController do
   defp gen_and_sign(extra \\ %{}) do
     state = AppState.get()
     did_type = AbtDid.get_did_type(state.did)
-    auth_info = AbtDid.Jwt.gen_and_sign(did_type, state.sk, extra)
+    auth_info = AbtDid.Signer.gen_and_sign(did_type, state.sk, extra)
 
     %{
-      appPk: state.pk |> Base.encode16(case: :lower),
+      appPk: state.pk |> Multibase.encode!(:base58_btc),
       authInfo: auth_info
     }
   end
@@ -171,7 +168,4 @@ defmodule AbtDidWorkshopWeb.LogonController do
   def get_agreement(_) do
     %{}
   end
-
-  defp hex_to_bin("0x" <> hex), do: hex_to_bin(hex)
-  defp hex_to_bin(hex), do: Base.decode16!(hex, case: :mixed)
 end

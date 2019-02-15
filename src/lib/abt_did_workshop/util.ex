@@ -22,4 +22,22 @@ defmodule AbtDidWorkshop.Util do
     {_, post} = String.split_at(str, String.length(str) - post_len)
     pre <> "..." <> post
   end
+
+  def str_to_bin(str) do
+    case Base.decode16(str, case: :mixed) do
+      {:ok, bin} -> bin
+      _ -> Multibase.decode!(str)
+    end
+  end
+
+  def get_body(jwt) do
+    jwt
+    |> String.split(".")
+    |> Enum.at(1)
+    |> Base.url_decode64!(padding: false)
+    |> Jason.decode!()
+  end
+
+  def hex_to_bin("0x" <> hex), do: hex_to_bin(hex)
+  def hex_to_bin(hex), do: Base.decode16!(hex, case: :mixed)
 end

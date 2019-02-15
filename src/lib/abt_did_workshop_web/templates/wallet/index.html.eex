@@ -1,0 +1,20 @@
+<section class="row">
+  <%= form_for @conn, Routes.wallet_path(@conn, :request_auth), [method: "get"], fn f -> %>
+      Try DID auth
+      <div class="form-group">
+        <p>
+          <label>
+            <%= text_input(f, :path) %>
+            <%= error_tag(f, :path) %>
+            <span>deep link</span>
+          </label>
+          <label>
+            <%= text_input(f, :sk) %>
+            <%= error_tag(f, :sk) %>
+            <span>secret key</span>
+          </label>
+        </p>
+      </div>
+      <%= submit "try", class: "btn btn-primary" %>
+  <% end %>
+</section>

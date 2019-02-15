@@ -19,6 +19,9 @@ defmodule AbtDidWorkshopWeb.Router do
     post("/did", DidController, :create)
     get("/did/show", DidController, :show)
     get("/did/new", DidController, :new)
+    get("/wallet", WalletController, :index)
+    get("/wallet/auth", WalletController, :request_auth)
+    post("/wallet/auth", WalletController, :response_auth)
   end
 
   scope "/api", AbtDidWorkshopWeb do
