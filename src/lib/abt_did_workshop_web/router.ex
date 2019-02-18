@@ -5,7 +5,7 @@ defmodule AbtDidWorkshopWeb.Router do
     plug(:accepts, ["html"])
     plug(:fetch_session)
     plug(:fetch_flash)
-    # plug(:protect_from_forgery)
+    plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
   end
 
@@ -15,17 +15,19 @@ defmodule AbtDidWorkshopWeb.Router do
 
   scope "/", AbtDidWorkshopWeb do
     pipe_through(:browser)
-
-    # get("/", PageController, :index)
-    # get("/pages", PageController, :new)
-    # post("/post", PageController, :create)
-    # post("/did", DidController, :new)
-    # get("/did/new", DidController, :create)
-    # get "/did/new" DidController, :new
-    # resources("/", DidController)
     get("/", DidController, :index)
     post("/did", DidController, :create)
-    post("/logon", LogonController, :logon)
+    get("/did/show", DidController, :show)
+    get("/did/new", DidController, :new)
+    get("/wallet", WalletController, :index)
+    get("/wallet/auth", WalletController, :request_auth)
+    post("/wallet/auth", WalletController, :response_auth)
+  end
+
+  scope "/api", AbtDidWorkshopWeb do
+    pipe_through(:api)
+    get("/logon", LogonController, :request)
+    post("/logon", LogonController, :auth)
   end
 
   # Other scopes may use custom stacks.

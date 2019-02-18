@@ -5,74 +5,167 @@ defmodule AbtDidWorkshopWeb.LogonController do
   alias AbtDidWorkshop.UserDb
   alias AbtDidWorkshop.Util
 
-  def logon(conn, %{"user_pk" => pk, "challenge" => challenge}) do
-    pk_bin = hex_to_bin(pk)
+  def request(conn, %{"userDid" => did}) do
+    case UserDb.get(did) do
+      nil -> json(conn, request_reg())
+      _ -> json(conn, gen_and_sign())
+    end
+  end
 
-    if false === AbtDid.Jwt.verify(challenge, pk_bin) do
-      json(conn, %{result: "invalid pk challenge"})
+  def request(conn, _),
+    do: send_resp(conn, 400, "The request must contain valid DID.")
+
+  def auth(conn, %{"userPk" => pk, "userInfo" => user_info}) do
+    pk_bin = Util.str_to_bin(pk)
+
+    if false === AbtDid.Signer.verify(user_info, pk_bin) do
+      send_resp(conn, 422, "The signature of the user info does not match the public key.")
     else
-      body =
-        challenge
-        |> String.split(".")
-        |> Enum.at(1)
-        |> Base.url_decode64!(padding: false)
-        |> Jason.decode!()
+      user_info
+      |> Util.get_body()
+      |> do_auth(pk, conn)
+    end
+  end
 
-      # did = body["iss"]
-      # iat = body["iat"]
-      # nbf = body["nbf"]
-      case UserDb.get(body["iss"]) do
-        nil -> json(conn, request_reg())
-        _ -> json(conn, gen_and_sign())
-      end
+  def auth(conn, _),
+    do: send_resp(conn, 400, "The request must contain valid public key and user info.")
+
+  defp do_auth(user_info, pk, conn) do
+    case UserDb.get(user_info["iss"]) do
+      nil ->
+        case match_claims?(user_info) do
+          true ->
+            add_user(pk, user_info)
+            json(conn, gen_and_sign())
+
+          false ->
+            send_resp(conn, 422, "Authentication failed.")
+        end
+
+      _ ->
+        json(conn, gen_and_sign())
+    end
+  end
+
+  defp add_user(pk, body) do
+    user = %{
+      did: body["iss"],
+      pk: pk
+    }
+
+    profile =
+      body
+      |> get_profile()
+      |> Map.delete("type")
+      |> Map.delete("meta")
+
+    UserDb.add(Map.merge(user, profile))
+  end
+
+  defp match_claims?(body) do
+    expected = AppState.get().profile
+    actual = get_profile(body)
+    check_profile(expected, actual)
+  end
+
+  defp get_profile(body) do
+    body
+    |> Map.get("requestedClaims", [])
+    |> Enum.filter(fn claim -> claim["type"] == "profile" end)
+    |> List.first() || %{}
+  end
+
+  defp check_profile([], _), do: true
+
+  defp check_profile(expected, actual) do
+    Enum.reduce(expected, true, fn claim, acc -> acc and check_profile_item(claim, actual) end)
+  end
+
+  defp check_profile_item(_, nil), do: false
+
+  defp check_profile_item("fullName", actual) do
+    case actual["fullName"] do
+      nil -> false
+      "" -> false
+      _ -> true
+    end
+  end
+
+  defp check_profile_item("birthday", actual) do
+    case actual["birthday"] do
+      nil -> false
+      "" -> false
+      _ -> true
+    end
+  end
+
+  defp check_profile_item("ssn", actual) do
+    case actual["ssn"] do
+      nil -> false
+      "" -> false
+      _ -> true
     end
   end
 
   defp request_reg() do
-    state = AppState.get()
-    claims = gen_claims(state.claims)
+    claims = gen_claims()
     callback = Util.get_callback()
-    gen_and_sign(%{callback: callback, requested: claims})
+
+    appInfo = %{
+      "name" => "ABT DID Workshop",
+      "description" =>
+        "A simple workshop for developers to quickly develop, design and debug the DID flow.",
+      "logo" => "https://example-application/logo"
+    }
+
+    gen_and_sign(%{
+      url: callback,
+      action: "responseAuth",
+      requestedClaims: claims,
+      appInfo: appInfo
+    })
   end
 
   defp gen_and_sign(extra \\ %{}) do
     state = AppState.get()
     did_type = AbtDid.get_did_type(state.did)
-    challenge = AbtDid.Jwt.gen_and_sign(did_type, state.sk, extra)
+    auth_info = AbtDid.Signer.gen_and_sign(did_type, state.sk, extra)
 
     %{
-      app_pk: state.pk |> Base.encode16(case: :lower),
-      challenge: challenge
+      appPk: state.pk |> Multibase.encode!(:base58_btc),
+      authInfo: auth_info
     }
   end
 
-  defp gen_claims(claims) do
-    claims
-    |> Enum.map(fn "claim_" <> claim -> get_claim(claim) end)
+  defp gen_claims() do
+    profile = AppState.get().profile
+    agreements = AppState.get().agreements
+
+    profile_claim =
+      case profile do
+        [] ->
+          nil
+
+        profile ->
+          %{
+            type: "profile",
+            meta: %{
+              description: "Please provide your profile information."
+            },
+            items: profile
+          }
+      end
+
+    agreement_claims =
+      case agreements do
+        [] -> []
+        _ -> Enum.map(agreements, &get_agreement/1)
+      end
+
+    [profile_claim] ++ agreement_claims
   end
 
-  defp get_claim("full_name"),
-    do: %{
-      id: "FullName",
-      tile: "Full Name (with suffix)",
-      type: "string"
-    }
-
-  defp get_claim("ssn"),
-    do: %{
-      id: "SSN",
-      title: "Social Security No.",
-      type: "string",
-      format: "###-##-####"
-    }
-
-  defp get_claim("birthday"),
-    do: %{
-      id: "birthday",
-      title: "Birthday (must be over 21)",
-      type: "date"
-    }
-
-  defp hex_to_bin("0x" <> hex), do: hex_to_bin(hex)
-  defp hex_to_bin(hex), do: Base.decode16!(hex, case: :mixed)
+  def get_agreement(_) do
+    %{}
+  end
 end

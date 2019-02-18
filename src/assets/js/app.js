@@ -15,3 +15,14 @@ import "phoenix_html"
 //
 // Local files can be imported directly using relative paths, for example:
 // import socket from "./socket"
+
+var QRCode = require('qrcode')
+var canvas = document.getElementById('canvas')
+var qrValue = document.getElementById('qrValue')
+
+if (canvas != null) {
+  QRCode.toCanvas(canvas, qrValue.value, function (error) {
+    if (error) console.error(error)
+    console.log('success!');
+  });
+}

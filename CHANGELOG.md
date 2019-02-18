@@ -1,3 +1,6 @@
+## 0.1.3 (February 14, 2019)
+  - Implement a dummy wallet.
+
 ## 0.1.2 (February 07, 2019)
   - Add logon
   - Implement QR code generationl

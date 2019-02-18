@@ -1,0 +1,45 @@
+<input id="qrValue" type="hidden" value="<%= @qr_code %>"></input>
+<br>
+<div align="center">
+<canvas id="canvas"></canvas>
+</div>
+
+<p>
+  The QR Code contains following URL.
+  <br>
+  <pre><%= @qr_code %></pre>
+</p>
+
+<p>
+    The Secret Key of the DID is:
+   <pre><%= Multibase.encode!(@sk, :base58_btc) %></pre>
+</p>
+
+<%= users = AbtDidWorkshop.UserDb.get_all(); if [] != users do %>
+  Known users:
+  <table border="1" width="50%">
+    <thead>
+    <tr>
+      <th>DID</th>
+      <th>Public Key</th>
+      <th>Profile</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%= for user <- users do %>
+    <tr>
+      <td><%= AbtDidWorkshop.Util.shorten(user.did, 15, 4) %></td>
+      <td><%= AbtDidWorkshop.Util.shorten(user.pk, 8, 8) %></td>
+      <td>
+        <%= user["fullName"] %>
+        <br>
+        <%= user["ssn"] %>
+        <br>
+        <%= user["birthday"] %>
+      </td>
+    </tr>
+    <% end %>
+    </tbody>
+  </table>
+<% end %>
+</div>

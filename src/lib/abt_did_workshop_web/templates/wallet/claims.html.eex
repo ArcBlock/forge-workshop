@@ -1,0 +1,27 @@
+<section class="row">
+  <%= form_for @conn, Routes.wallet_path(@conn, :response_auth), fn f -> %>
+    <div class="form-group">
+      <%= text_input(f, :sk, value: @sk, type: "hidden") %>
+      <%= text_input(f, :pk, value: @pk, type: "hidden") %>
+      <%= text_input(f, :did, value: @did, type: "hidden") %>
+      <%= text_input(f, :url, value: @url, type: "hidden") %>
+    </div>
+    <%= if @profile != nil do %>
+      <div class="form-group">
+        <%= @profile["meta"]["description"] %>
+        <p>
+          <%= for item <- @profile["items"] do %>
+            <label>
+              <%= text_input(f, "profile_" <> item) %>
+              <span><%= item %></span>
+            </label>
+          <% end %>
+        </p>
+      </div>
+      <%= submit "submit", class: "btn btn-primary" %>
+    <% end %>
+  <% end %>
+</section>
+
+
+<%= @agreements %>

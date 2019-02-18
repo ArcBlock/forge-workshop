@@ -8,12 +8,20 @@ defmodule AbtDidWorkshop.AppState do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
+  def add_path(path) do
+    GenServer.call(__MODULE__, {:add_path, path})
+  end
+
   def add_key(sk, pk, did) do
     GenServer.call(__MODULE__, {:add_key, sk, pk, did})
   end
 
-  def add_claims(claims) do
-    GenServer.call(__MODULE__, {:add_claims, claims})
+  def add_profile(claims) do
+    GenServer.call(__MODULE__, {:add_profile, claims})
+  end
+
+  def add_agreements(claims) do
+    GenServer.call(__MODULE__, {:add_agreements, claims})
   end
 
   def get() do
@@ -22,6 +30,10 @@ defmodule AbtDidWorkshop.AppState do
 
   def init(:ok) do
     {:ok, %{}}
+  end
+
+  def handle_call({:add_path, path}, _from, state) do
+    {:reply, :ok, Map.put(state, :path, path)}
   end
 
   def handle_call({:add_key, sk, pk, did}, _from, state) do
@@ -34,8 +46,12 @@ defmodule AbtDidWorkshop.AppState do
     {:reply, :ok, state}
   end
 
-  def handle_call({:add_claims, claims}, _from, state) do
-    {:reply, :ok, Map.put(state, :claims, claims)}
+  def handle_call({:add_profile, claims}, _from, state) do
+    {:reply, :ok, Map.put(state, :profile, claims)}
+  end
+
+  def handle_call({:add_agreements, claims}, _from, state) do
+    {:reply, :ok, Map.put(state, :agreements, claims)}
   end
 
   def handle_call(:get, _from, state) do

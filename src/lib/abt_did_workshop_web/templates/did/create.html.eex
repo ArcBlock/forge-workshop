@@ -1,0 +1,59 @@
+<%= if @conn.assigns[:header] do %>
+  <section class="phx-hero">
+    <h1><%= gettext "Welcome to %{name}!", name: "ABT DID Workshop" %></h1>
+    <p>A simple workshop for developers to quickly develop, design and debug the DID flow.</p>
+  </section>
+<% end %>
+<br>
+<section class="row">
+  <row>
+    <%= form_for @conn, Routes.did_path(@conn, :create), fn f -> %>
+        Step 1: Input your deep link path
+      <div class="form-group">
+        <p>
+          <label>
+            <%= text_input(f, :path, value: "https://arcwallet.io/i/") %>
+          </label>
+        </p>
+      </div>
+        Step 1: Choose your claims
+      <div class="form-group">
+        <p>
+          <label>
+            <%= checkbox f, :claim_profile_fullName  %>
+            <span>Full Name</span>
+          </label>
+        </p>
+        <p>
+          <label>
+            <%= checkbox f, :claim_profile_ssn  %>
+            <span>Social Security No.</span>
+          </label>
+        </p>
+        <p>
+          <label>
+            <%= checkbox f, :claim_profile_birthday  %>
+            <span>Date of Birth</span>
+          </label>
+        </p>
+      </div>
+        Step 2: Choose how to create a DID.
+      <div class="form-group">
+        <label>DID type</label>
+        <%= select f, :role_type, ["account", "node", "device", "application", "smart_contract", "bot", "asset", "stake", "validator", "group"] %>
+        <br>
+        <label>DSA algorithm</label>
+        <%= select f, :key_type, ["ed25519", "secp256k1"] %>
+        <br>
+        <label>Hash function</label>
+        <%= select f, :hash_type, ["keccak", "sha3", "keccak_384", "sha3_384", "keccak_512", "sha3_512"] %>
+      </div>
+      <%= submit "Generate", class: "btn btn-primary" %>
+    <% end %>
+  </row>
+  <script>
+    $(document).ready(function () {
+      $('select').formSelect();
+    });
+  </script>
+</section>
