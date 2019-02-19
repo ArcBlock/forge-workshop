@@ -1,0 +1,35 @@
+<%= if @conn.assigns[:alert] != nil do %>
+  <script>
+    alert("<%= @conn.assigns[:alert] %>")
+  </script>
+<% end %>
+<br>
+<%= form_for @conn, Routes.did_path(@conn, :update_claims), fn f -> %>
+  <section class="column">
+    Input your deep link path
+    <div class="form-group">
+      <p>
+        <label>
+          <%= text_input(f, :path, value: "https://arcwallet.io/i/") %>
+        </label>
+      </p>
+    </div>
+  </section>
+  
+  <section class="column">
+    <p>
+      Choose your claims
+    </p>
+    <div class="form-group">
+    <%= for {claim_id, claim_descrip} <- Application.get_env(:abt_did_workshop, :profile) do %>
+      <p>
+        <label>
+          <%= checkbox f, "claim_profile_" <> claim_id  %>
+          <span><%= claim_descrip %></span>
+        </label>
+      </p>
+    <% end %>
+    </div>
+  </section>
+  <%= submit "SUBMIT", class: "btn btn-primary" %>
+<% end %>

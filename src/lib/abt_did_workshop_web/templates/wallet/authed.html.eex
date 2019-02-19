@@ -1,12 +1,8 @@
-<%= if @jwt != nil do %>
+<%= if @error == nil do %>
+  <br>
   Authentication succeed! 
   <br>
-  Received following JWT from application.
-  <br> 
-  Please put it in the "Authentication" field of header of future requests.
-  <pre>
-    <%= @jwt %>
-  </pre>
+  You can see authenticated user(s) <a href="/did#known_users">here</a>.
 <% else %>
   Authentication failed!
   <br>

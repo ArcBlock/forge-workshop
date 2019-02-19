@@ -1,20 +1,41 @@
 <section class="row">
-  <%= form_for @conn, Routes.wallet_path(@conn, :request_auth), [method: "get"], fn f -> %>
-      Try DID auth
-      <div class="form-group">
-        <p>
-          <label>
-            <%= text_input(f, :path) %>
-            <%= error_tag(f, :path) %>
-            <span>deep link</span>
-          </label>
-          <label>
-            <%= text_input(f, :sk) %>
-            <%= error_tag(f, :sk) %>
-            <span>secret key</span>
-          </label>
-        </p>
-      </div>
-      <%= submit "try", class: "btn btn-primary" %>
-  <% end %>
+  Here you can try to start the DID authentication process in this dummy wallet.
 </section>
+<%= form_for @conn, Routes.wallet_path(@conn, :request_auth), [method: "get"], fn f -> %>
+  <section class="row">
+    <div class="form-group">
+      <p>
+        <label>
+          <%= text_input(f, :path, value: AbtDidWorkshop.Util.gen_deeplink()) %>
+          <span>Deep link scanned from QR code</span>
+        </label>
+      </p>
+    </div>
+  </section>
+  <section class="column">
+    Try with our sample secret keys:
+    <div class = "form-group">
+      <p>
+        <label>
+        <%= select f, :sample_key, ["Choose your key"]++ @keys %>
+        </label>
+      </p>
+    </div>
+  </section>
+  <section class="column">
+  &nbsp;&nbsp; or <br><br>
+  </section>
+
+  <section class="column">
+    Input your own secret key:
+    <div class = "form-group">
+      <p>
+        <label>
+          <%= text_input(f, :input_key) %>
+          <span>Base16 or Base58 encoded secret key (ed25519 or secp256k1 only)</span>
+        </label>
+      </p>
+    </div>
+  </section>
+  <%= submit "try", class: "btn btn-primary" %>
+<% end %>

@@ -3,7 +3,7 @@ defmodule AbtDidWorkshopWeb.DidController do
 
   alias AbtDid.Type, as: DidType
   alias AbtDidWorkshop.AppState
-  alias AbtDidWorkshop.Util
+  alias AbtDidWorkshop.UserDb
 
   @ed25519 %Mcrypto.Signer.Ed25519{}
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
@@ -13,34 +13,44 @@ defmodule AbtDidWorkshopWeb.DidController do
 
     case Map.get(state, :did) do
       nil ->
-        render(conn, "create.html", header: true)
+        render(conn, "step1.html")
 
       _ ->
         render(conn, "index.html", did: state.did)
     end
   end
 
-  def show(conn, _) do
-    state = AppState.get()
-    url = Util.get_callback()
-    qr_code = gen_qr_code(state.path, state.pk, state.did, url)
+  def show(conn, _params) do
+    app_state = AppState.get()
 
-    render(conn, "show.html",
-      sk: state.sk,
-      pk: state.pk,
-      did: state.did,
-      url: url,
-      qr_code: qr_code
-    )
+    cond do
+      Map.get(app_state, :sk) == nil ->
+        render(conn, "step1.html", alert: "You must create an application DID first.")
+
+      Map.get(app_state, :path) == nil ->
+        render(conn, "step2.html", alert: "Deep link path is required.")
+
+      true ->
+        render(conn, "show.html", sk: app_state.sk)
+    end
   end
 
-  def new(conn, _) do
-    render(conn, "create.html")
+  def continue(conn, _) do
+    app_state = AppState.get()
+
+    case Map.get(app_state, :sk) do
+      nil -> redirect(conn, to: "/")
+      _ -> render(conn, "step2.html")
+    end
   end
 
-  def create(conn, params) do
-    store_claims(params)
+  def regenerate(conn, _) do
+    AppState.clear()
+    UserDb.clear()
+    redirect(conn, to: "/")
+  end
 
+  def create_did(conn, params) do
     {pk, sk} =
       case params["key_type"] do
         "ed25519" -> Mcrypto.keypair(@ed25519)
@@ -55,24 +65,21 @@ defmodule AbtDidWorkshopWeb.DidController do
 
     did = AbtDid.pk_to_did(did_type, pk)
     AppState.add_key(sk, pk, did)
-    AppState.add_path(params["path"])
-    url = Util.get_callback()
-    qr_code = gen_qr_code(params["path"], pk, did, url)
 
-    render(conn, "show.html",
-      sk: sk,
-      pk: pk,
-      did: did,
-      url: url,
-      qr_code: qr_code
-    )
+    render(conn, "step2.html")
   end
 
-  defp gen_qr_code(path, pk, did, url) do
-    path = String.trim_trailing(path, "/")
-    app_pk = Multibase.encode!(pk, :base58_btc)
-    url = URI.encode_www_form(url)
-    "#{path}?appPk=#{app_pk}&appDid=#{did}&action=requestAuth&url=#{url}"
+  def update_claims(conn, %{"path" => path} = params) when path != "" do
+    store_claims(params)
+    AppState.add_path(path)
+
+    redirect(conn, to: "/did")
+  end
+
+  def update_claims(conn, _) do
+    conn
+    |> put_flash(:error, "Invalid deep link or secret key")
+    |> render("step2.html")
   end
 
   defp store_claims(params) do

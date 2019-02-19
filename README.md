@@ -67,5 +67,5 @@ curl http://192.168.1.8:4000/api/logon?user_did=did:abt:z1XmG17q3DTjcpHPCx2Vyepa
 
 8. Send claims back
 ```bash
-curl -H "Content-Type: application/json" -X POST -d '{"user_pk":"f5bcf626df396d566f193a5684a2d6e7df724bae4e544930d300b205021c3369","challenge":"eyJhbGciOiJFZDI1NTE5IiwidHlwIjoiSldUIn0.eyJyZXF1ZXN0ZWRDbGFpbXMiOlt7ImJpcnRoZGF5IjoiMTk5My0wOS0yNyIsImZ1bGxOYW1lIjoiQWxpY2UgWHUiLCJzc24iOiIxMjM0NTYiLCJ0eXBlIjoicHJvZmlsZSJ9XSwiZXhwIjoiMTU1MDAzNDk1OSIsImlhdCI6IjE1NTAwMzMxNTkiLCJpc3MiOiJkaWQ6YWJ0OnoxVWJMWGVXaE5YSkozRTE1YWJuVEQxcW40SmdMTEVTMnh0IiwibmJmIjoiMTU1MDAzMzE1OSJ9.9nQfpvCcM3ZbfTSggwjPXZ6NJJpZXN5iYjKMTEpkrtiMC_sqUuC0NYP4jXL9mgoGuXFCgO2ktmbi510I_7_VAg"}' http://192.168.1.8:4000/api/logon/
+curl -H "Content-Type: application/json" -X POST -d '{"user_pk":"f5bcf626df396d566f193a5684a2d6e7df724bae4e544930d300b205021c3369","challenge":"eyJhbGciOiJFZDI1NTE5IiwidHlwIjoiSldUIn0.eyJyZXF1ZXN0ZWRDbGFpbXMiOlt7ImJpcnRoZGF5IjoiMTk5My0wOS0yNyIsImZ1bGxOYW1lIjoiQWxpY2UgWHUiLCJzc24iOiIxMjM0NTYiLCJ0eXBlIjoicHJvZmlsZSJ9XSwiZXhwIjoiMTU1MDAzNDk1OSIsImlhdCI6IjE1NTAwMzMxNTkiLCJpc3MiOiJkaWQ6YWJ0OnoxVWJMWGVXaE5YSkozRTE1YWJuVEQxcW40SmdMTEVTMnh0IiwibmJmIjoiMTU1MDAzMzE1OSJ9.9nQfpvCcM3ZbfTSggwjPXZ6NJJpZXN5iYjKMTEpkrtiMC_sqUuC0NYP4jXL9mgoGuXFCgO2ktmbi510I_7_VAg"}' http://192.168.1.8:4000/api/auth/
 ```

@@ -1,3 +1,6 @@
+## 0.1.4 (February 18, 2019)
+  - Fix workflow.
+
 ## 0.1.3 (February 14, 2019)
   - Implement a dummy wallet.
 

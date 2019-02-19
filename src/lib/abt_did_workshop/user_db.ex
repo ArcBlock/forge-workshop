@@ -16,6 +16,10 @@ defmodule AbtDidWorkshop.UserDb do
     GenServer.call(__MODULE__, {:remove, did})
   end
 
+  def clear() do
+    GenServer.call(__MODULE__, :clear)
+  end
+
   def get(did) do
     GenServer.call(__MODULE__, {:get, did})
   end
@@ -29,13 +33,17 @@ defmodule AbtDidWorkshop.UserDb do
   end
 
   def handle_call({:add, user}, _from, state) do
-    state = Map.put_new(state, user.did, user)
+    state = Map.put(state, user.did, user)
     {:reply, :ok, state}
   end
 
   def handle_call({:remove, did}, _from, state) do
     state = Map.delete(state, did)
     {:reply, :ok, state}
+  end
+
+  def handle_call(:clear, _from, _state) do
+    {:reply, :ok, %{}}
   end
 
   def handle_call({:get, did}, _from, state) do

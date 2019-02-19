@@ -1,23 +1,35 @@
-<input id="qrValue" type="hidden" value="<%= @qr_code %>"></input>
+<input id="qrValue" type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink() %>"></input>
 <br>
 <div align="center">
 <canvas id="canvas"></canvas>
 </div>
 
-<p>
-  The QR Code contains following URL.
-  <br>
-  <pre><%= @qr_code %></pre>
-</p>
+<section class="columns">
+  The QR Code contains following deep link. 
+  <pre> <%= AbtDidWorkshop.Util.gen_deeplink() %> </pre>
+</section>
+<section class="row">
+  <section class="column" align="center">
+    <%= form_for @conn, Routes.wallet_path(@conn, :index), [method: "get"], fn _ -> %>
+      <%= submit "Try authentication in wallet", class: "btn btn-primary" %>
+    <% end %>
+  </section>
+  <section class="column" align="center">
+    <%= form_for @conn, Routes.did_path(@conn, :continue), [method: "get"], fn _ -> %>
+      <%= submit "Reselect claims", class: "btn btn-primary" %>
+    <% end %>
+  </section>
+</section>
 
 <p>
     The Secret Key of the DID is:
    <pre><%= Multibase.encode!(@sk, :base58_btc) %></pre>
 </p>
 
+<a name="known_users"></a>
 <%= users = AbtDidWorkshop.UserDb.get_all(); if [] != users do %>
   Known users:
-  <table border="1" width="50%">
+  <table >
     <thead>
     <tr>
       <th>DID</th>
@@ -31,11 +43,18 @@
       <td><%= AbtDidWorkshop.Util.shorten(user.did, 15, 4) %></td>
       <td><%= AbtDidWorkshop.Util.shorten(user.pk, 8, 8) %></td>
       <td>
-        <%= user["fullName"] %>
-        <br>
-        <%= user["ssn"] %>
-        <br>
-        <%= user["birthday"] %>
+        <table class="striped">
+          <%= for claim_id <- AbtDidWorkshop.AppState.get().profile  do %>
+            <tr>
+              <td>
+                 <%= claim_id %>
+              </td>
+              <td align="right">
+                <%= user[claim_id] %>
+              </td>
+            </tr>
+          <% end %>
+        </table>
       </td>
     </tr>
     <% end %>

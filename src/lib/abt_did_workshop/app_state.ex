@@ -28,6 +28,10 @@ defmodule AbtDidWorkshop.AppState do
     GenServer.call(__MODULE__, :get)
   end
 
+  def clear() do
+    GenServer.call(__MODULE__, :clear)
+  end
+
   def init(:ok) do
     {:ok, %{}}
   end
@@ -52,6 +56,10 @@ defmodule AbtDidWorkshop.AppState do
 
   def handle_call({:add_agreements, claims}, _from, state) do
     {:reply, :ok, Map.put(state, :agreements, claims)}
+  end
+
+  def handle_call(:clear, _from, _state) do
+    {:reply, :ok, %{}}
   end
 
   def handle_call(:get, _from, state) do
