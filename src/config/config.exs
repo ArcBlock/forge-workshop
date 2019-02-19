@@ -29,18 +29,13 @@ config :abt_did_workshop, :profile, [
 ]
 
 config :abt_did_workshop, :app_info,
-  app_name: "ABT DID Workshop",
+  name: "ABT DID Workshop",
   subtitle: "Play with DID authentication protocol.",
   description:
     "A simple workshop for developers to quickly develop, design and debug the DID flow.",
   icon: "https://example-application/logo",
-  app_previews: [
-    "https://example-application/preview/1",
-    "https://example-application/preview/2",
-    "https://example-application/preview/3"
-  ],
   copyright: "https://example-application/copyright",
-  publisher: ""
+  publisher: "did:abt:zNKSHDK5KTZ5bdxfHoKp6F2iibbpLriYJDSi"
 
 # Configures Elixir's Logger
 config :logger, :console,

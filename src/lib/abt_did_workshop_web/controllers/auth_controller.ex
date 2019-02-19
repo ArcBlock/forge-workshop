@@ -109,18 +109,11 @@ defmodule AbtDidWorkshopWeb.AuthController do
     claims = gen_claims()
     callback = Util.get_callback()
 
-    app_info =
-      :abt_did_workshop
-      |> Application.get_env(:app_info, [])
-      |> Enum.into(%{}, fn {key, value} ->
-        {key |> Atom.to_string() |> Recase.to_camel(), value}
-      end)
-
     gen_and_sign(%{
       url: callback,
       action: "responseAuth",
       requestedClaims: claims,
-      appInfo: app_info
+      appInfo: AppState.get().info
     })
   end
 
