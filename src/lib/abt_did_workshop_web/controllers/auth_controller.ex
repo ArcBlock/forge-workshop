@@ -105,20 +105,22 @@ defmodule AbtDidWorkshopWeb.AuthController do
     end
   end
 
-  defp request_reg() do
+  defp request_reg do
     claims = gen_claims()
     callback = Util.get_callback()
+
+    app_info =
+      :abt_did_workshop
+      |> Application.get_env(:app_info, [])
+      |> Enum.into(%{}, fn {key, value} ->
+        {key |> Atom.to_string() |> Recase.to_camel(), value}
+      end)
 
     gen_and_sign(%{
       url: callback,
       action: "responseAuth",
       requestedClaims: claims,
-      appInfo: %{
-        "name" => "ABT DID Workshop",
-        "description" =>
-          "A simple workshop for developers to quickly develop, design and debug the DID flow.",
-        "logo" => "https://example-application/logo"
-      }
+      appInfo: app_info
     })
   end
 
@@ -133,7 +135,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
     }
   end
 
-  defp gen_claims() do
+  defp gen_claims do
     profile = AppState.get().profile
     agreements = AppState.get().agreements
 

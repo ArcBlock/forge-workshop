@@ -53,6 +53,7 @@ defmodule AbtDidWorkshop.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:eqrcode, "~> 0.1.5"},
       {:httpoison, "~> 1.4"},
+      {:recase, "~> 0.4"},
 
       # ArcBlock
       {:abt_did, git: "git@github.com:arcblock/abt-did.git", tag: "v0.1.16"},

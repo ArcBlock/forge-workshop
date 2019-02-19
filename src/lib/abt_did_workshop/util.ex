@@ -41,7 +41,7 @@ defmodule AbtDidWorkshop.Util do
     |> Jason.decode!()
   end
 
-  def gen_deeplink() do
+  def gen_deeplink do
     url = get_callback() |> URI.encode_www_form()
     app_state = AppState.get()
     path = String.trim_trailing(app_state.path, "/")

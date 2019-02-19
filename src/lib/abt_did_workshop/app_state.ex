@@ -24,11 +24,11 @@ defmodule AbtDidWorkshop.AppState do
     GenServer.call(__MODULE__, {:add_agreements, claims})
   end
 
-  def get() do
+  def get do
     GenServer.call(__MODULE__, :get)
   end
 
-  def clear() do
+  def clear do
     GenServer.call(__MODULE__, :clear)
   end
 
