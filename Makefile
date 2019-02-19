@@ -28,6 +28,7 @@ install:
 
 dep:
 	@echo "Install dependencies required for this repo..."
+	@cd src/assets; npm install
 	@cd src; mix deps.get
 
 pre-build: install dep

@@ -5,20 +5,18 @@
 
 <br>
 
+<section class="row" align="center">
+You have already generated a DID: &nbsp &nbsp <b><%= @did %></b>
+</section>
 <section class="row">
-  <section class="row" align="center">
-    You have already generated a DID: <%= @did %>
+  <section class="column" align="center">
+    <%= form_for @conn, Routes.did_path(@conn, :continue), [method: "get"], fn _ -> %>
+      <%= submit "Continue", class: "btn btn-primary" %>
+    <% end %>
   </section>
-  <section class="row">
-    <section class="column" align="center">
-      <%= form_for @conn, Routes.did_path(@conn, :show), [method: "get"], fn _ -> %>
-        <%= submit "Continue", class: "btn btn-primary" %>
-      <% end %>
-    </section>
-    <section class="column" align="center">
-      <%= form_for @conn, Routes.did_path(@conn, :new), [method: "get"], fn _ -> %>
-        <%= submit "Regenerate", class: "btn btn-primary" %>
-      <% end %>
-    </section>
+  <section class="column" align="center">
+    <%= form_for @conn, Routes.did_path(@conn, :regenerate), [method: "get"], fn _ -> %>
+      <%= submit "Start over", class: "btn btn-primary" %>
+    <% end %>
   </section>
 </section>

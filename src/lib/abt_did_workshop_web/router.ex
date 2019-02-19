@@ -16,9 +16,12 @@ defmodule AbtDidWorkshopWeb.Router do
   scope "/", AbtDidWorkshopWeb do
     pipe_through(:browser)
     get("/", DidController, :index)
-    post("/did", DidController, :create)
-    get("/did/show", DidController, :show)
-    get("/did/new", DidController, :new)
+    post("/did", DidController, :create_did)
+    get("/did", DidController, :show)
+    post("/did/claims", DidController, :update_claims)
+    get("/did/claims", DidController, :continue)
+    get("/did/regenerate", DidController, :regenerate)
+
     get("/wallet", WalletController, :index)
     get("/wallet/auth", WalletController, :request_auth)
     post("/wallet/auth", WalletController, :response_auth)
@@ -26,8 +29,8 @@ defmodule AbtDidWorkshopWeb.Router do
 
   scope "/api", AbtDidWorkshopWeb do
     pipe_through(:api)
-    get("/logon", LogonController, :request)
-    post("/logon", LogonController, :auth)
+    get("/auth", AuthController, :request_auth)
+    post("/auth", AuthController, :response_auth)
   end
 
   # Other scopes may use custom stacks.

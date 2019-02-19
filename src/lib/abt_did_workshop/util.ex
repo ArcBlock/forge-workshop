@@ -1,5 +1,8 @@
 defmodule AbtDidWorkshop.Util do
   @moduledoc false
+
+  alias AbtDidWorkshop.AppState
+
   def get_ip do
     {:ok, ip_list} = :inet.getif()
     ips = List.first(ip_list)
@@ -14,7 +17,7 @@ defmodule AbtDidWorkshop.Util do
       |> Keyword.get(:http)
       |> Keyword.get(:port)
 
-    "http://#{get_ip()}:#{port}/api/logon/"
+    "http://#{get_ip()}:#{port}/api/auth/"
   end
 
   def shorten(str, pre_len, post_len) do
@@ -36,6 +39,14 @@ defmodule AbtDidWorkshop.Util do
     |> Enum.at(1)
     |> Base.url_decode64!(padding: false)
     |> Jason.decode!()
+  end
+
+  def gen_deeplink() do
+    url = get_callback() |> URI.encode_www_form()
+    app_state = AppState.get()
+    path = String.trim_trailing(app_state.path, "/")
+    app_pk = Multibase.encode!(app_state.pk, :base58_btc)
+    "#{path}?appPk=#{app_pk}&appDid=#{app_state.did}&action=requestAuth&url=#{url}"
   end
 
   def hex_to_bin("0x" <> hex), do: hex_to_bin(hex)
