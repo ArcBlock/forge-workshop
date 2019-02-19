@@ -71,6 +71,7 @@ defmodule AbtDidWorkshopWeb.DidController do
 
   def update_claims(conn, %{"path" => path} = params) when path != "" do
     store_claims(params)
+    store_app_info(params)
     AppState.add_path(path)
 
     redirect(conn, to: "/did")
@@ -94,13 +95,21 @@ defmodule AbtDidWorkshopWeb.DidController do
       |> Enum.filter(fn claim -> String.starts_with?(claim, "claim_profile_") end)
       |> Enum.map(fn "claim_profile_" <> claim -> claim end)
 
-    AbtDidWorkshop.AppState.add_profile(profile)
+    AppState.add_profile(profile)
 
     agreements =
       claims
       |> Enum.filter(fn claim -> String.starts_with?(claim, "claim_agreement_") end)
       |> Enum.map(fn "claim_agreement_" <> claim -> claim end)
 
-    AbtDidWorkshop.AppState.add_agreements(agreements)
+    AppState.add_agreements(agreements)
+  end
+
+  defp store_app_info(params) do
+    params
+    |> Map.to_list()
+    |> Enum.filter(fn {k, _} -> String.starts_with?(k, "app_info_") end)
+    |> Enum.into(%{}, fn {"app_info_" <> k, v} -> {k, v} end)
+    |> AppState.add_info()
   end
 end

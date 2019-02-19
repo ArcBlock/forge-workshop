@@ -5,8 +5,41 @@
 <% end %>
 <br>
 <%= form_for @conn, Routes.did_path(@conn, :update_claims), fn f -> %>
+  <% info = AbtDidWorkshop.AppState.get().info %>
   <section class="column">
-    Input your deep link path
+    <b>Input your application metadata</b>
+    <div class="form-group">
+      <p>
+        <label>
+          <%= text_input(f, :app_info_name, value: info["name"]) %>
+          <span>Application name</span>
+        </label>
+        <label>
+          <%= text_input(f, :app_info_subtitle, value: info["subtitle"]) %>
+          <span>Subtitle</span>
+        </label>
+        <label>
+          <%= text_input(f, :app_info_description, value: info["description"]) %>
+          <span>Description</span>
+        </label>
+        <label>
+          <%= text_input(f, :app_info_icon, value: info["icon"]) %>
+          <span>Icon</span>
+        </label>
+        <label>
+          <%= text_input(f, :app_info_copyright, value: info["copyright"]) %>
+          <span>Copyright</span>
+        </label>
+        <label>
+          <%= text_input(f, :app_info_publisher, value: info["publisher"]) %>
+          <span>Publisher</span>
+        </label>
+      </p>
+    </div>
+  </section>
+
+  <section class="column">
+    <b>Input your deep link path</b>
     <div class="form-group">
       <p>
         <label>
@@ -17,9 +50,7 @@
   </section>
   
   <section class="column">
-    <p>
-      Choose your claims
-    </p>
+    <b><p>Choose your claims</p></b>
     <div class="form-group">
     <%= for {claim_id, claim_descrip} <- Application.get_env(:abt_did_workshop, :profile) do %>
       <p>

@@ -1,8 +1,8 @@
 defmodule AbtDidWorkshopWeb.WalletController do
   use AbtDidWorkshopWeb, :controller
 
-  alias AbtDidWorkshop.Util
   alias AbtDidWorkshop.AppState
+  alias AbtDidWorkshop.Util
 
   def index(conn, _params) do
     if Map.get(AppState.get(), :sk, nil) == nil do

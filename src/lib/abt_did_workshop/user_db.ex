@@ -16,7 +16,7 @@ defmodule AbtDidWorkshop.UserDb do
     GenServer.call(__MODULE__, {:remove, did})
   end
 
-  def clear() do
+  def clear do
     GenServer.call(__MODULE__, :clear)
   end
 
@@ -24,7 +24,7 @@ defmodule AbtDidWorkshop.UserDb do
     GenServer.call(__MODULE__, {:get, did})
   end
 
-  def get_all() do
+  def get_all do
     GenServer.call(__MODULE__, {:get_all})
   end
 

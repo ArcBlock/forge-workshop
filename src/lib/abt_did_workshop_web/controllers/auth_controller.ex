@@ -105,7 +105,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
     end
   end
 
-  defp request_reg() do
+  defp request_reg do
     claims = gen_claims()
     callback = Util.get_callback()
 
@@ -113,12 +113,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
       url: callback,
       action: "responseAuth",
       requestedClaims: claims,
-      appInfo: %{
-        "name" => "ABT DID Workshop",
-        "description" =>
-          "A simple workshop for developers to quickly develop, design and debug the DID flow.",
-        "logo" => "https://example-application/logo"
-      }
+      appInfo: AppState.get().info
     })
   end
 
@@ -133,7 +128,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
     }
   end
 
-  defp gen_claims() do
+  defp gen_claims do
     profile = AppState.get().profile
     agreements = AppState.get().agreements
 

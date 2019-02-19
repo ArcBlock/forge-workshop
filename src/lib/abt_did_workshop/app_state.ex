@@ -24,16 +24,25 @@ defmodule AbtDidWorkshop.AppState do
     GenServer.call(__MODULE__, {:add_agreements, claims})
   end
 
-  def get() do
+  def add_info(info) do
+    GenServer.call(__MODULE__, {:add_info, info})
+  end
+
+  def get do
     GenServer.call(__MODULE__, :get)
   end
 
-  def clear() do
+  def clear do
     GenServer.call(__MODULE__, :clear)
   end
 
   def init(:ok) do
-    {:ok, %{}}
+    app_info =
+      :abt_did_workshop
+      |> Application.get_env(:app_info, [])
+      |> Enum.into(%{}, fn {k, v} -> {Atom.to_string(k), v} end)
+
+    {:ok, %{info: app_info}}
   end
 
   def handle_call({:add_path, path}, _from, state) do
@@ -56,6 +65,10 @@ defmodule AbtDidWorkshop.AppState do
 
   def handle_call({:add_agreements, claims}, _from, state) do
     {:reply, :ok, Map.put(state, :agreements, claims)}
+  end
+
+  def handle_call({:add_info, info}, _from, state) do
+    {:reply, :ok, Map.put(state, :info, info)}
   end
 
   def handle_call(:clear, _from, _state) do
