@@ -1,3 +1,6 @@
+## 0.1.5 (February 19, 2019)
+  - Add page to input app metadata.
+
 ## 0.1.4 (February 18, 2019)
   - Fix workflow.
 
