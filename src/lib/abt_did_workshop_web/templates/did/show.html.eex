@@ -35,14 +35,14 @@
       <div class="collapsible-header"><%= user.did %></div>
       <div class="collapsible-body">
         <span>
-          <table class="striped">
+          <table class="striped" style="font-size: smaller; table-layout: fixed;">
             <tr>
-              <td> DID </td>
-              <td> <%= user.did %> </td>
+              <td style="width: 30%"> DID </td>
+              <td style="word-wrap: break-word;"> <%= user.did %> </td>
             </tr>
             <tr>
               <td> Publick Key </td>
-              <td> <%= user.pk %> </td>
+              <td style="word-wrap: break-word;"> <%= user.pk %> </td>
             </tr>
             <%= for claim_id <- AbtDidWorkshop.AppState.get().profile do %>
               <tr>
@@ -55,19 +55,35 @@
               </tr>
             <% end %>
             <%= for agr <- user.agreement do %>
-              <tr>
-                <td colspan="2" wordWrap="break-word" >
-                  Agreement Hash: <%= agr["hash"]["digest"] %>
-                  <br>
-                  Agreed?: <%= agr["agreed"] %>
-                  <br>
+            <tr>
+              <td colspan="2">
+                <table style="font-size: smaller; table-layout: fixed;">
+                  <tr>
+                    <td style="width: 30%">Hash</td>
+                    <td style="word-wrap: break-word;"><%= agr["hash"]["digest"] %></td>
+                  </tr>
+                  <tr>
+                    <td>URI</td>
+                    <td style="word-wrap: break-word;">
+                    <% uri = AbtDidWorkshop.Util.get_agreement_uri(agr["uri"]) %>
+                    <a href='<%= uri %>'><%= uri %></a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Agreed?</td>
+                    <td style="word-wrap: break-word;"><%= agr["agreed"] %></td>
+                  </tr>
                   <%= if agr["agreed"] do %>
-                  Signature: <%= agr["sig"] %>
+                  <tr>
+                    <td> Signature </td>
+                    <td style="word-wrap: break-word;"> <%= agr["sig"] %> </td>
+                  </tr>
                   <% end %>
-                </td>
-              </tr>
+                </table>
+              </td>
+            </tr>
             <% end %>
-        </table>
+          </table>
         </span>
       </div>
     </li>

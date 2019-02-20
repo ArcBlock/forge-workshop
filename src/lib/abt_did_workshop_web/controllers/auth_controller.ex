@@ -165,17 +165,11 @@ defmodule AbtDidWorkshopWeb.AuthController do
   end
 
   defp gen_agreement(id) do
-    port =
-      :abt_did_workshop
-      |> Application.get_env(AbtDidWorkshopWeb.Endpoint)
-      |> Keyword.get(:http)
-      |> Keyword.get(:port)
-
     :abt_did_workshop
     |> Application.get_env(:agreement, [])
     |> Enum.filter(fn agr -> agr.meta.id == id end)
     |> List.first()
-    |> Map.update!(:uri, fn uri -> "http://localhost:#{port}" <> uri end)
+    |> Map.update!(:uri, &Util.get_agreement_uri/1)
     |> Map.delete(:content)
   end
 

@@ -10,14 +10,19 @@ defmodule AbtDidWorkshop.Util do
     "#{i1}.#{i2}.#{i3}.#{i4}"
   end
 
-  def get_callback do
-    port =
-      :abt_did_workshop
-      |> Application.get_env(AbtDidWorkshopWeb.Endpoint)
-      |> Keyword.get(:http)
-      |> Keyword.get(:port)
+  def get_port do
+    :abt_did_workshop
+    |> Application.get_env(AbtDidWorkshopWeb.Endpoint)
+    |> Keyword.get(:http)
+    |> Keyword.get(:port)
+  end
 
-    "http://#{get_ip()}:#{port}/api/auth/"
+  def get_callback do
+    "http://#{get_ip()}:#{get_port()}/api/auth/"
+  end
+
+  def get_agreement_uri(uri) do
+    "http://localhost:#{get_port()}" <> uri
   end
 
   def shorten(str, pre_len, post_len) do
