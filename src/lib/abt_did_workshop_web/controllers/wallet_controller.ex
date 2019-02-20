@@ -103,7 +103,7 @@ defmodule AbtDidWorkshopWeb.WalletController do
     if AbtDid.Signer.verify(auth_info, app_pk) do
       body = Util.get_body(auth_info)
 
-      case Map.get(body, "requestedClaims", []) do
+      case Map.get(body, "requestedClaims") || [] do
         [] ->
           do_response_auth(conn, sk, pk, did, url)
 

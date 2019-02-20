@@ -136,22 +136,24 @@ defmodule AbtDidWorkshopWeb.AuthController do
   defp gen_claims do
     profile_claim = gen_profile()
     agreement_claims = gen_agreement()
-    [profile_claim] ++ agreement_claims
+    profile_claim ++ agreement_claims
   end
 
   defp gen_profile do
     case AppState.get().profile do
       [] ->
-        nil
+        []
 
       profile ->
-        %{
-          type: "profile",
-          meta: %{
-            description: "Please provide your profile information."
-          },
-          items: profile
-        }
+        [
+          %{
+            type: "profile",
+            meta: %{
+              description: "Please provide your profile information."
+            },
+            items: profile
+          }
+        ]
     end
   end
 
