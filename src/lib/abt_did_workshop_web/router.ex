@@ -31,6 +31,7 @@ defmodule AbtDidWorkshopWeb.Router do
     pipe_through(:api)
     get("/auth", AuthController, :request_auth)
     post("/auth", AuthController, :response_auth)
+    get("/agreement/:id", AgreementController, :get)
   end
 
   # Other scopes may use custom stacks.

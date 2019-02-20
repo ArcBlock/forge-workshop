@@ -1,7 +1,7 @@
 <input id="qrValue" type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink() %>"></input>
 <br>
 <div align="center">
-<canvas id="canvas"></canvas>
+  <canvas id="canvas"></canvas>
 </div>
 
 <section class="columns">
@@ -29,36 +29,49 @@
 <a name="known_users"></a>
 <%= users = AbtDidWorkshop.UserDb.get_all(); if [] != users do %>
   Known users:
-  <table >
-    <thead>
-    <tr>
-      <th>DID</th>
-      <th>Public Key</th>
-      <th>Profile</th>
-    </tr>
-    </thead>
-    <tbody>
+  <ul class="collapsible popout">
     <%= for user <- users do %>
-    <tr>
-      <td><%= AbtDidWorkshop.Util.shorten(user.did, 15, 4) %></td>
-      <td><%= AbtDidWorkshop.Util.shorten(user.pk, 8, 8) %></td>
-      <td>
-        <table class="striped">
-          <%= for claim_id <- AbtDidWorkshop.AppState.get().profile  do %>
+    <li>
+      <div class="collapsible-header"><%= user.did %></div>
+      <div class="collapsible-body">
+        <span>
+          <table class="striped">
             <tr>
-              <td>
-                 <%= claim_id %>
-              </td>
-              <td align="right">
-                <%= user[claim_id] %>
-              </td>
+              <td> DID </td>
+              <td> <%= user.did %> </td>
             </tr>
-          <% end %>
+            <tr>
+              <td> Publick Key </td>
+              <td> <%= user.pk %> </td>
+            </tr>
+            <%= for claim_id <- AbtDidWorkshop.AppState.get().profile do %>
+              <tr>
+                <td>
+                  <%= claim_id %>
+                </td>
+                <td text-align="right">
+                  <%= user.profile[claim_id] %>
+                </td>
+              </tr>
+            <% end %>
+            <%= for agr <- user.agreement do %>
+              <tr>
+                <td colspan="2" wordWrap="break-word" >
+                  Agreement Hash: <%= agr["hash"]["digest"] %>
+                  <br>
+                  Agreed?: <%= agr["agreed"] %>
+                  <br>
+                  <%= if agr["agreed"] do %>
+                  Signature: <%= agr["sig"] %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
         </table>
-      </td>
-    </tr>
+        </span>
+      </div>
+    </li>
     <% end %>
-    </tbody>
-  </table>
+  </ul>
 <% end %>
-</div>
+

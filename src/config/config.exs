@@ -28,6 +28,37 @@ config :abt_did_workshop, :profile, [
   {"birthday", "Birthday"}
 ]
 
+config :abt_did_workshop, :agreement, [
+  %{
+    meta: %{
+      description: "Data policy",
+      id: "1"
+    },
+    uri: "/api/agreement/1",
+    hash: %{
+      method: "sha256",
+      digest: "z73jC7FoJMSpmLwsrWF7oT5xBGYaMRNrWs7ajBEB2vuJh"
+    },
+    type: "agreement",
+    content:
+      "Information and content you provide. We collect the content, communications and other information you provide when you use our Products, including when you sign up for an account, create or share content, and message or communicate with others. This can include information in or about the content you provide (like metadata), such as the location of a photo or the date a file was created. It can also include what you see through features we provide, such as our camera, so we can do things like suggest masks and filters that you might like, or give you tips on using camera formats. Our systems automatically process content and communications you and others provide to analyze context and what's in them for the purposes described below. Learn more about how you can control who can see the things you share."
+  },
+  %{
+    meta: %{
+      description: "Terms of Service",
+      id: "2"
+    },
+    uri: "/api/agreement/2",
+    hash: %{
+      method: "sha3",
+      digest: "z62acdB8rK5kpUarnPiDfBnEHxcjpuwhNt1BdAUYDaeN5"
+    },
+    type: "agreement",
+    content:
+      "Don’t misuse our Services. For example, don’t interfere with our Services or try to access them using a method other than the interface and the instructions that we provide. You may use our Services only as permitted by law, including applicable export and re-export control laws and regulations. We may suspend or stop providing our Services to you if you do not comply with our terms or policies or if we are investigating suspected misconduct."
+  }
+]
+
 config :abt_did_workshop, :app_info,
   name: "ABT DID Workshop",
   subtitle: "Play with DID authentication protocol.",

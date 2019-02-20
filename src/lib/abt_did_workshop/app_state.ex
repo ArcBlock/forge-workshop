@@ -71,8 +71,8 @@ defmodule AbtDidWorkshop.AppState do
     {:reply, :ok, Map.put(state, :info, info)}
   end
 
-  def handle_call(:clear, _from, _state) do
-    {:reply, :ok, %{}}
+  def handle_call(:clear, _from, state) do
+    {:reply, :ok, %{info: state.info}}
   end
 
   def handle_call(:get, _from, state) do

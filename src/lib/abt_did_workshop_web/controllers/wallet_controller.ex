@@ -4,6 +4,9 @@ defmodule AbtDidWorkshopWeb.WalletController do
   alias AbtDidWorkshop.AppState
   alias AbtDidWorkshop.Util
 
+  @ed25519 %Mcrypto.Signer.Ed25519{}
+  @secp256k1 %Mcrypto.Signer.Secp256k1{}
+
   def index(conn, _params) do
     if Map.get(AppState.get(), :sk, nil) == nil do
       conn
@@ -41,10 +44,11 @@ defmodule AbtDidWorkshopWeb.WalletController do
       |> Enum.filter(fn {key, _} -> String.starts_with?(key, "profile_") end)
       |> Enum.into(%{type: "profile"}, fn {"profile_" <> key, value} -> {key, value} end)
 
+    agreements = process_agreements(params)
     url = URI.decode_www_form(params["url"])
 
     do_response_auth(conn, params["sk"], params["pk"], params["did"], url, %{
-      requestedClaims: [profile]
+      requestedClaims: [profile] ++ agreements
     })
   end
 
@@ -105,9 +109,11 @@ defmodule AbtDidWorkshopWeb.WalletController do
 
         claims ->
           profile =
-            Enum.filter(claims, fn claim -> claim["type"] == "profile" end) |> List.first()
+            claims
+            |> Enum.filter(fn c -> c["type"] == "profile" end)
+            |> List.first()
 
-          agreements = Enum.filter(claims, fn claim -> claim["type"] == "agreement" end)
+          agreements = Enum.filter(claims, fn c -> c["type"] == "agreement" end)
 
           render(conn, "claims.html",
             profile: profile,
@@ -141,6 +147,46 @@ defmodule AbtDidWorkshopWeb.WalletController do
       _ ->
         render(conn, "authed.html", error: response)
     end
+  end
+
+  defp process_agreements(params) do
+    result =
+      params
+      |> Enum.filter(fn {key, _} -> String.starts_with?(key, "agreement_") end)
+      |> Enum.into(%{}, fn
+        {"agreement_" <> id, "true"} -> {id, true}
+        {"agreement_" <> id, "false"} -> {id, false}
+      end)
+
+    :abt_did_workshop
+    |> Application.get_env(:agreement)
+    |> Enum.map(fn agr ->
+      agr
+      |> Map.delete(:content)
+      |> Map.put(:agreed, result[agr.meta.id])
+      |> Map.delete(:meta)
+    end)
+    |> Enum.map(fn agr ->
+      case agr.agreed do
+        true -> sign_agreement(agr, params["sk"], params["did"])
+        false -> agr
+      end
+    end)
+  end
+
+  defp sign_agreement(agreement, sk_str, did) do
+    did_type = AbtDid.get_did_type(did)
+
+    signer =
+      case did_type.key_type do
+        :ed25519 -> @ed25519
+        :secp256k1 -> @secp256k1
+      end
+
+    digest = Util.str_to_bin(agreement.hash.digest)
+    sk = Util.str_to_bin(sk_str)
+    sig = Mcrypto.sign!(signer, digest, sk) |> Multibase.encode!(:base58_btc)
+    Map.put(agreement, :sig, sig)
   end
 
   defp stop(conn, error, to) do
