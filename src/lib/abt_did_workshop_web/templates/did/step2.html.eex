@@ -52,14 +52,26 @@
   <section class="column">
     <b><p>Choose your claims</p></b>
     <div class="form-group">
-    <%= for {claim_id, claim_descrip} <- Application.get_env(:abt_did_workshop, :profile) do %>
-      <p>
-        <label>
-          <%= checkbox f, "claim_profile_" <> claim_id  %>
-          <span><%= claim_descrip %></span>
-        </label>
-      </p>
-    <% end %>
+      <%= for {claim_id, claim_descrip} <- Application.get_env(:abt_did_workshop, :profile) do %>
+        <p>
+          <label>
+            <%= checkbox f, "claim_profile_" <> claim_id  %>
+            <span><%= claim_descrip %></span>
+          </label>
+        </p>
+      <% end %>
+    </div>
+
+    <div class="form-group">
+      <%= for agr <- Application.get_env(:abt_did_workshop, :agreement) do %>
+        <% meta = agr.meta %>
+        <p>
+          <label>
+            <%= checkbox f, "claim_agreement_" <> meta.id %>
+            <span><%= meta.description %></span>
+          </label>
+        </p>
+      <% end %>
     </div>
   </section>
   <%= submit "SUBMIT", class: "btn btn-primary" %>

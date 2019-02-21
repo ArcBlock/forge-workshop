@@ -1,3 +1,6 @@
+## 0.1.6 (February 20, 2019)
+ - Add agreement claim type.
+
 ## 0.1.5 (February 19, 2019)
   - Add page to input app metadata.
 

@@ -28,6 +28,10 @@
       $(document).ready(function () {
         $('select').formSelect();
       });
+      $(document).ready(function(){
+        $('.collapsible').collapsible();
+      });
   </script>
+    <%= Drab.Client.run(@conn) %>
   </body>
 </html>

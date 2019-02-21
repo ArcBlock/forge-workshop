@@ -52,7 +52,7 @@ config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/abt_did_workshop_web/views/.*(ex)$},
-      ~r{lib/abt_did_workshop_web/templates/.*(eex)$}
+      ~r{lib/abt_did_workshop_web/templates/.*(eex|drab)$}
     ]
   ]
 

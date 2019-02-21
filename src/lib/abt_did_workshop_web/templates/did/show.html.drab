@@ -1,0 +1,93 @@
+<input id="qrValue" type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink() %>"></input>
+<br>
+<div align="center">
+  <canvas id="canvas"></canvas>
+</div>
+
+<section class="columns">
+  The QR Code contains following deep link. 
+  <pre> <%= AbtDidWorkshop.Util.gen_deeplink() %> </pre>
+</section>
+<section class="row">
+  <section class="column" align="center">
+    <%= form_for @conn, Routes.wallet_path(@conn, :index), [method: "get"], fn _ -> %>
+      <%= submit "Try authentication in wallet", class: "btn btn-primary" %>
+    <% end %>
+  </section>
+  <section class="column" align="center">
+    <%= form_for @conn, Routes.did_path(@conn, :continue), [method: "get"], fn _ -> %>
+      <%= submit "Reselect claims", class: "btn btn-primary" %>
+    <% end %>
+  </section>
+</section>
+
+<p>
+    The Secret Key of the DID is:
+   <pre><%= Multibase.encode!(@sk, :base58_btc) %></pre>
+</p>
+
+<a name="known_users"></a>
+<%= if [] != @users do %>
+  Known users:
+  <ul class="collapsible popout">
+    <%= for user <- @users do %>
+    <li>
+      <div class="collapsible-header"><%= user.did %></div>
+      <div class="collapsible-body">
+        <span>
+          <table class="striped" style="font-size: smaller; table-layout: fixed;">
+            <tr>
+              <td style="width: 30%"> DID </td>
+              <td style="word-wrap: break-word;"> <%= user.did %> </td>
+            </tr>
+            <tr>
+              <td> Publick Key </td>
+              <td style="word-wrap: break-word;"> <%= user.pk %> </td>
+            </tr>
+            <%= for claim_id <- AbtDidWorkshop.AppState.get().profile do %>
+              <tr>
+                <td>
+                  <%= claim_id %>
+                </td>
+                <td text-align="right">
+                  <%= user.profile[claim_id] %>
+                </td>
+              </tr>
+            <% end %>
+            <%= for agr <- user.agreement do %>
+            <tr>
+              <td colspan="2">
+                <table style="font-size: smaller; table-layout: fixed;">
+                  <tr>
+                    <td style="width: 30%">Hash</td>
+                    <td style="word-wrap: break-word;"><%= agr["hash"]["digest"] %></td>
+                  </tr>
+                  <tr>
+                    <td>URI</td>
+                    <td style="word-wrap: break-word;">
+                    <% uri = AbtDidWorkshop.Util.get_agreement_uri(agr["uri"]) %>
+                    <a href='<%= uri %>'><%= uri %></a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Agreed?</td>
+                    <td style="word-wrap: break-word;"><%= agr["agreed"] %></td>
+                  </tr>
+                  <%= if agr["agreed"] do %>
+                  <tr>
+                    <td> Signature </td>
+                    <td style="word-wrap: break-word;"> <%= agr["sig"] %> </td>
+                  </tr>
+                  <% end %>
+                </table>
+              </td>
+            </tr>
+            <% end %>
+          </table>
+        </span>
+      </div>
+    </li>
+    <% end %>
+  </ul>
+<% end %>
+

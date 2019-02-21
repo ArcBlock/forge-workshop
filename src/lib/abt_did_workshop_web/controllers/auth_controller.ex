@@ -64,16 +64,16 @@ defmodule AbtDidWorkshopWeb.AuthController do
   defp add_user(pk, body) do
     user = %{
       did: body["iss"],
-      pk: pk
+      pk: pk,
+      profile: get_profile(body),
+      agreement: get_agreement(body)
     }
 
-    profile =
-      body
-      |> get_profile()
-      |> Map.delete("type")
-      |> Map.delete("meta")
+    UserDb.add(user)
 
-    UserDb.add(Map.merge(user, profile))
+    socket = UserDb.get_socket()
+    Drab.Live.poke(socket, users: UserDb.get_all())
+    Drab.Core.exec_js(socket, "$(document).ready(function(){$('.collapsible').collapsible();});")
   end
 
   defp match_claims?(body) do
@@ -86,7 +86,16 @@ defmodule AbtDidWorkshopWeb.AuthController do
     body
     |> Map.get("requestedClaims", [])
     |> Enum.filter(fn claim -> claim["type"] == "profile" end)
-    |> List.first() || %{}
+    |> List.first()
+    |> Kernel.||(%{})
+    |> Map.delete("type")
+    |> Map.delete("meta")
+  end
+
+  defp get_agreement(body) do
+    body
+    |> Map.get("requestedClaims", [])
+    |> Enum.filter(fn c -> c["type"] == "agreement" end)
   end
 
   defp check_profile([], _), do: true
@@ -129,15 +138,18 @@ defmodule AbtDidWorkshopWeb.AuthController do
   end
 
   defp gen_claims do
-    profile = AppState.get().profile
-    agreements = AppState.get().agreements
+    profile_claim = gen_profile()
+    agreement_claims = gen_agreement()
+    profile_claim ++ agreement_claims
+  end
 
-    profile_claim =
-      case profile do
-        [] ->
-          nil
+  defp gen_profile do
+    case AppState.get().profile do
+      [] ->
+        []
 
-        profile ->
+      profile ->
+        [
           %{
             type: "profile",
             meta: %{
@@ -145,19 +157,24 @@ defmodule AbtDidWorkshopWeb.AuthController do
             },
             items: profile
           }
-      end
-
-    agreement_claims =
-      case agreements do
-        [] -> []
-        _ -> Enum.map(agreements, &get_agreement/1)
-      end
-
-    [profile_claim] ++ agreement_claims
+        ]
+    end
   end
 
-  defp get_agreement(_) do
-    %{}
+  defp gen_agreement do
+    case AppState.get().agreements do
+      [] -> []
+      agreements -> Enum.map(agreements, &gen_agreement/1)
+    end
+  end
+
+  defp gen_agreement(id) do
+    :abt_did_workshop
+    |> Application.get_env(:agreement, [])
+    |> Enum.filter(fn agr -> agr.meta.id == id end)
+    |> List.first()
+    |> Map.update!(:uri, &Util.get_agreement_uri/1)
+    |> Map.delete(:content)
   end
 
   defp filled_all_claims?(user) do

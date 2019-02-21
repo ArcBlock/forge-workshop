@@ -18,10 +18,21 @@
           <% end %>
         </p>
       </div>
-      <%= submit "submit", class: "btn btn-primary" %>
     <% end %>
+    <%= if @agreements != [] do %>
+      <p>Application is asking for your agreement:</p>
+      <div class="form-group">
+        <%= for agr <- @agreements do %>
+          <p>
+            <a href='<%= agr["uri"] %>'> <%= agr["meta"]["description"] %></a>
+            <label>
+              <%= checkbox f, "agreement_" <> agr["meta"]["id"] %>
+              <span> Agree </span>
+            </label>
+          </p>
+        <% end %>
+      </div>
+    <% end %>
+    <%= submit "submit", class: "btn btn-primary" %>
   <% end %>
 </section>
-
-
-<%= @agreements %>
