@@ -10,7 +10,7 @@
 </section>
 <section class="row">
   <section class="column" align="center">
-    <%= form_for @conn, Routes.wallet_path(@conn, :index), [method: "get"], fn _ -> %>
+    <%= form_for @conn, Routes.wallet_path(@conn, :index), [method: "get", target: "_blank"], fn _ -> %>
       <%= submit "Try authentication in wallet", class: "btn btn-primary" %>
     <% end %>
   </section>

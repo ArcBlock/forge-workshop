@@ -64,7 +64,7 @@ config :abt_did_workshop, :app_info,
   subtitle: "Play with DID authentication protocol.",
   description:
     "A simple workshop for developers to quickly develop, design and debug the DID flow.",
-  icon: "https://example-application/logo",
+  icon: "/images/logo@2x.png",
   copyright: "https://example-application/copyright",
   publisher: "did:abt:zNKSHDK5KTZ5bdxfHoKp6F2iibbpLriYJDSi"
 
