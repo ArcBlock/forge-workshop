@@ -108,16 +108,14 @@ defmodule AbtDidWorkshopWeb.WalletController do
           do_response_auth(conn, sk, pk, did, url)
 
         claims ->
-          profile =
-            claims
-            |> Enum.filter(fn c -> c["type"] == "profile" end)
-            |> List.first()
-
+          profile = claims |> Enum.filter(fn c -> c["type"] == "profile" end) |> List.first()
           agreements = Enum.filter(claims, fn c -> c["type"] == "agreement" end)
+          app_info = Map.get(body, "appInfo", %{})
 
           render(conn, "claims.html",
             profile: profile,
             agreements: agreements,
+            app_info: app_info,
             sk: sk,
             pk: pk,
             did: did,
