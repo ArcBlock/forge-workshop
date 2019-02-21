@@ -26,3 +26,4 @@ if (canvas != null) {
     console.log('success!');
   });
 }
+window.__socket = require("phoenix").Socket;

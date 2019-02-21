@@ -142,10 +142,14 @@ defmodule AbtDidWorkshopWeb.WalletController do
 
     case Jason.decode(response) do
       {:ok, %{"appPk" => _}} ->
-        render(conn, "authed.html", error: nil)
+        conn
+        |> put_flash(:info, "Authentication Succeeded!")
+        |> redirect(to: Routes.did_path(conn, :show))
 
       _ ->
-        render(conn, "authed.html", error: response)
+        conn
+        |> put_flash(:error, "Authentication failed! Error: #{response}")
+        |> redirect(to: Routes.did_path(conn, :show))
     end
   end
 

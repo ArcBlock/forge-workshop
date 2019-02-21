@@ -27,10 +27,10 @@
 </p>
 
 <a name="known_users"></a>
-<%= users = AbtDidWorkshop.UserDb.get_all(); if [] != users do %>
+<%= if [] != @users do %>
   Known users:
   <ul class="collapsible popout">
-    <%= for user <- users do %>
+    <%= for user <- @users do %>
     <li>
       <div class="collapsible-header"><%= user.did %></div>
       <div class="collapsible-body">

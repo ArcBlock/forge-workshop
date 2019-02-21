@@ -12,6 +12,10 @@ defmodule AbtDidWorkshop.UserDb do
     GenServer.call(__MODULE__, {:add, user})
   end
 
+  def add_socket(socket) do
+    GenServer.call(__MODULE__, {:add_socket, socket})
+  end
+
   def remove(did) do
     GenServer.call(__MODULE__, {:remove, did})
   end
@@ -25,32 +29,44 @@ defmodule AbtDidWorkshop.UserDb do
   end
 
   def get_all do
-    GenServer.call(__MODULE__, {:get_all})
+    GenServer.call(__MODULE__, :get_all)
+  end
+
+  def get_socket do
+    GenServer.call(__MODULE__, :get_socket)
   end
 
   def init(:ok) do
-    {:ok, %{}}
+    {:ok, {%{}, nil}}
   end
 
-  def handle_call({:add, user}, _from, state) do
-    state = Map.put(state, user.did, user)
-    {:reply, :ok, state}
+  def handle_call({:add, user}, _from, {db, socket}) do
+    db = Map.put(db, user.did, user)
+    {:reply, :ok, {db, socket}}
   end
 
-  def handle_call({:remove, did}, _from, state) do
-    state = Map.delete(state, did)
-    {:reply, :ok, state}
+  def handle_call({:add_socket, socket}, _from, {db, _}) do
+    {:reply, :ok, {db, socket}}
   end
 
-  def handle_call(:clear, _from, _state) do
-    {:reply, :ok, %{}}
+  def handle_call({:remove, did}, _from, {db, socket}) do
+    db = Map.delete(db, did)
+    {:reply, :ok, {db, socket}}
   end
 
-  def handle_call({:get, did}, _from, state) do
-    {:reply, Map.get(state, did), state}
+  def handle_call(:clear, _from, {_, socket}) do
+    {:reply, :ok, {%{}, socket}}
   end
 
-  def handle_call({:get_all}, _from, state) do
-    {:reply, Map.values(state), state}
+  def handle_call({:get, did}, _from, {db, socket}) do
+    {:reply, Map.get(db, did), {db, socket}}
+  end
+
+  def handle_call(:get_all, _from, {db, socket}) do
+    {:reply, Map.values(db), {db, socket}}
+  end
+
+  def handle_call(:get_socket, _from, {db, socket}) do
+    {:reply, socket, {db, socket}}
   end
 end

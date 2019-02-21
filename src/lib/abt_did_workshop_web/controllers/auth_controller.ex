@@ -70,6 +70,10 @@ defmodule AbtDidWorkshopWeb.AuthController do
     }
 
     UserDb.add(user)
+
+    socket = UserDb.get_socket()
+    Drab.Live.poke(socket, users: UserDb.get_all())
+    Drab.Core.exec_js(socket, "$(document).ready(function(){$('.collapsible').collapsible();});")
   end
 
   defp match_claims?(body) do

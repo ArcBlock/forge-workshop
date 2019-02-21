@@ -31,7 +31,7 @@ defmodule AbtDidWorkshopWeb.DidController do
         render(conn, "step2.html", alert: "Deep link path is required.")
 
       true ->
-        render(conn, "show.html", sk: app_state.sk)
+        render(conn, "show.html", sk: app_state.sk, users: AbtDidWorkshop.UserDb.get_all())
     end
   end
 

@@ -68,6 +68,15 @@ config :abt_did_workshop, :app_info,
   copyright: "https://example-application/copyright",
   publisher: "did:abt:zNKSHDK5KTZ5bdxfHoKp6F2iibbpLriYJDSi"
 
+# Configures Drab
+config :drab, AbtDidWorkshopWeb.Endpoint, otp_app: :abt_did_workshop
+
+# Configures default Drab file extension
+config :phoenix, :template_engines, drab: Drab.Live.Engine
+
+# Configures Drab for webpack
+config :drab, AbtDidWorkshopWeb.Endpoint, js_socket_constructor: "window.__socket"
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

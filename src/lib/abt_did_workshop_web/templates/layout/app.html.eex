@@ -32,5 +32,6 @@
         $('.collapsible').collapsible();
       });
   </script>
+    <%= Drab.Client.run(@conn) %>
   </body>
 </html>
