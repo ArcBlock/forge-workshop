@@ -1,6 +1,8 @@
 TOP_DIR=.
 OUTPUT_DIR=$(TOP_DIR)/output
 README=$(TOP_DIR)/README.md
+PROTO_PATH=$(TOP_DIR)/src/priv/proto
+PROTO_GEN_PATH=$(TOP_DIR)/src/lib/gen
 
 BUILD_NAME=abt_did_workshop
 VERSION=$(strip $(shell cat version))
@@ -28,7 +30,7 @@ install:
 
 dep:
 	@echo "Install dependencies required for this repo..."
-	@cd src/assets; npm install
+	# @cd src/assets; npm install
 	@cd src; mix deps.get
 
 pre-build: install dep
@@ -36,6 +38,9 @@ pre-build: install dep
 
 post-build:
 	@echo "Running scripts after the build is done..."
+
+rebuild-proto: # prepare-vendor-proto
+	@protoc -I $(PROTO_PATH)/ --elixir_out=plugins=grpc:$(PROTO_GEN_PATH) $(PROTO_PATH)/*.proto
 
 all: pre-build build post-build
 

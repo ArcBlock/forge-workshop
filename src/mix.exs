@@ -43,22 +43,17 @@ defmodule AbtDidWorkshop.MixProject do
     [
       {:phoenix, "~> 1.4.0"},
       {:phoenix_pubsub, "~> 1.1"},
-      {:phoenix_ecto, "~> 4.0"},
-      {:ecto_sql, "~> 3.0"},
-      {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:eqrcode, "~> 0.1.5"},
       {:httpoison, "~> 1.4"},
-      {:recase, "~> 0.4"},
-      {:drab, "~> 0.10.0"},
+      {:drab, "~> 0.10"},
 
       # ArcBlock
-      {:abt_did, git: "git@github.com:arcblock/abt-did.git", tag: "v0.1.16"},
-      # {:abt_did, path: "~/Documents/GitHub/ArcBlock/abt-did"},
+      {:abt_did_elixir, git: "git@github.com:arcblock/abt-did-elixir.git", tag: "v0.1.17"},
+      {:forge_sdk, path: "~/Documents/GitHub/ArcBlock/forge-elixir-sdk"},
 
       # utility tools for error logs and metrics
       {:ex_datadog_plug, "~> 0.5.0"},
@@ -69,7 +64,7 @@ defmodule AbtDidWorkshop.MixProject do
       {:statix, "~> 1.1"},
 
       # deployment
-      {:distillery, "~> 1.5", override: true},
+      {:distillery, "~> 2.0", runtime: false},
 
       # dev & test
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},

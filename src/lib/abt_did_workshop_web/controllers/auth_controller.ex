@@ -116,7 +116,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
 
   defp request_reg do
     claims = gen_claims()
-    callback = Util.get_callback()
+    callback = Util.get_callback() <> "auth/"
 
     gen_and_sign(%{
       url: callback,

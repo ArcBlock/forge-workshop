@@ -71,6 +71,22 @@ config :abt_did_workshop, :app_info,
 # Configures Drab
 config :drab, AbtDidWorkshopWeb.Endpoint, otp_app: :abt_did_workshop
 
+config :abt_did_workshop, :wallet,
+  moniker_prefix: "stu",
+  passphrase: "abcd1234"
+
+config :abt_did_workshop, :robert,
+  address: "z1YgP3zaVdQzB9gC3kHAyTiiMMPZhLzCLDP",
+  pk:
+    <<41, 245, 57, 253, 111, 41, 92, 141, 236, 179, 248, 104, 214, 70, 231, 252, 248, 254, 240,
+      67, 143, 71, 217, 171, 206, 213, 160, 125, 70, 142, 146, 229>>,
+  sk:
+    <<130, 120, 1, 15, 32, 115, 128, 114, 252, 49, 69, 204, 87, 211, 69, 172, 138, 163, 53, 180,
+      98, 48, 217, 92, 123, 220, 46, 142, 126, 75, 93, 19, 41, 245, 57, 253, 111, 41, 92, 141,
+      236, 179, 248, 104, 214, 70, 231, 252, 248, 254, 240, 67, 143, 71, 217, 171, 206, 213, 160,
+      125, 70, 142, 146, 229>>,
+  type: [address: 1, hash: 1, pk: 0, role: 0]
+
 # Configures default Drab file extension
 config :phoenix, :template_engines, drab: Drab.Live.Engine
 

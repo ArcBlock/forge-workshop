@@ -18,11 +18,11 @@ defmodule AbtDidWorkshop.Util do
   end
 
   def get_callback do
-    "http://#{get_ip()}:#{get_port()}/api/auth/"
+    "http://#{get_ip()}:#{get_port()}/api/"
   end
 
   def get_agreement_uri(uri) do
-    "http://localhost:#{get_port()}" <> uri
+    "http://#{get_ip()}:#{get_port()}" <> uri
   end
 
   def shorten(str, pre_len, post_len) do
@@ -47,7 +47,7 @@ defmodule AbtDidWorkshop.Util do
   end
 
   def gen_deeplink do
-    url = get_callback() |> URI.encode_www_form()
+    url = (get_callback() <> "auth/") |> URI.encode_www_form()
     app_state = AppState.get()
     path = String.trim_trailing(app_state.path, "/")
     app_pk = Multibase.encode!(app_state.pk, :base58_btc)

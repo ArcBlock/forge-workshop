@@ -6,20 +6,17 @@ defmodule AbtDidWorkshop.Application do
   alias AbtDidWorkshopWeb.Endpoint
 
   def start(_type, _args) do
-    # List all child processes to be supervised
-    children = [
-      # Start the Ecto repository
-      AbtDidWorkshop.Repo,
-      # Start the endpoint when the application starts
-      AbtDidWorkshopWeb.Endpoint,
-      AbtDidWorkshop.UserDb,
-      AbtDidWorkshop.AppState
-      # Starts a worker by calling: AbtDidWorkshop.Worker.start_link(arg)
-      # {AbtDidWorkshop.Worker, arg},
-    ]
+    filename = :abt_did_workshop |> Application.app_dir() |> Path.join("priv/forge.toml")
+    servers = ForgeSdk.init(:cert, "", filename)
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
+    children =
+      servers ++
+        [
+          AbtDidWorkshopWeb.Endpoint,
+          AbtDidWorkshop.UserDb,
+          AbtDidWorkshop.AppState
+        ]
+
     opts = [strategy: :one_for_one, name: AbtDidWorkshop.Supervisor]
     Supervisor.start_link(children, opts)
   end
@@ -29,5 +26,11 @@ defmodule AbtDidWorkshop.Application do
   def config_change(changed, _new, removed) do
     Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp register_type_urls do
+    ForgeAbi.register_type_urls([
+      {:certificate, "ws:x:certificate", AbtDidWorkshop.Certificate}
+    ])
   end
 end
