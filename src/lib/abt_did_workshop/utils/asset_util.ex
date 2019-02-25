@@ -28,15 +28,13 @@ defmodule AbtDidWorkshop.AssetUtil do
   end
 
   def get_cert(owner) do
+    init_certs(owner, "ABT", 40)
+
     certs =
       [address: owner.address]
       |> ForgeSdk.get_assets()
       |> elem(0)
       |> Enum.filter(fn %{owner: addr} -> addr == owner.address end)
-
-    # if length(certs) < 5 do
-    #   init_certs(owner, "ABT study certificate", 20)
-    # end
 
     List.first(certs)
   end
@@ -59,8 +57,15 @@ defmodule AbtDidWorkshop.AssetUtil do
   end
 
   def init_certs(wallet, content, number) do
-    for i <- 1..number do
-      init_cert(wallet, content, i)
+    state = ForgeSdk.get_account_state(address: wallet.address)
+
+    if state.num_assets < 20 do
+      Task.async(fn ->
+        for i <- 1..number do
+          init_cert(wallet, content, i)
+          Process.sleep(1000)
+        end
+      end)
     end
   end
 

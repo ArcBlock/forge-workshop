@@ -17,8 +17,11 @@ defmodule AbtDidWorkshop.Application do
           AbtDidWorkshop.AppState
         ]
 
+    register_type_urls()
     opts = [strategy: :one_for_one, name: AbtDidWorkshop.Supervisor]
-    Supervisor.start_link(children, opts)
+    result = Supervisor.start_link(children, opts)
+    init_certs()
+    result
   end
 
   # Tell Phoenix to update the endpoint configuration
@@ -32,5 +35,11 @@ defmodule AbtDidWorkshop.Application do
     ForgeAbi.register_type_urls([
       {:certificate, "ws:x:certificate", AbtDidWorkshop.Certificate}
     ])
+  end
+
+  defp init_certs do
+    {robert, _} = AbtDidWorkshop.WalletUtil.init_robert()
+    Process.sleep(5000)
+    AbtDidWorkshop.AssetUtil.init_certs(robert, "ABT", 40)
   end
 end

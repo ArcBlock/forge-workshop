@@ -33,7 +33,7 @@ defmodule AbtDidWorkshopWeb.Router do
     post("/auth", AuthController, :response_auth)
     get("/agreement/:id", AgreementController, :get)
 
-    get("/cert", CertController, :index)
+    # get("/cert", CertController, :index)
     post("/cert/recover-wallet", CertController, :recover_wallet)
     post("/cert/request-issue", CertController, :request_issue)
     post("/cert/response-issue", CertController, :response_issue)

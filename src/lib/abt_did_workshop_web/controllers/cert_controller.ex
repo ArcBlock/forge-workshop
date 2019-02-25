@@ -25,7 +25,7 @@ defmodule AbtDidWorkshopWeb.CertController do
   @doc """
   Issue certificate to the `address`
   """
-  def request_issue(conn, %{address: address}) do
+  def request_issue(conn, %{"address" => address}) do
     if hasCert?(address) do
       json(conn, %{response: "You already have a certificate"})
     else
@@ -88,7 +88,7 @@ defmodule AbtDidWorkshopWeb.CertController do
   end
 
   defp hasCert?(address) do
-    state = ForgeSdk.get_account_state(address: address)
+    state = ForgeSdk.get_account_state(address: address) || %{num_assets: 0}
     state.num_assets > 0
   end
 
