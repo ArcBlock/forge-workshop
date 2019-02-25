@@ -25,7 +25,12 @@ defmodule AbtDidWorkshopWeb.CertController do
   @doc """
   Issue certificate to the `address`
   """
-  def request_issue(conn, %{"address" => address}) do
+  def request_issue(conn, %{"userInfo" => user_info}) do
+    address =
+      user_info
+      |> Util.get_body()
+      |> Map.get("iss")
+
     if hasCert?(address) do
       json(conn, %{response: "You already have a certificate"})
     else
@@ -37,19 +42,31 @@ defmodule AbtDidWorkshopWeb.CertController do
         |> AssetUtil.give_away_cert(cert.address)
         |> Transaction.encode()
         |> Multibase.encode!(:base58_btc)
-        |> request_sign(cert.address, robert)
+        |> request_sign(robert)
 
       json(conn, response)
     end
   end
 
-  def response_issue(conn, %{address: address, sig: sig_str, tx: tx_str}) do
+  def response_issue(conn, %{"userInfo" => user_info}) do
+    body = Util.get_body(user_info)
+    address = Map.get(body, "iss")
+
+    claim =
+      body
+      |> Map.get("requestedClaims")
+      |> List.first()
+
     tx =
-      tx_str
+      claim
+      |> Map.get("tx")
       |> Util.str_to_bin()
       |> Transaction.decode()
 
-    sig = Util.str_to_bin(sig_str)
+    sig =
+      claim
+      |> Map.get("sig")
+      |> Util.str_to_bin()
 
     tx = %{tx | signatures: [AbciVendor.KVPair.new(key: address, value: sig)]}
     hash = ForgeSdk.send_tx(ForgeAbi.RequestSendTx.new(tx: tx))
@@ -59,15 +76,39 @@ defmodule AbtDidWorkshopWeb.CertController do
   @doc """
 
   """
-  def reward(conn, %{"address" => address}) do
-    if hasCert?(address) do
+  # def reward(conn, %{"address" => address}) do
+  #   if hasCert?(address) do
+  #     json(conn, %{response: "ok"})
+  #   else
+  #     json(conn, %{response: "failed"})
+  #   end
+  # end
+
+  def requeste_reward(conn, _param) do
+    {robert, _} = WalletUtil.init_robert()
+    json(conn, request_cert(robert))
+  end
+
+  def response_reward(conn, %{"userInfo" => user_info}) do
+    body = Util.get_body(user_info)
+    address = Map.get(body, "iss")
+
+    asset =
+      body
+      |> Map.get("requestedClaims")
+      |> List.first()
+      |> Map.get("certificate")
+
+    state = ForgeSdk.get_asset_state(address: asset) || %{owner: ""}
+
+    if state.owner == address do
       json(conn, %{response: "ok"})
     else
       json(conn, %{response: "failed"})
     end
   end
 
-  defp request_sign(tx, asset, owner) do
+  defp request_sign(tx, owner) do
     claims = [
       %{
         type: "proofOfHolding",
@@ -75,7 +116,7 @@ defmodule AbtDidWorkshopWeb.CertController do
           description: "Please sign the transaction."
         },
         tx: tx,
-        asset: asset
+        sig: ""
       }
     ]
 
@@ -98,7 +139,8 @@ defmodule AbtDidWorkshopWeb.CertController do
         type: "proofOfHolding",
         meta: %{
           description: "Please provide your certification."
-        }
+        },
+        certificate: ""
       }
     ]
 
@@ -110,7 +152,7 @@ defmodule AbtDidWorkshopWeb.CertController do
     })
   end
 
-  defp gen_and_sign(owner, extra \\ %{}) do
+  defp gen_and_sign(owner, extra) do
     did_type = AbtDid.get_did_type(owner.address)
     auth_info = AbtDid.Signer.gen_and_sign(did_type, owner.sk, extra)
 
