@@ -35,9 +35,9 @@ defmodule AbtDidWorkshopWeb.Router do
 
     # get("/cert", CertController, :index)
     post("/cert/recover-wallet", CertController, :recover_wallet)
-    post("/cert/request-issue", CertController, :request_issue)
-    post("/cert/response-issue", CertController, :response_issue)
-    post("/cert/request-reward", CertController, :request_reward)
-    post("/cert/response-reward", CertController, :response_reward)
+    get("/cert/request-issue", CertController, :request_issue)
+    post("/cert/request-issue", CertController, :response_issue)
+    get("/cert/request-reward", CertController, :request_reward)
+    post("/cert/request-reward", CertController, :response_reward)
   end
 end

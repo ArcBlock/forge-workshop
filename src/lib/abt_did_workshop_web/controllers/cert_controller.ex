@@ -1,9 +1,11 @@
 defmodule AbtDidWorkshopWeb.CertController do
   use AbtDidWorkshopWeb, :controller
 
+  alias AbtDidWorkshop.AppState
   alias AbtDidWorkshop.AssetUtil
   alias AbtDidWorkshop.WalletUtil
   alias AbtDidWorkshop.Util
+
 
   alias ForgeAbi.Transaction
 
@@ -25,11 +27,8 @@ defmodule AbtDidWorkshopWeb.CertController do
   @doc """
   Issue certificate to the `address`
   """
-  def request_issue(conn, %{"userInfo" => user_info}) do
-    address =
-      user_info
-      |> Util.get_body()
-      |> Map.get("iss")
+  def request_issue(conn, %{"userDid" => user_did}) do
+    address = user_did
 
     if hasCert?(address) do
       json(conn, %{response: "You already have a certificate"})
@@ -84,7 +83,7 @@ defmodule AbtDidWorkshopWeb.CertController do
   #   end
   # end
 
-  def requeste_reward(conn, _param) do
+  def request_reward(conn, _param) do
     {robert, _} = WalletUtil.init_robert()
     json(conn, request_cert(robert))
   end
@@ -111,7 +110,7 @@ defmodule AbtDidWorkshopWeb.CertController do
   defp request_sign(tx, owner) do
     claims = [
       %{
-        type: "proofOfHolding",
+        type: "signature",
         meta: %{
           description: "Please sign the transaction."
         },
@@ -124,7 +123,8 @@ defmodule AbtDidWorkshopWeb.CertController do
 
     gen_and_sign(owner, %{
       url: callback,
-      requestedClaims: claims
+      requestedClaims: claims,
+      appInfo: AppState.get().info
     })
   end
 
@@ -148,7 +148,8 @@ defmodule AbtDidWorkshopWeb.CertController do
 
     gen_and_sign(owner, %{
       url: callback,
-      requestedClaims: claims
+      requestedClaims: claims,
+      appInfo: AppState.get().info
     })
   end
 
