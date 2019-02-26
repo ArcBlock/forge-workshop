@@ -1,17 +1,11 @@
 defmodule AbtDidWorkshopWeb.CertController do
   use AbtDidWorkshopWeb, :controller
 
-  alias AbtDidWorkshop.AppState
-  alias AbtDidWorkshop.AssetUtil
-  alias AbtDidWorkshop.WalletUtil
-  alias AbtDidWorkshop.Util
+  alias AbtDidWorkshop.{AppState, AssetsDb, AssetUtil, Plugs.VerifySig, Util, WalletUtil}
 
+  alias ForgeAbi.{Transaction, TransferTx, Util.BigInt}
 
-  alias ForgeAbi.Transaction
-
-  def index(conn, _params) do
-    text(conn, "123")
-  end
+  plug(VerifySig when action in [:response_issue, :response_reward])
 
   def recover_wallet(conn, _) do
     [{wallet, _}] = WalletUtil.init_wallets(1)
@@ -24,14 +18,9 @@ defmodule AbtDidWorkshopWeb.CertController do
     })
   end
 
-  @doc """
-  Issue certificate to the `address`
-  """
-  def request_issue(conn, %{"userDid" => user_did}) do
-    address = user_did
-
+  def request_issue(conn, %{"userDid" => address}) do
     if hasCert?(address) do
-      json(conn, %{response: "You already have a certificate"})
+      json(conn, %{error: "You already have a certificate"})
     else
       {robert, _} = WalletUtil.init_robert()
       cert = AssetUtil.get_cert(robert)
@@ -47,14 +36,9 @@ defmodule AbtDidWorkshopWeb.CertController do
     end
   end
 
-  def response_issue(conn, %{"userInfo" => user_info}) do
-    body = Util.get_body(user_info)
-    address = Map.get(body, "iss")
-
-    claim =
-      body
-      |> Map.get("requestedClaims")
-      |> List.first()
+  def response_issue(conn, _) do
+    address = conn.assigns.did
+    claim = List.first(conn.assigns.claims)
 
     tx =
       claim
@@ -72,38 +56,28 @@ defmodule AbtDidWorkshopWeb.CertController do
     json(conn, %{tx: hash})
   end
 
-  @doc """
-
-  """
-  # def reward(conn, %{"address" => address}) do
-  #   if hasCert?(address) do
-  #     json(conn, %{response: "ok"})
-  #   else
-  #     json(conn, %{response: "failed"})
-  #   end
-  # end
-
   def request_reward(conn, _param) do
     {robert, _} = WalletUtil.init_robert()
     json(conn, request_cert(robert))
   end
 
-  def response_reward(conn, %{"userInfo" => user_info}) do
-    body = Util.get_body(user_info)
-    address = Map.get(body, "iss")
+  def response_reward(conn, _) do
+    address = conn.assigns.did
 
     asset =
-      body
-      |> Map.get("requestedClaims")
+      conn.assigns.claims
       |> List.first()
       |> Map.get("certificate")
 
     state = ForgeSdk.get_asset_state(address: asset) || %{owner: ""}
 
-    if state.owner == address do
-      json(conn, %{response: "ok"})
+    if state.owner != address or AssetsDb.member?(asset) do
+      json(conn, %{error: "Invalid certificate."})
     else
-      json(conn, %{response: "failed"})
+      AssetsDb.add(asset)
+      {robert, _} = WalletUtil.init_robert()
+      hash = transfer_token(robert, address)
+      json(conn, %{tx: hash})
     end
   end
 
@@ -126,11 +100,6 @@ defmodule AbtDidWorkshopWeb.CertController do
       requestedClaims: claims,
       appInfo: AppState.get().info
     })
-  end
-
-  defp hasCert?(address) do
-    state = ForgeSdk.get_account_state(address: address) || %{num_assets: 0}
-    state.num_assets > 0
   end
 
   defp request_cert(owner) do
@@ -161,5 +130,16 @@ defmodule AbtDidWorkshopWeb.CertController do
       appPk: owner.pk |> Multibase.encode!(:base58_btc),
       authInfo: auth_info
     }
+  end
+
+  defp hasCert?(address) do
+    state = ForgeSdk.get_account_state(address: address) || %{num_assets: 0}
+    state.num_assets > 0
+  end
+
+  defp transfer_token(from, to) do
+    value = BigInt.biguint(1_000_000_000_000_000_000)
+    itx = TransferTx.new(to: to, value: value)
+    ForgeSdk.transfer(itx, wallet: from)
   end
 end

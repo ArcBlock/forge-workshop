@@ -1,6 +1,4 @@
 defmodule AbtDidWorkshop.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   alias AbtDidWorkshopWeb.Endpoint
@@ -14,6 +12,7 @@ defmodule AbtDidWorkshop.Application do
         [
           AbtDidWorkshopWeb.Endpoint,
           AbtDidWorkshop.UserDb,
+          AbtDidWorkshop.AssetsDb,
           AbtDidWorkshop.AppState
         ]
 

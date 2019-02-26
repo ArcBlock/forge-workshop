@@ -1,15 +1,17 @@
 defmodule AbtDidWorkshop.AssetUtil do
+  @moduledoc false
+
   alias AbtDidWorkshop.Certificate
 
   alias ForgeAbi.{
     CreateAssetTx,
     ExchangeInfo,
     ExchangeTx,
-    Transaction,
     RequestGetAssets,
     RequestGetAssetState,
     RequestSendTx,
-    RequestSignData
+    RequestSignData,
+    Transaction
   }
 
   alias Google.Protobuf.Any

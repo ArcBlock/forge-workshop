@@ -7,9 +7,6 @@
 # General application configuration
 use Mix.Config
 
-config :abt_did_workshop,
-  ecto_repos: [AbtDidWorkshop.Repo]
-
 # Configures the endpoint
 config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
   url: [host: "localhost"],

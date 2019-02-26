@@ -1,16 +1,17 @@
 defmodule AbtDidWorkshop.WalletUtil do
+  @moduledoc false
+
   alias ForgeAbi.{
-    EncodingType,
     DeclareTx,
+    EncodingType,
     HashType,
     KeyType,
-    RoleType,
-    WalletInfo,
-    WalletType,
-    # Requests
     RequestCreateTx,
     RequestCreateWallet,
-    RequestSendTx
+    RequestSendTx,
+    RoleType,
+    WalletInfo,
+    WalletType
   }
 
   def init_wallets(number) do
@@ -51,7 +52,7 @@ defmodule AbtDidWorkshop.WalletUtil do
     ForgeSdk.send_tx(req_send)
   end
 
-  def init_robert() do
+  def init_robert do
     type =
       :abt_did_workshop |> Application.get_env(:robert) |> Keyword.get(:type) |> WalletType.new()
 
