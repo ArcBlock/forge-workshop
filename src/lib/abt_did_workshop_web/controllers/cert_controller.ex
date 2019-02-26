@@ -52,8 +52,11 @@ defmodule AbtDidWorkshopWeb.CertController do
       |> Util.str_to_bin()
 
     tx = %{tx | signatures: [AbciVendor.KVPair.new(key: address, value: sig)]}
-    hash = ForgeSdk.send_tx(ForgeAbi.RequestSendTx.new(tx: tx))
-    json(conn, %{tx: hash})
+
+    case ForgeSdk.send_tx(ForgeAbi.RequestSendTx.new(tx: tx)) do
+      {:error, reason} -> json(conn, %{error: reason})
+      hash -> json(conn, %{tx: hash})
+    end
   end
 
   def request_reward(conn, _param) do
@@ -76,8 +79,11 @@ defmodule AbtDidWorkshopWeb.CertController do
     else
       AssetsDb.add(asset)
       {robert, _} = WalletUtil.init_robert()
-      hash = transfer_token(robert, address)
-      json(conn, %{tx: hash})
+
+      case transfer_token(robert, address) do
+        {:error, reason} -> json(conn, %{error: reason})
+        hash -> json(conn, %{tx: hash})
+      end
     end
   end
 
