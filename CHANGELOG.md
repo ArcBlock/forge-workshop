@@ -1,5 +1,8 @@
+## 0.1.8 (February 26, 2019)
+  - Update for demo.
+
 ## 0.1.7 (February 21, 2019)
-- Display app meta on the claim filling page.
+ - Display app meta on the claim filling page.
 
 ## 0.1.6 (February 20, 2019)
  - Add agreement claim type.
