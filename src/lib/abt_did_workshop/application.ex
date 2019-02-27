@@ -1,27 +1,26 @@
 defmodule AbtDidWorkshop.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   alias AbtDidWorkshopWeb.Endpoint
 
   def start(_type, _args) do
-    # List all child processes to be supervised
-    children = [
-      # Start the Ecto repository
-      AbtDidWorkshop.Repo,
-      # Start the endpoint when the application starts
-      AbtDidWorkshopWeb.Endpoint,
-      AbtDidWorkshop.UserDb,
-      AbtDidWorkshop.AppState
-      # Starts a worker by calling: AbtDidWorkshop.Worker.start_link(arg)
-      # {AbtDidWorkshop.Worker, arg},
-    ]
+    filename = :abt_did_workshop |> Application.app_dir() |> Path.join("priv/forge.toml")
+    servers = ForgeSdk.init(:cert, "", filename)
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
+    children =
+      servers ++
+        [
+          AbtDidWorkshopWeb.Endpoint,
+          AbtDidWorkshop.UserDb,
+          AbtDidWorkshop.AssetsDb,
+          AbtDidWorkshop.AppState
+        ]
+
+    register_type_urls()
     opts = [strategy: :one_for_one, name: AbtDidWorkshop.Supervisor]
-    Supervisor.start_link(children, opts)
+    result = Supervisor.start_link(children, opts)
+    init_certs()
+    result
   end
 
   # Tell Phoenix to update the endpoint configuration
@@ -29,5 +28,17 @@ defmodule AbtDidWorkshop.Application do
   def config_change(changed, _new, removed) do
     Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp register_type_urls do
+    ForgeAbi.register_type_urls([
+      {:certificate, "ws:x:certificate", AbtDidWorkshop.Certificate}
+    ])
+  end
+
+  defp init_certs do
+    {robert, _} = AbtDidWorkshop.WalletUtil.init_robert()
+    Process.sleep(5000)
+    AbtDidWorkshop.AssetUtil.init_certs(robert, "ABT", 40)
   end
 end

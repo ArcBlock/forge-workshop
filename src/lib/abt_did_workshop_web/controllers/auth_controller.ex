@@ -1,9 +1,9 @@
 defmodule AbtDidWorkshopWeb.AuthController do
   use AbtDidWorkshopWeb, :controller
 
-  alias AbtDidWorkshop.AppState
-  alias AbtDidWorkshop.UserDb
-  alias AbtDidWorkshop.Util
+  alias AbtDidWorkshop.{AppState, Plugs.VerifySig, UserDb, Util}
+
+  plug(VerifySig when action in [:response_auth])
 
   def request_auth(conn, %{"userDid" => did}) do
     user = UserDb.get(did)
@@ -18,26 +18,11 @@ defmodule AbtDidWorkshopWeb.AuthController do
   def request_auth(conn, _),
     do: send_resp(conn, 400, "The request must contain valid DID.")
 
-  def response_auth(conn, %{"userPk" => pk, "userInfo" => user_info}) do
-    pk_bin = Util.str_to_bin(pk)
-
-    if false === AbtDid.Signer.verify(user_info, pk_bin) do
-      send_resp(conn, 422, "The signature of the user info does not match the public key.")
-    else
-      user_info
-      |> Util.get_body()
-      |> do_response_auth(pk, conn)
-    end
-  end
-
-  def response_auth(conn, _),
-    do: send_resp(conn, 400, "The request must contain valid public key and user info.")
-
-  defp do_response_auth(user_info, pk, conn) do
-    user_did = Map.get(user_info, "iss")
+  def response_auth(conn, _) do
+    user_did = conn.assigns.did
     user = UserDb.get(user_did)
 
-    if user != nil and Map.get(user_info, "requestedClaims", []) == [] do
+    if user != nil and conn.assigns.claims == [] do
       case filled_all_claims?(user) do
         true ->
           json(conn, gen_and_sign())
@@ -46,14 +31,14 @@ defmodule AbtDidWorkshopWeb.AuthController do
           json(conn, request_reg())
       end
     else
-      do_response_auth_add(conn, pk, user_info)
+      do_response_auth_add(conn)
     end
   end
 
-  defp do_response_auth_add(conn, pk, user_info) do
-    case match_claims?(user_info) do
+  defp do_response_auth_add(conn) do
+    case match_claims?(conn.assigns.claims) do
       true ->
-        add_user(pk, user_info)
+        add_user(conn.assigns.pk, conn.assigns.did, conn.assigns.claims)
         json(conn, gen_and_sign())
 
       false ->
@@ -61,12 +46,12 @@ defmodule AbtDidWorkshopWeb.AuthController do
     end
   end
 
-  defp add_user(pk, body) do
+  defp add_user(pk, did, claims) do
     user = %{
-      did: body["iss"],
-      pk: pk,
-      profile: get_profile(body),
-      agreement: get_agreement(body)
+      did: did,
+      pk: pk |> Multibase.encode!(:base58_btc),
+      profile: get_profile(claims),
+      agreement: get_agreement(claims)
     }
 
     UserDb.add(user)
@@ -76,15 +61,14 @@ defmodule AbtDidWorkshopWeb.AuthController do
     Drab.Core.exec_js(socket, "$(document).ready(function(){$('.collapsible').collapsible();});")
   end
 
-  defp match_claims?(body) do
+  defp match_claims?(claims) do
     expected = AppState.get().profile
-    actual = get_profile(body)
+    actual = get_profile(claims)
     check_profile(expected, actual)
   end
 
-  defp get_profile(body) do
-    body
-    |> Map.get("requestedClaims", [])
+  defp get_profile(claims) do
+    claims
     |> Enum.filter(fn claim -> claim["type"] == "profile" end)
     |> List.first()
     |> Kernel.||(%{})
@@ -92,9 +76,8 @@ defmodule AbtDidWorkshopWeb.AuthController do
     |> Map.delete("meta")
   end
 
-  defp get_agreement(body) do
-    body
-    |> Map.get("requestedClaims", [])
+  defp get_agreement(claims) do
+    claims
     |> Enum.filter(fn c -> c["type"] == "agreement" end)
   end
 
@@ -116,7 +99,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
 
   defp request_reg do
     claims = gen_claims()
-    callback = Util.get_callback()
+    callback = Util.get_callback() <> "auth/"
 
     gen_and_sign(%{
       url: callback,

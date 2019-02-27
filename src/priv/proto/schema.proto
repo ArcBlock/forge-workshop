@@ -1,0 +1,10 @@
+syntax = "proto3";
+package abt_did_workshop;
+
+message Certificate {
+  string issuer = 1;
+  uint64 iat = 2;
+  uint64 exp = 3;
+  string content = 4;
+  bytes sig = 5;
+}
