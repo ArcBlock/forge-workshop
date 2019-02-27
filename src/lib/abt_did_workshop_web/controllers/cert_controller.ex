@@ -93,7 +93,7 @@ defmodule AbtDidWorkshopWeb.CertController do
     end
   end
 
-  defp request_sign(tx, owner) do
+  def request_sign(tx, owner) do
     claims = [
       %{
         type: "signature",
@@ -135,8 +135,7 @@ defmodule AbtDidWorkshopWeb.CertController do
   end
 
   defp gen_and_sign(owner, extra) do
-    did_type = AbtDid.get_did_type(owner.address)
-    auth_info = AbtDid.Signer.gen_and_sign(did_type, owner.sk, extra)
+    auth_info = AbtDid.Signer.gen_and_sign(owner.address, owner.sk, extra)
 
     %{
       appPk: owner.pk |> Multibase.encode!(:base58_btc),
