@@ -99,7 +99,7 @@ defmodule AbtDidWorkshopWeb.CertController do
       }
     ]
 
-    callback = Util.get_callback() <> "cert/response-issue/"
+    callback = Util.get_callback() <> "cert/issue/"
 
     gen_and_sign(owner, %{
       url: callback,
@@ -119,7 +119,7 @@ defmodule AbtDidWorkshopWeb.CertController do
       }
     ]
 
-    callback = Util.get_callback() <> "cert/response-reward/"
+    callback = Util.get_callback() <> "cert/reward/"
 
     gen_and_sign(owner, %{
       url: callback,

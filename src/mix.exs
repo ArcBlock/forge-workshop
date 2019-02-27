@@ -52,7 +52,8 @@ defmodule AbtDidWorkshop.MixProject do
 
       # ArcBlock
       {:abt_did_elixir, git: "git@github.com:arcblock/abt-did-elixir.git", tag: "v0.1.17"},
-      {:forge_sdk, path: "~/Documents/GitHub/ArcBlock/forge-elixir-sdk"},
+      # {:forge_sdk, path: "~/Documents/GitHub/ArcBlock/forge-elixir-sdk"},
+      {:forge_sdk, git: "git@github.com:arcblock/forge-elixir-sdk.git"},
 
       # utility tools for error logs and metrics
       {:ex_datadog_plug, "~> 0.5.0"},
