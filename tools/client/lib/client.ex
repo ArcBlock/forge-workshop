@@ -23,28 +23,47 @@ defmodule Client do
     )
   end
 
-  def request_issue(w) do
+  def get_cert(w) do
     %HTTPoison.Response{body: response} =
       HTTPoison.get!("localhost:4000/api/cert/issue?userDid=#{w.address}")
 
     response = Jason.decode!(response)
+    do_get_cert(w, response)
+  end
+
+  defp do_get_cert(_, %{"error" => error}) do
+    error
+  end
+
+  defp do_get_cert(w, response) do
     auth_info = get_body(response["authInfo"])
     url = auth_info["url"]
     [claim] = auth_info["requestedClaims"]
     tx_data = str_to_bin(claim["tx"])
     sig = ForgeSdk.Wallet.Util.sign!(w, tx_data)
-
     claim = Map.put(claim, "sig", Multibase.encode!(sig, :base58_btc))
-    user_info = AbtDid.Signer.gen_and_sign(w.address, w.sk, %{requestedClaims: [claim]})
+    req = prepare_request(w, %{requestedClaims: [claim]})
 
-    req =
-      %{
-        userPk: Multibase.encode!(w.pk, :base58_btc),
-        userInfo: user_info
-      }
-      |> Jason.encode!()
+    %HTTPoison.Response{body: body} =
+      HTTPoison.post!(url, req, [{"content-type", "application/json"}])
 
-    HTTPoison.post!(url, req, [{"content-type", "application/json"}])
+    Jason.decode!(body)
+  end
+
+  def get_reward(w, asset) do
+    # zjdgZ3VU2ojWUybnBUEkByZWShDhYJLUWKNm
+    %HTTPoison.Response{body: response} = HTTPoison.get!("localhost:4000/api/cert/reward")
+    response = Jason.decode!(response)
+    auth_info = get_body(response["authInfo"])
+    url = auth_info["url"]
+    [claim] = auth_info["requestedClaims"]
+    claim = Map.put(claim, "certificate", asset)
+    req = prepare_request(w, %{requestedClaims: [claim]})
+
+    %HTTPoison.Response{body: body} =
+      HTTPoison.post!(url, req, [{"content-type", "application/json"}])
+
+    Jason.decode!(body)
   end
 
   defp str_to_bin(str) do
@@ -60,5 +79,15 @@ defmodule Client do
     |> Enum.at(1)
     |> Base.url_decode64!(padding: false)
     |> Jason.decode!()
+  end
+
+  defp prepare_request(w, extra) do
+    user_info = AbtDid.Signer.gen_and_sign(w.address, w.sk, extra)
+
+    %{
+      userPk: Multibase.encode!(w.pk, :base58_btc),
+      userInfo: user_info
+    }
+    |> Jason.encode!()
   end
 end

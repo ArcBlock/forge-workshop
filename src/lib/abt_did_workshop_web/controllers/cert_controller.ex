@@ -56,8 +56,12 @@ defmodule AbtDidWorkshopWeb.CertController do
     tx = %{tx | signatures: [AbciVendor.KVPair.new(key: address, value: sig)]}
 
     case ForgeSdk.send_tx(ForgeAbi.RequestSendTx.new(tx: tx)) do
-      {:error, reason} -> json(conn, %{error: reason})
-      hash -> json(conn, %{tx: hash})
+      {:error, reason} ->
+        json(conn, %{error: reason})
+
+      hash ->
+        assets = extract_asset(tx)
+        json(conn, %{tx: hash, assetAddresses: assets})
     end
   end
 
@@ -149,5 +153,10 @@ defmodule AbtDidWorkshopWeb.CertController do
     value = BigInt.biguint(1_000_000_000_000_000_000)
     itx = TransferTx.new(to: to, value: value)
     ForgeSdk.transfer(itx, wallet: from)
+  end
+
+  defp extract_asset(tx) do
+    {:exchange, exchange_tx} = ForgeAbi.decode_any(tx.itx)
+    exchange_tx.sender.assets
   end
 end
