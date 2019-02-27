@@ -1,0 +1,20 @@
+<h2>Demos</h2>
+
+<ul class="collection">
+  <%= for demo <- @demos do %>
+    <li class="collection-item">
+      <%= link(demo.name, to: Routes.demo_path(@conn, :show, demo)) %>
+        <div class="right">
+          <%= link("Edit", to: Routes.demo_path(@conn, :edit, demo)) %>
+          <!-- link的默认method是get -->
+          <%= link("Delete", to: Routes.demo_path(@conn, :delete, demo), method: :delete) %>
+        </div>
+    </li>
+  <% end %>
+</ul>
+
+<div class="fixed-action-btn">
+  <%= link(to: Routes.demo_path(@conn, :new), class: "btn-floating btn-large waves-effect waves-light red") do %>
+    <i class="material-icons">add</i>
+  <% end %>
+</div>

@@ -13,7 +13,8 @@ defmodule AbtDidWorkshop.Application do
           AbtDidWorkshopWeb.Endpoint,
           AbtDidWorkshop.UserDb,
           AbtDidWorkshop.AssetsDb,
-          AbtDidWorkshop.AppState
+          AbtDidWorkshop.AppState,
+          AbtDidWorkshop.Repo
         ]
 
     register_type_urls()

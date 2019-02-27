@@ -1,0 +1,65 @@
+<%= form_for @changeset, Routes.demo_path(@conn, :create), fn f -> %>
+  <div class="form-group">
+    <p>
+      <%= text_input f, :name, placeholder: "Title", class: "form-control" %>
+      <%= error_tag f, :name %>
+    </p>
+    <p>
+      <%= text_input f, :description, placeholder: "Description (optional)" %>
+    </p>
+    <p>
+      <%= select f, :behavior, [
+        [key: "Issue Asset", value: "issue_asset"], 
+        [key: "Redeem Asset", value: "redeem_asset"]
+      ], prompt: "Demo behavior" %>
+      <%= error_tag f, :behavior %>
+    </p>
+  </div>
+
+  <div class="form-group" id="issue_asset">
+    <p>
+      <%= text_input f, :asset_content, placeholder: "Asset Content" %>
+    </p>
+  </div>
+
+  <div class="form-group" id="redeem_asset">
+    <p>
+      <%= if @asset_demos == [] do %>
+        There is no assets to redeem, please create demo to issue assets first.
+      <% else %>
+      <%= for asset_demo <- @asset_demos do %>
+        <p>
+          <label>
+            <%= checkbox f, asset_demo.id  %>
+            <span><%= asset_demo.name %></span>
+          </label>
+        </p>
+      <% end %>
+      <% end %>
+    </p>
+  </div>
+
+  <p>
+    <%= submit "Save Demo", class: "btn btn-primary" %>
+  </p>
+<% end %>
+<script>
+function setSubForm() {
+ if ($('#demo_behavior').val() == "issue_asset") {
+    $('#issue_asset').show();
+    $('#redeem_asset').hide();
+  } else if ($('#demo_behavior').val() == "redeem_asset") {
+    $('#issue_asset').hide();
+    $('#redeem_asset').show();
+  } else {
+    $('#issue_asset').hide();
+    $('#redeem_asset').hide();
+  }
+}
+
+setSubForm();
+
+$('#demo_behavior').on('change', function() {
+  setSubForm();
+});
+</script>
