@@ -17,7 +17,7 @@ defmodule AbtDidWorkshop.Plugs.VerifySig do
 
       conn
       |> assign(:pk, pk_bin)
-      |> assign(:did, body["iss"])
+      |> assign(:did, Util.did_to_address(body["iss"]))
       |> assign(:iat, body["iat"])
       |> assign(:nbf, body["nbf"])
       |> assign(:exp, body["exp"])

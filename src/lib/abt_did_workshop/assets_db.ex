@@ -34,7 +34,7 @@ defmodule AbtDidWorkshop.AssetsDb do
   end
 
   def handle_call({:member, address}, _from, state) do
-    {:replay, MapSet.member?(state, address), state}
+    {:reply, MapSet.member?(state, address), state}
   end
 
   defp create_file do
