@@ -3,6 +3,13 @@ defmodule AbtDidWorkshop.Util do
 
   alias AbtDidWorkshop.AppState
 
+  def str_to_bin(str) do
+    case Base.decode16(str, case: :mixed) do
+      {:ok, bin} -> bin
+      _ -> Multibase.decode!(str)
+    end
+  end
+
   def get_ip do
     {:ok, ip_list} = :inet.getif()
     ips = List.first(ip_list)
@@ -31,13 +38,6 @@ defmodule AbtDidWorkshop.Util do
     pre <> "..." <> post
   end
 
-  def str_to_bin(str) do
-    case Base.decode16(str, case: :mixed) do
-      {:ok, bin} -> bin
-      _ -> Multibase.decode!(str)
-    end
-  end
-
   def get_body(jwt) do
     jwt
     |> String.split(".")
@@ -56,4 +56,7 @@ defmodule AbtDidWorkshop.Util do
 
   def hex_to_bin("0x" <> hex), do: hex_to_bin(hex)
   def hex_to_bin(hex), do: Base.decode16!(hex, case: :mixed)
+
+  def did_to_address("did:abt:" <> address), do: address
+  def did_to_address(address), do: address
 end

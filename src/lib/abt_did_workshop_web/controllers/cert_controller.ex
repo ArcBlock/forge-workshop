@@ -18,7 +18,9 @@ defmodule AbtDidWorkshopWeb.CertController do
     })
   end
 
-  def request_issue(conn, %{"userDid" => address}) do
+  def request_issue(conn, %{"userDid" => did}) do
+    address = Util.did_to_address(did)
+
     if hasCert?(address) do
       json(conn, %{error: "You already have a certificate"})
     else
