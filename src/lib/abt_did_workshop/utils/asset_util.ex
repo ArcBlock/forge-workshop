@@ -33,7 +33,7 @@ defmodule AbtDidWorkshop.AssetUtil do
     init_certs(owner, "ABT", 40)
 
     certs =
-      [address: owner.address]
+      [owner_address: owner.address]
       |> ForgeSdk.get_assets()
       |> elem(0)
       |> Enum.filter(fn %{owner: addr} -> addr == owner.address end)
