@@ -40,5 +40,7 @@ defmodule AbtDidWorkshopWeb.Router do
     post("/cert/issue", CertController, :response_issue)
     get("/cert/reward", CertController, :request_reward)
     post("/cert/reward", CertController, :response_reward)
+
+    post("/authinfo", ApiController, :auth_info)
   end
 end

@@ -1,3 +1,10 @@
+## 0.1.10 (February 27, 2019)
+  - Add an API to return authInfo for Event Chain.
+
+## 0.1.9 (February 27, 2019)
+  - Add get reward
+  - Fix the did to address
+
 ## 0.1.8 (February 26, 2019)
   - Update for demo.
 
