@@ -3,9 +3,8 @@ defmodule Client do
   Documentation for Client.
   """
 
-  def get_wallet do
-    %HTTPoison.Response{body: body} =
-      HTTPoison.post!("localhost:4000/api/cert/recover-wallet", "")
+  def get_wallet(host \\ "localhost:4000") do
+    %HTTPoison.Response{body: body} = HTTPoison.post!(host <> "/api/cert/recover-wallet", "")
 
     w = Jason.decode!(body) |> IO.inspect()
 
@@ -23,9 +22,9 @@ defmodule Client do
     )
   end
 
-  def get_cert(w) do
+  def get_cert(w, host \\ "localhost:4000") do
     %HTTPoison.Response{body: response} =
-      HTTPoison.get!("localhost:4000/api/cert/issue?userDid=#{w.address}")
+      HTTPoison.get!(host <> "/api/cert/issue?userDid=#{w.address}")
 
     response = Jason.decode!(response)
     do_get_cert(w, response)
@@ -50,9 +49,9 @@ defmodule Client do
     Jason.decode!(body)
   end
 
-  def get_reward(w, asset) do
+  def get_reward(w, asset, host \\ "localhost:4000") do
     # zjdgZ3VU2ojWUybnBUEkByZWShDhYJLUWKNm
-    %HTTPoison.Response{body: response} = HTTPoison.get!("localhost:4000/api/cert/reward")
+    %HTTPoison.Response{body: response} = HTTPoison.get!(host <> "/api/cert/reward")
     response = Jason.decode!(response)
     auth_info = get_body(response["authInfo"])
     url = auth_info["url"]
