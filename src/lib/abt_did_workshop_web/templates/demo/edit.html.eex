@@ -1,0 +1,9 @@
+<%= form_for @changeset, Routes.demo_path(@conn, :update, @demo), fn(f) -> %>
+  <div class="form-group">
+    <%= text_input(f, :title, placeholder: "Demo case title", class: "form-control") %>
+    <%= error_tag(f, :title) %>
+    <%= text_input f, :description, placeholder: "Description (optional)" %>
+  </div>
+
+  <%= submit "Save Demo", class: "btn btn-primary" %>
+<% end %>

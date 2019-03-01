@@ -10,6 +10,7 @@ import css from "../css/app.css"
 // Import dependencies
 //
 import "phoenix_html"
+import { SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION } from "constants";
 
 // Import local files
 //
@@ -17,13 +18,15 @@ import "phoenix_html"
 // import socket from "./socket"
 
 var QRCode = require('qrcode')
-var canvas = document.getElementById('canvas')
-var qrValue = document.getElementById('qrValue')
+var canvases = Array.from(document.getElementsByTagName('canvas'));
 
-if (canvas != null) {
-  QRCode.toCanvas(canvas, qrValue.value, function (error) {
-    if (error) console.error(error)
-    console.log('success!');
+if (canvases != null && canvases.length > 0) {
+  canvases.forEach((canvas) => {
+    var qrValue = document.getElementById('qrValue_' + canvas.id.substr(7));
+    QRCode.toCanvas(canvas, qrValue.value, function (error) {
+      if (error) console.error(error)
+      console.log('success!');
+    });
   });
 }
 window.__socket = require("phoenix").Socket;

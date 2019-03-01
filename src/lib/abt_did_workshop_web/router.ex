@@ -27,6 +27,7 @@ defmodule AbtDidWorkshopWeb.Router do
     post("/wallet/auth", WalletController, :response_auth)
 
     resources("/demo", DemoController)
+    resources("/tx", TxController)
   end
 
   scope "/api", AbtDidWorkshopWeb do

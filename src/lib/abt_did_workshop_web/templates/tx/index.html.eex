@@ -1,0 +1,86 @@
+<div class="section">
+  <h4> <%= @demo.title %> </h4>
+  <p style="font-size: smaller"> <%= @demo.description %> </p>
+</div>
+
+Transaction list:
+<!-- <ul class="collection"> 
+  <%= for tx <- @txs do %>
+    <li class="collection-item">
+      <%= link(tx.name, to: Routes.tx_path(@conn, :show, tx)) %>
+        <div class="right">
+          <%= link("Edit", to: Routes.tx_path(@conn, :edit, tx)) %>
+          <%= link("Delete", to: Routes.tx_path(@conn, :delete, tx), method: :delete) %>
+        </div>
+    </li>
+  <% end %>f
+</ul> -->
+
+<ul class="collection">
+  <%= for tx <- @txs do %>
+    <li class="collection-item">
+      <div class="row">
+        <div class="col s8">
+          <!-- Tx name, description and tx type. -->
+          <h5> <%= tx.name %> </h5>
+          <p style="font-size: smaller"> <%= tx.description %> </p>
+          <%= String.upcase(tx.tx_type) %> 
+          <!-- Tx behaviors -->
+          <ul class="collection">
+            <%= for beh <- tx.tx_behaviors do %>
+              <li class="collection-item" style="font-size: smaller"> 
+                <div class="row">
+                  <div class="col s2 m2">
+                    <%= beh.behavior %>
+                  </div>
+                  <%= if beh.token != nil do %>
+                    <div class="col s5"> <%= beh.token %> TBA </div>
+                  <% end %>
+                  <%= if beh.asset_content != nil and beh.asset_content != "" do %>
+                    <div class="col s5"> <%= beh.asset_content %></div>
+                  <% end %>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+        <!-- QR Code -->
+        <div class="col s4">
+          <input id='<%= "qrValue_#{tx.id}" %>' type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink(tx) %>"></input>
+          <div align="center">
+            <canvas id='<%= "canvas_#{tx.id}" %>'></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style: "font-size: smaller">
+        <div class="col s8"></div>
+        <div class="col s2">
+          <%= link("Edit", to: Routes.tx_path(@conn, :edit, tx)) %>
+        </div>
+        <div class="col s2">
+          <%= link("Delete", to: Routes.tx_path(@conn, :delete, tx), method: :delete) %>
+        </div>
+      </div>    
+    </li>
+  <% end %>
+</ul>
+
+<div class="fixed-action-btn">
+  <%= link(to: Routes.tx_path(@conn, :new, demo: @demo), class: "btn-floating btn-large waves-effect waves-light red") do %>
+    <i class="material-icons">add</i>
+  <% end %>
+</div>
+
+<script>
+var QRCode = require('qrcode')
+var canvas = document.getElementById('canvas')
+var qrValue = document.getElementById('qrValue')
+
+if (canvas != null) {
+  QRCode.toCanvas(canvas, qrValue.value, function (error) {
+    if (error) console.error(error)
+    console.log('success!');
+  });
+}
+</script>

@@ -1,0 +1,135 @@
+<%= form_for @changeset, Routes.tx_path(@conn, :create), fn f -> %>
+  <div class="form-group">
+    <p>
+      <%= text_input f, :name, placeholder: "Transaction Name", class: "form-control" %>
+      <%= error_tag f, :name %>
+    </p>
+    <p>
+      <%= text_input f, :description, placeholder: "Description (optional)" %>
+    </p>
+    <p>
+      <%= select f, :tx_type, ["TransferTx", "ExchangeTx", "ActivateAssetTx", "UpdateAssetTx", "Show"], prompt: "Choose your transaction type", id: :tx_type %>
+      <%= error_tag f, :behavior %>
+    </p>
+  </div>
+
+  <div class="form-group" id="TransferTx">
+      <div class="section">
+        <h7> TransferTx </h7>
+        <div class="divider"></div>
+        <br/>
+        <p style="font-size: smaller"> TransferTx is single direction transaction. You can <b>either</b> give something to someone or ask something from someone. This transaction only needs the signature of sender.  </p>
+      </div>
+
+      <div class="row">
+        <div class="col s2">
+          <span style="font-size: smaller"> Offer: </span>
+        </div>
+        <div class="col s4">
+          <%= text_input f, :offer_token, placeholder: "Token amout to offer." %>
+        </div>
+        <div class="col s6">
+          <%= text_input f, :offer_asset, placeholder: "Asset content to offer." %>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s2">
+          <span style="font-size: smaller"> Demand: </span>
+        </div>
+        <div class="col s4">
+          <%= text_input f, :demand_token, placeholder: "Token amout to demand." %>
+        </div>
+        <div class="col s6">
+          <%= text_input f, :demand_asset, placeholder: "Asset content to demand." %>
+        </div>
+      </div>
+  </div>
+
+  <div class="form-group" id="ExchangeTx">
+    <div class="section">
+      <h7> ExchangeTx </h7>
+      <div class="divider"></div>
+      <br/>
+      <p style="font-size: smaller"> ExchangeTx is two-way transaction. Both sender's and receiver's signatures are required. </p>
+    </div>
+
+    <div class="row">
+      <div class="col s2">
+        <span style="font-size: smaller"> Offer: </span>
+      </div>
+      <div class="col s4">
+        <%= text_input f, :offer_token, placeholder: "Token amout to offer." %>
+      </div>
+      <div class="col s6">
+        <%= text_input f, :offer_asset, placeholder: "Asset content to offer." %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col s2">
+        <span style="font-size: smaller"> Demand: </span>
+      </div>
+      <div class="col s4">
+        <%= text_input f, :demand_token, placeholder: "Token amout to demand." %>
+      </div>
+      <div class="col s6">
+        <%= text_input f, :demand_asset, placeholder: "Asset content to demand." %>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group" id="ActivateAssetTx">
+    <div class="section">
+      <h7> ActivateAssetTx </h7>
+      <div class="divider"></div>
+      <br/>
+      <p style="font-size: smaller"> Once an asset is activated, it is not transferable nor modifiable. It is valid till the expiration time, and then become invalid forever. </p>
+    </div>
+    <div class="row">
+      <div class="col s2">
+        <span style="font-size: smaller"> Offer: </span>
+      </div>
+      <div class="col s4">
+        <%= text_input f, :offer_token, placeholder: "Token amout to offer." %>
+      </div>
+      <div class="col s6">
+        <%= text_input f, :offer_asset, placeholder: "Asset content to offer." %>
+      </div>
+    </div>
+  </div>
+  
+  <div class="form-group" id="UpdateAssetTx">
+    <div class="section">
+      <h7> UpdateAssetTx </h7>
+      <div class="divider"></div>
+      <br/>
+      <p style="font-size: smaller"> Once an asset is activated, it is not transferable nor modifiable. It is valid till the expiration time, and then become invalid forever. </p>
+    </div>
+  </div>
+
+  <div class="form-group" id="Show">
+    <p>
+    Show
+    </p>
+  </div>
+  <p>
+    <%= submit "Save Demo", class: "btn btn-primary" %>
+  </p>
+<% end %>
+<script>
+function showSubForm(form_id) {
+  list = ["TransferTx", "ExchangeTx", "ActivateAssetTx", "UpdateAssetTx", "Show"]
+  list.forEach(function (id) {
+    if (id == form_id) {
+      $('#' + id).show()
+    } else {
+      $('#' + id).hide()
+    }
+  });
+}
+
+showSubForm('none');
+
+$('#tx_type').on('change', function() {
+  showSubForm($(this).val());
+});
+</script>

@@ -6,25 +6,18 @@ defmodule AbtDidWorkshop.Demo do
   use Ecto.Schema
 
   import Ecto.Changeset
-  import Ecto.Query
 
-  alias AbtDidWorkshop.Repo
+  alias AbtDidWorkshop.Tx
 
   schema("demo") do
-    field(:name, :string)
+    field(:title, :string)
     field(:description, :string)
-    field(:behavior, :string)
-    field(:asset_content, :string)
+    has_many(:txs, Tx, on_delete: :delete_all)
   end
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:name, :description, :behavior, :asset_content])
-    |> validate_required([:name, :behavior])
-  end
-
-  def get_assets() do
-    from(d in AbtDidWorkshop.Demo, where: d.behavior == "issue_asset")
-    |> Repo.all()
+    |> cast(params, [:title, :description])
+    |> validate_required([:title])
   end
 end

@@ -2,64 +2,60 @@ defmodule AbtDidWorkshopWeb.DemoController do
   use AbtDidWorkshopWeb, :controller
 
   alias AbtDidWorkshop
-  alias AbtDidWorkshop.Repo
-  alias AbtDidWorkshop.Demo
+  alias AbtDidWorkshop.{Repo, Demo, Tables.DemoTable}
 
   def index(conn, _) do
-    demos = Repo.all(Demo)
-    render(conn, "index.html", demos: demos)
-  end
-
-  def show(conn, _) do
-  end
-
-  def new(conn, _) do
     changeset = Demo.changeset(%Demo{}, %{})
-    assets = Demo.get_assets()
-    render(conn, "new.html", changeset: changeset, asset_demos: assets)
+    demos = DemoTable.get_all()
+    render(conn, "index.html", demos: demos, changeset: changeset)
   end
 
-  def create(conn, %{"demo" => %{"behavior" => "issue_asset", "asset_content" => ""}}) do
-    conn
-    |> put_flash(:error, "Must fill in asset content to issue assets")
-    |> redirect(to: Routes.demo_path(conn, :new))
-  end
-
-  def create(conn, %{"demo" => demo} = param) do
-    asset_content =
-      case demo["behavior"] do
-        "issue_asset" -> demo["issue_asset"]
-        _ -> ""
-      end
-
-    changeset =
-      Demo.changeset(%Demo{}, %{
-        name: demo["name"],
-        description: demo["description"],
-        behavior: demo["behavior"],
-        asset_content: asset_content
-      })
-
-    case Repo.insert(changeset) do
-      {:ok, _} ->
+  def create(conn, %{"demo" => demo}) do
+    case DemoTable.insert(demo) do
+      {:ok, record} ->
         conn
-        |> put_flash(:info, "Demo Created!")
-        |> redirect(to: Routes.demo_path(conn, :index))
+        |> put_flash(:info, "Successfully created demo case. Now please add transactions.")
+        |> redirect(to: Routes.tx_path(conn, :index, demo_id: record.id))
 
       {:error, changeset} ->
-        render(conn, "new.html", changeset: changeset, asset_demos: Demo.get_assets())
+        demos = DemoTable.get_all()
+        render(conn, "index.html", demos: demos, changeset: changeset)
     end
   end
 
-  def update(conn, _) do
+  def delete(conn, %{"id" => demo_id}) do
+    case DemoTable.delete(demo_id) do
+      {:ok, _} ->
+        conn
+        |> put_flash(:info, "Successfully deleted demo.")
+        |> redirect(to: Routes.demo_path(conn, :index))
+
+      {:error, reason} ->
+        conn
+        |> put_flash(:error, reason)
+        |> redirect(to: Routes.demo_path(conn, :index))
+        |> halt()
+    end
   end
 
-  def delete(conn, %{"id" => demo_id}) do
-    Repo.get!(Demo, demo_id)
-    |> Repo.delete!()
+  def edit(conn, %{"id" => demo_id}) do
+    demo = Repo.get(Demo, demo_id)
+    changeset = Demo.changeset(demo)
+    render(conn, "edit.html", changeset: changeset, demo: demo)
+  end
 
-    conn
-    |> put_flash(:info, "Demo Deleted")
-    |> redirect(to: Routes.demo_path(conn, :index))
+  def update(conn, %{"id" => demo_id, "demo" => new_demo}) do
+    old_demo = Repo.get(Demo, demo_id)
+    changeset = Demo.changeset(old_demo, new_demo)
+
+    case Repo.update(changeset) do
+      {:ok, _} ->
+        conn
+        |> put_flash(:info, "Demo updated.")
+        |> redirect(to: Routes.demo_path(conn, :index))
+
+      {:error, changeset} ->
+        render(conn, "edit.html", changeset: changeset, demo: old_demo)
+    end
   end
 end

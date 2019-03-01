@@ -54,6 +54,14 @@ defmodule AbtDidWorkshop.Util do
     "#{path}?appPk=#{app_pk}&appDid=#{app_state.did}&action=requestAuth&url=#{url}"
   end
 
+  def gen_deeplink(tx) do
+    url = (get_callback() <> "tx/#{tx.id}") |> URI.encode_www_form()
+    app_state = AppState.get()
+    path = String.trim_trailing(app_state.path, "/")
+    app_pk = Multibase.encode!(app_state.pk, :base58_btc)
+    "#{path}?appPk=#{app_pk}&appDid=#{app_state.did}&action=requestAuth&url=#{url}"
+  end
+
   def hex_to_bin("0x" <> hex), do: hex_to_bin(hex)
   def hex_to_bin(hex), do: Base.decode16!(hex, case: :mixed)
 
