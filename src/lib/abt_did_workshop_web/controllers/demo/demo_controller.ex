@@ -2,7 +2,7 @@ defmodule AbtDidWorkshopWeb.DemoController do
   use AbtDidWorkshopWeb, :controller
 
   alias AbtDidWorkshop
-  alias AbtDidWorkshop.{Repo, Demo, Tables.DemoTable}
+  alias AbtDidWorkshop.{Demo, Repo, Tables.DemoTable}
 
   def index(conn, _) do
     changeset = Demo.changeset(%Demo{}, %{})

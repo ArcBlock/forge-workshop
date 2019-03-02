@@ -28,6 +28,7 @@ defmodule AbtDidWorkshopWeb.Router do
 
     resources("/demo", DemoController)
     resources("/tx", TxController)
+    put("/tx", TxController, :create)
   end
 
   scope "/api", AbtDidWorkshopWeb do

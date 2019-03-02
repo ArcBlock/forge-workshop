@@ -45,4 +45,11 @@ defmodule AbtDidWorkshopWeb.ApiController do
 
     json(conn, Jason.encode!(response))
   end
+
+  def auth_info(conn, _) do
+    json(
+      conn,
+      Jason.encode!(%{error: "Insufficient data. You must have sk, pk, address, tx and url."})
+    )
+  end
 end

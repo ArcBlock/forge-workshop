@@ -18,7 +18,7 @@ defmodule AbtDidWorkshop.Repo.Migrations.Init do
       add(:tx_type, :string)
       add(:behavior, :string)
       add(:token, :integer)
-      add(:asset_content, :string)
+      add(:asset, :string)
       add(:tx_id, references(:tx))
     end
 

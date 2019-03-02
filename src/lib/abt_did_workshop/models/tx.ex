@@ -20,6 +20,6 @@ defmodule AbtDidWorkshop.Tx do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:name, :description, :tx_type])
-    |> validate_required([:name, :description, :tx_type])
+    |> validate_required([:name, :tx_type])
   end
 end

@@ -1,4 +1,6 @@
 defmodule AbtDidWorkshop.Tables.DemoTable do
+  @moduledoc false
+
   import Ecto.Query
 
   alias AbtDidWorkshop.{Demo, Repo}
@@ -12,7 +14,7 @@ defmodule AbtDidWorkshop.Tables.DemoTable do
     |> Repo.one()
   end
 
-  def get_all() do
+  def get_all do
     from(
       d in Demo,
       preload: [:txs]

@@ -13,13 +13,13 @@ defmodule AbtDidWorkshop.TxBehavior do
     field(:tx_type, :string)
     field(:behavior, :string)
     field(:token, :integer)
-    field(:asset_content, :string)
+    field(:asset, :string)
     belongs_to(:tx, Tx)
   end
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:tx_type, :behavior, :token, :asset_content])
+    |> cast(params, [:tx_type, :behavior, :token, :asset])
     |> validate_required([:tx_type, :behavior])
   end
 end

@@ -1,8 +1,10 @@
 defmodule AbtDidWorkshop.Tables.TxTable do
+  @moduledoc false
+
   import Ecto
   import Ecto.Query
 
-  alias AbtDidWorkshop.{Tables.DemoTable, Tx, TxBehavior, Repo}
+  alias AbtDidWorkshop.{Repo, Tables.DemoTable, Tx, TxBehavior}
 
   def get_all(demo_id) do
     from(
@@ -26,15 +28,17 @@ defmodule AbtDidWorkshop.Tables.TxTable do
     from(
       t in Tx,
       join: b in TxBehavior,
-      on: t.id == b.tx_id and b.behavior == "offer" and b.asset_content != "",
+      on: t.id == b.tx_id and b.behavior == "offer" and b.asset != "",
       where: t.demo_id == ^demo_id,
       preload: [:tx_behaviors]
     )
     |> Repo.all()
   end
 
-  def insert(tx, demo_id) do
+  def upsert(tx, tx_id, demo_id) do
     Repo.transaction(fn ->
+      delete(tx_id)
+
       tx_record =
         demo_id
         |> DemoTable.get()
@@ -51,9 +55,19 @@ defmodule AbtDidWorkshop.Tables.TxTable do
     end)
   end
 
-  def delete(id) do
+  def delete(nil), do: :ok
+  def delete(""), do: :ok
+
+  def delete(id) when is_binary(id) do
     id
-    |> get()
-    |> Repo.delete()
+    |> String.to_integer()
+    |> delete()
+  end
+
+  def delete(id) do
+    case get(id) do
+      nil -> :ok
+      tx -> Repo.delete(tx)
+    end
   end
 end

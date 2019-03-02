@@ -4,18 +4,6 @@
 </div>
 
 Transaction list:
-<!-- <ul class="collection"> 
-  <%= for tx <- @txs do %>
-    <li class="collection-item">
-      <%= link(tx.name, to: Routes.tx_path(@conn, :show, tx)) %>
-        <div class="right">
-          <%= link("Edit", to: Routes.tx_path(@conn, :edit, tx)) %>
-          <%= link("Delete", to: Routes.tx_path(@conn, :delete, tx), method: :delete) %>
-        </div>
-    </li>
-  <% end %>f
-</ul> -->
-
 <ul class="collection">
   <%= for tx <- @txs do %>
     <li class="collection-item">
@@ -36,8 +24,8 @@ Transaction list:
                   <%= if beh.token != nil do %>
                     <div class="col s5"> <%= beh.token %> TBA </div>
                   <% end %>
-                  <%= if beh.asset_content != nil and beh.asset_content != "" do %>
-                    <div class="col s5"> <%= beh.asset_content %></div>
+                  <%= if beh.asset != nil and beh.asset != "" do %>
+                    <div class="col s5"> <%= beh.asset %></div>
                   <% end %>
                 </div>
               </li>
@@ -56,10 +44,10 @@ Transaction list:
       <div class="row" style: "font-size: smaller">
         <div class="col s8"></div>
         <div class="col s2">
-          <%= link("Edit", to: Routes.tx_path(@conn, :edit, tx)) %>
+          <%= link("Edit", to: Routes.tx_path(@conn, :edit, tx, demo_id: @demo.id)) %>
         </div>
         <div class="col s2">
-          <%= link("Delete", to: Routes.tx_path(@conn, :delete, tx), method: :delete) %>
+          <%= link("Delete", to: Routes.tx_path(@conn, :delete, tx, demo_id: @demo.id), method: :delete) %>
         </div>
       </div>    
     </li>
@@ -67,7 +55,7 @@ Transaction list:
 </ul>
 
 <div class="fixed-action-btn">
-  <%= link(to: Routes.tx_path(@conn, :new, demo: @demo), class: "btn-floating btn-large waves-effect waves-light red") do %>
+  <%= link(to: Routes.tx_path(@conn, :new, demo_id: @demo.id), class: "btn-floating btn-large waves-effect waves-light red") do %>
     <i class="material-icons">add</i>
   <% end %>
 </div>

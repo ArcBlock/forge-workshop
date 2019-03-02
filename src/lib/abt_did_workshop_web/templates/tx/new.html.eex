@@ -1,15 +1,18 @@
+<br>
 <%= form_for @changeset, Routes.tx_path(@conn, :create), fn f -> %>
+  <% init_tx_type = @changeset.data.tx_type || ""%>
+  <%= text_input f, :init_tx_type, value: init_tx_type, type: "hidden" %>
+  <%= text_input f, :demo_id, value: @demo_id, type: "hidden" %>
+  <%= text_input f, :tx_id, value: @tx_id, type: "hidden" %>
   <div class="form-group">
     <p>
       <%= text_input f, :name, placeholder: "Transaction Name", class: "form-control" %>
-      <%= error_tag f, :name %>
     </p>
     <p>
       <%= text_input f, :description, placeholder: "Description (optional)" %>
     </p>
     <p>
-      <%= select f, :tx_type, ["TransferTx", "ExchangeTx", "ActivateAssetTx", "UpdateAssetTx", "Show"], prompt: "Choose your transaction type", id: :tx_type %>
-      <%= error_tag f, :behavior %>
+      <%= select f, :tx_type, ["TransferTx", "ExchangeTx", "ActivateAssetTx", "UpdateAssetTx", [key: "Proof of Holding", value: "ProofOfHolding"]], prompt: "Choose your transaction type", id: :tx_type, value: init_tx_type %>
     </p>
   </div>
 
@@ -26,10 +29,10 @@
           <span style="font-size: smaller"> Offer: </span>
         </div>
         <div class="col s4">
-          <%= text_input f, :offer_token, placeholder: "Token amout to offer." %>
+          <%= text_input f, :transfer_offer_token, placeholder: "Token amout to offer.", value: behavior_value("TransferTx_offer_token", @changeset.data) %>
         </div>
         <div class="col s6">
-          <%= text_input f, :offer_asset, placeholder: "Asset content to offer." %>
+          <%= text_input f, :transfer_offer_asset, placeholder: "Asset content to offer.", value: behavior_value("TransferTx_offer_asset", @changeset.data) %>
         </div>
       </div>
       <div class="row">
@@ -37,10 +40,10 @@
           <span style="font-size: smaller"> Demand: </span>
         </div>
         <div class="col s4">
-          <%= text_input f, :demand_token, placeholder: "Token amout to demand." %>
+          <%= text_input f, :transfer_demand_token, placeholder: "Token amout to demand.", value: behavior_value("TransferTx_demand_token", @changeset.data) %>
         </div>
         <div class="col s6">
-          <%= text_input f, :demand_asset, placeholder: "Asset content to demand." %>
+          <%= text_input f, :transfer_demand_asset, placeholder: "Asset content to demand.", value: behavior_value("TransferTx_demand_asset", @changeset.data) %>
         </div>
       </div>
   </div>
@@ -58,10 +61,10 @@
         <span style="font-size: smaller"> Offer: </span>
       </div>
       <div class="col s4">
-        <%= text_input f, :offer_token, placeholder: "Token amout to offer." %>
+        <%= text_input f, :exchange_offer_token, placeholder: "Token amout to offer.", value: behavior_value("ExchangeTx_offer_token", @changeset.data) %>
       </div>
       <div class="col s6">
-        <%= text_input f, :offer_asset, placeholder: "Asset content to offer." %>
+        <%= text_input f, :exchange_offer_asset, placeholder: "Asset content to offer.", value: behavior_value("ExchangeTx_offer_asset", @changeset.data) %>
       </div>
     </div>
     <div class="row">
@@ -69,10 +72,10 @@
         <span style="font-size: smaller"> Demand: </span>
       </div>
       <div class="col s4">
-        <%= text_input f, :demand_token, placeholder: "Token amout to demand." %>
+        <%= text_input f, :exchange_demand_token, placeholder: "Token amout to demand.", value: behavior_value("ExchangeTx_demand_token", @changeset.data) %>
       </div>
       <div class="col s6">
-        <%= text_input f, :demand_asset, placeholder: "Asset content to demand." %>
+        <%= text_input f, :exchange_demand_asset, placeholder: "Asset content to demand.", value: behavior_value("ExchangeTx_demand_asset", @changeset.data) %>
       </div>
     </div>
   </div>
@@ -85,14 +88,8 @@
       <p style="font-size: smaller"> Once an asset is activated, it is not transferable nor modifiable. It is valid till the expiration time, and then become invalid forever. </p>
     </div>
     <div class="row">
-      <div class="col s2">
-        <span style="font-size: smaller"> Offer: </span>
-      </div>
-      <div class="col s4">
-        <%= text_input f, :offer_token, placeholder: "Token amout to offer." %>
-      </div>
-      <div class="col s6">
-        <%= text_input f, :offer_asset, placeholder: "Asset content to offer." %>
+      <div class="col s12">
+        <%= text_input f, :activate_asset, placeholder: "The content of the asset you want to activate.", value: behavior_value("ActivateAssetTx_activate_asset", @changeset.data) %>
       </div>
     </div>
   </div>
@@ -102,32 +99,52 @@
       <h7> UpdateAssetTx </h7>
       <div class="divider"></div>
       <br/>
-      <p style="font-size: smaller"> Once an asset is activated, it is not transferable nor modifiable. It is valid till the expiration time, and then become invalid forever. </p>
+      <p style="font-size: smaller"> Use this transaction to update the asset content as you want. The asset owner's signature is required. You can type the function to update asset content in the input box bellow. The function will be called with the asset's current content, and the ouput will be the new content. Both input and output are strings. </p>
+    </div>
+    <div class="row">
+      <div class="col s12">
+        <%= text_input f, :update_func, placeholder: "The elixir function to update content, e.g.,  fn c -> c |> String.to_integer() |> Kernel.+(1) |> inspect() end", value: behavior_value("UpdateAssetTx_update_asset", @changeset.data) %>
+      </div>
     </div>
   </div>
 
-  <div class="form-group" id="Show">
-    <p>
-    Show
-    </p>
+  <div class="form-group" id="ProofOfHolding">
+    <div class="section">
+      <h7> Proof of Holding </h7>
+      <div class="divider"></div>
+      <br/>
+      <p style="font-size: smaller"> This operation is not a transaction. It means you just want others to show you that they are in possession of a DID. The DID could be an account, an asset or even a stake. </p>
+    </div>
+    <div class="row">
+      <div class="col s6">
+        <%= text_input f, :poh_token, placeholder: "The token amout to hold.", value: behavior_value("ProofOfHolding_poh_token", @changeset.data) %>
+      </div>
+      <div class="col s6">
+        <%= text_input f, :poh_asset, placeholder: "The content of the asset to hold.", value: behavior_value("ProofOfHolding_poh_asset", @changeset.data) %>
+      </div>
+    </div>
   </div>
   <p>
     <%= submit "Save Demo", class: "btn btn-primary" %>
   </p>
 <% end %>
+
 <script>
 function showSubForm(form_id) {
-  list = ["TransferTx", "ExchangeTx", "ActivateAssetTx", "UpdateAssetTx", "Show"]
+  list = ["TransferTx", "ExchangeTx", "ActivateAssetTx", "UpdateAssetTx", "ProofOfHolding"]
   list.forEach(function (id) {
-    if (id == form_id) {
-      $('#' + id).show()
+    if (form_id == "") {
+      $('#' + id).hide();
+    } else if (id == form_id) {
+      $('#' + id).show();
     } else {
-      $('#' + id).hide()
+      $('#' + id).hide();
     }
   });
 }
 
-showSubForm('none');
+initTxType = document.getElementById("tx_init_tx_type");
+showSubForm(initTxType.value);
 
 $('#tx_type').on('change', function() {
   showSubForm($(this).val());
