@@ -27,6 +27,9 @@ Transaction list:
                   <%= if beh.asset != nil and beh.asset != "" do %>
                     <div class="col s5"> <%= beh.asset %></div>
                   <% end %>
+                  <%= if beh.function != nil and beh.function != "" do %>
+                    <div class="col s5"> <%= beh.function %></div>
+                  <% end %>
                 </div>
               </li>
             <% end %>

@@ -44,5 +44,8 @@ defmodule AbtDidWorkshopWeb.Router do
     post("/cert/reward", CertController, :response_reward)
 
     post("/authinfo", ApiController, :auth_info)
+
+    get("/transaction/:id", TransactionController, :request)
+    post("/transaction/:id", TransactionController, :response)
   end
 end

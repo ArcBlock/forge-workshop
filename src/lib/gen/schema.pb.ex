@@ -8,16 +8,18 @@ defmodule AbtDidWorkshop.Certificate do
           iat: non_neg_integer,
           nbf: non_neg_integer,
           exp: non_neg_integer,
-          content: String.t(),
+          title: String.t(),
+          content: integer,
           sig: String.t()
         }
-  defstruct [:from, :to, :iat, :nbf, :exp, :content, :sig]
+  defstruct [:from, :to, :iat, :nbf, :exp, :title, :content, :sig]
 
   field(:from, 1, type: :string)
   field(:to, 2, type: :string)
   field(:iat, 3, type: :uint64)
   field(:nbf, 4, type: :uint64)
   field(:exp, 5, type: :uint64)
-  field(:content, 6, type: :string)
-  field(:sig, 7, type: :bytes)
+  field(:title, 6, type: :string)
+  field(:content, 7, type: :int64)
+  field(:sig, 8, type: :bytes)
 end

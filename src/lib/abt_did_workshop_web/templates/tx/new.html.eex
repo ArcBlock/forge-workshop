@@ -32,7 +32,7 @@
           <%= text_input f, :transfer_offer_token, placeholder: "Token amout to offer.", value: behavior_value("TransferTx_offer_token", @changeset.data) %>
         </div>
         <div class="col s6">
-          <%= text_input f, :transfer_offer_asset, placeholder: "Asset content to offer.", value: behavior_value("TransferTx_offer_asset", @changeset.data) %>
+          <%= text_input f, :transfer_offer_asset, placeholder: "Asset title to offer.", value: behavior_value("TransferTx_offer_asset", @changeset.data) %>
         </div>
       </div>
       <div class="row">
@@ -43,7 +43,7 @@
           <%= text_input f, :transfer_demand_token, placeholder: "Token amout to demand.", value: behavior_value("TransferTx_demand_token", @changeset.data) %>
         </div>
         <div class="col s6">
-          <%= text_input f, :transfer_demand_asset, placeholder: "Asset content to demand.", value: behavior_value("TransferTx_demand_asset", @changeset.data) %>
+          <%= text_input f, :transfer_demand_asset, placeholder: "Asset title to demand.", value: behavior_value("TransferTx_demand_asset", @changeset.data) %>
         </div>
       </div>
   </div>
@@ -64,7 +64,7 @@
         <%= text_input f, :exchange_offer_token, placeholder: "Token amout to offer.", value: behavior_value("ExchangeTx_offer_token", @changeset.data) %>
       </div>
       <div class="col s6">
-        <%= text_input f, :exchange_offer_asset, placeholder: "Asset content to offer.", value: behavior_value("ExchangeTx_offer_asset", @changeset.data) %>
+        <%= text_input f, :exchange_offer_asset, placeholder: "Asset title to offer.", value: behavior_value("ExchangeTx_offer_asset", @changeset.data) %>
       </div>
     </div>
     <div class="row">
@@ -75,7 +75,7 @@
         <%= text_input f, :exchange_demand_token, placeholder: "Token amout to demand.", value: behavior_value("ExchangeTx_demand_token", @changeset.data) %>
       </div>
       <div class="col s6">
-        <%= text_input f, :exchange_demand_asset, placeholder: "Asset content to demand.", value: behavior_value("ExchangeTx_demand_asset", @changeset.data) %>
+        <%= text_input f, :exchange_demand_asset, placeholder: "Asset title to demand.", value: behavior_value("ExchangeTx_demand_asset", @changeset.data) %>
       </div>
     </div>
   </div>
@@ -89,7 +89,7 @@
     </div>
     <div class="row">
       <div class="col s12">
-        <%= text_input f, :activate_asset, placeholder: "The content of the asset you want to activate.", value: behavior_value("ActivateAssetTx_activate_asset", @changeset.data) %>
+        <%= text_input f, :activate_asset, placeholder: "The title of the asset you want to activate.", value: behavior_value("ActivateAssetTx_activate_asset", @changeset.data) %>
       </div>
     </div>
   </div>
@@ -99,11 +99,14 @@
       <h7> UpdateAssetTx </h7>
       <div class="divider"></div>
       <br/>
-      <p style="font-size: smaller"> Use this transaction to update the asset content as you want. The asset owner's signature is required. You can type the function to update asset content in the input box bellow. The function will be called with the asset's current content, and the ouput will be the new content. Both input and output are strings. </p>
+      <p style="font-size: smaller"> Use this transaction to update the asset content as you want. The owner's signature is required. You can type the function to update asset content in the input box bellow. The function will be called with the asset's current content, and the ouput will be the new content. Both input and output are integer. </p>
     </div>
     <div class="row">
-      <div class="col s12">
-        <%= text_input f, :update_func, placeholder: "The elixir function to update content, e.g.,  fn c -> c |> String.to_integer() |> Kernel.+(1) |> inspect() end", value: behavior_value("UpdateAssetTx_update_asset", @changeset.data) %>
+      <div class="col s4">
+        <%= text_input f, :update_asset, placeholder: "The title of asset to update.", value: behavior_value("UpdateAssetTx_update_asset", @changeset.data) %>
+      </div>
+      <div class="col s8">
+        <%= text_input f, :update_func, placeholder: "The elixir function to update content, e.g.,  fn c -> c + 1 end", value: behavior_value("UpdateAssetTx_update_function", @changeset.data) %>
       </div>
     </div>
   </div>
@@ -120,7 +123,7 @@
         <%= text_input f, :poh_token, placeholder: "The token amout to hold.", value: behavior_value("ProofOfHolding_poh_token", @changeset.data) %>
       </div>
       <div class="col s6">
-        <%= text_input f, :poh_asset, placeholder: "The content of the asset to hold.", value: behavior_value("ProofOfHolding_poh_asset", @changeset.data) %>
+        <%= text_input f, :poh_asset, placeholder: "The title of the asset to hold.", value: behavior_value("ProofOfHolding_poh_asset", @changeset.data) %>
       </div>
     </div>
   </div>

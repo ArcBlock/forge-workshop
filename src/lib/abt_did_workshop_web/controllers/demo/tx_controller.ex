@@ -103,7 +103,7 @@ defmodule AbtDidWorkshopWeb.TxController do
          %{"demo_id" => demo_id, "tx_id" => tx_id, "tx_type" => "ActivateAssetTx"} = tx
        ) do
     case tx["activate_asset"] do
-      "" -> go_to_new(conn, demo_id, tx_id, "Asset content cannot be empty.")
+      "" -> go_to_new(conn, demo_id, tx_id, "Asset title cannot be empty.")
       asset -> create_single(conn, demo_id, tx_id, "activate", nil, asset, tx)
     end
   end
@@ -120,9 +120,24 @@ defmodule AbtDidWorkshopWeb.TxController do
         _ -> false
       end
 
-    case valid do
-      false -> go_to_new(conn, demo_id, tx_id, "Invalid function.")
-      true -> create_single(conn, demo_id, tx_id, "update", nil, tx["update_func"], tx)
+    cond do
+      tx["update_asset"] == "" ->
+        go_to_new(conn, demo_id, tx_id, "Asset title cannot be empty.")
+
+      valid == false ->
+        go_to_new(conn, demo_id, tx_id, "Invalid function.")
+
+      true ->
+        create_single(
+          conn,
+          demo_id,
+          tx_id,
+          "update",
+          nil,
+          tx["update_asset"],
+          tx,
+          tx["update_func"]
+        )
     end
   end
 
@@ -142,11 +157,12 @@ defmodule AbtDidWorkshopWeb.TxController do
     end
   end
 
-  defp create_single(conn, demo_id, tx_id, behavior, token, asset, tx) do
+  defp create_single(conn, demo_id, tx_id, behavior, token, asset, tx, func \\ nil) do
     behaviors = [
       %{
         behavior: behavior,
         asset: asset,
+        function: func,
         token: token,
         tx_type: tx["tx_type"]
       }

@@ -7,6 +7,7 @@ message Certificate {
   uint64 iat = 3;
   uint64 nbf = 4;
   uint64 exp = 5;
-  string content = 6;
-  bytes sig = 7;
+  string title = 6;
+  int64 content = 7;
+  bytes sig = 8;
 }

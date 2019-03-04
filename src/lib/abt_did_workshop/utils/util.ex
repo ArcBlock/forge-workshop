@@ -55,7 +55,7 @@ defmodule AbtDidWorkshop.Util do
   end
 
   def gen_deeplink(tx) do
-    url = (get_callback() <> "tx/#{tx.id}") |> URI.encode_www_form()
+    url = (get_callback() <> "transaction/#{tx.id}") |> URI.encode_www_form()
     app_state = AppState.get()
     path = String.trim_trailing(app_state.path, "/")
     app_pk = Multibase.encode!(app_state.pk, :base58_btc)
@@ -67,4 +67,8 @@ defmodule AbtDidWorkshop.Util do
 
   def did_to_address("did:abt:" <> address), do: address
   def did_to_address(address), do: address
+
+  def empty?(nil), do: true
+  def empty?(""), do: true
+  def empty?(_), do: false
 end
