@@ -47,5 +47,7 @@ defmodule AbtDidWorkshopWeb.Router do
 
     get("/transaction/:id", TransactionController, :request)
     post("/transaction/:id", TransactionController, :response)
+
+    get("/state/account/:addr", StateController, :account)
   end
 end

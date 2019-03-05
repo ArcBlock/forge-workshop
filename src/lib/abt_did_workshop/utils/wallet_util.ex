@@ -14,6 +14,18 @@ defmodule AbtDidWorkshop.WalletUtil do
     WalletType
   }
 
+  def get_account_state(address) do
+    state = ForgeSdk.get_account_state(address: address)
+
+    case state do
+      nil ->
+        nil
+
+      state ->
+        %{balance: ForgeAbi.Util.BigInt.to_int(state.balance), num_assets: state.num_assets}
+    end
+  end
+
   def init_wallets(number) do
     moniker_prefix =
       :abt_did_workshop |> Application.get_env(:wallet) |> Keyword.get(:moniker_prefix)

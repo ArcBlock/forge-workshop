@@ -8,14 +8,19 @@ defmodule AbtDidWorkshopWeb.TransactionController do
   alias AbtDidWorkshop.{
     AppState,
     AssetUtil,
-    Certificate,
+    Plugs.VerifySig,
     Tables.TxTable,
+    TransactionHelper,
     TxBehavior,
     Util,
     WalletUtil
   }
 
-  @tba 1_000_000_000_000_000_000
+  alias AbtDidWorkshopWeb.TransactionHelper
+
+  alias ForgeAbi.Transaction
+
+  plug(VerifySig when action in [:response])
 
   def request(conn, %{"id" => id, "userDid" => did}) do
     tx_id = String.to_integer(id)
@@ -33,15 +38,28 @@ defmodule AbtDidWorkshopWeb.TransactionController do
     end
   end
 
-  def response(conn, %{"id" => tx_id}) do
-    json(conn, %{error: "response #{tx_id}"})
+  def response(conn, %{"id" => id}) do
+    tx_id = String.to_integer(id)
+    user_addr = conn.assigns.did
+    claims = conn.assigns.claims
+    {robert, _} = WalletUtil.init_robert()
+
+    case TxTable.get(tx_id) do
+      nil ->
+        json(conn, %{error: "Cannot find transaction."})
+
+      tx ->
+        tx.tx_type
+        |> do_response(tx.tx_behaviors, claims, robert, user_addr)
+        |> reply(conn, tx_id)
+    end
   end
 
   defp do_request(_, behaviors, _, _) when is_nil(behaviors) or behaviors == [] do
     %{error: "Invliad transaction behaviors"}
   end
 
-  defp do_request("TransferTx", [%TxBehavior{} = beh], from, user_addr) do
+  defp do_request("TransferTx", [%TxBehavior{} = beh], robert, user_addr) do
     cond do
       # When robert only offers something to the user.
       beh.behavior == "offer" ->
@@ -49,8 +67,11 @@ defmodule AbtDidWorkshopWeb.TransactionController do
 
       # When robert only demands token from the user.
       Util.empty?(beh.asset) ->
+        sender = %{address: user_addr, token: beh.token, asset: beh.asset}
+        receiver = %{address: robert.address, token: nil, asset: nil}
+
         "TransferTx"
-        |> get_transaction_to_sign([beh], from, user_addr)
+        |> TransactionHelper.get_transaction_to_sign(sender, receiver)
         |> require_signature(user_addr)
 
       # When robert demands asset from the user.
@@ -59,8 +80,8 @@ defmodule AbtDidWorkshopWeb.TransactionController do
     end
   end
 
-  defp do_request("ExchangeTx", behaviors, from, user_addr) do
-    offer = Enum.find(behaviors, fn beh -> beh.behavior == "offer" end)
+  defp do_request("ExchangeTx", behaviors, robert, user_addr) do
+    offer = Enum.find(behaviors, %{token: nil, asset: nil}, fn beh -> beh.behavior == "offer" end)
     demand = Enum.find(behaviors, fn beh -> beh.behavior == "demand" end)
 
     cond do
@@ -70,8 +91,11 @@ defmodule AbtDidWorkshopWeb.TransactionController do
 
       # When robert only demands token from the user.
       Util.empty?(demand.asset) ->
+        sender = %{address: user_addr, token: demand.token, asset: nil}
+        receiver = %{address: robert.address, token: offer.token, assets: offer.asset}
+
         "ExchangeTx"
-        |> get_transaction_to_sign([demand, offer], from, user_addr)
+        |> TransactionHelper.get_transaction_to_sign(sender, receiver)
         |> require_signature(user_addr)
 
       # When robert demands asset from the user.
@@ -101,56 +125,59 @@ defmodule AbtDidWorkshopWeb.TransactionController do
     hold_account ++ hold_asset
   end
 
-  defp get_transaction_to_sign(tx_type, behaviors, from, user_addr, assets \\ []) do
-    itx = get_itx_to_sign(tx_type, behaviors, from, user_addr, assets)
+  defp do_response("TransferTx", [%TxBehavior{} = beh], claims, robert, user_addr) do
+    cond do
+      # When robert only offers something to the user.
+      beh.behavior == "offer" ->
+        asset = gen_asset(robert, user_addr, beh.asset)
+        sender = %{address: robert.address, token: beh.token, asset: asset}
+        receiver = %{address: user_addr, token: nil, asset: nil}
 
-    ForgeAbi.Transaction.new(
-      chain_id: "forge_local",
-      from: user_addr,
-      itx: itx,
-      nonce: ForgeSdk.get_nonce(user_addr) + 1
-    )
-    |> ForgeAbi.Transaction.encode()
+        "TransferTx"
+        |> TransactionHelper.get_transaction_to_sign(sender, receiver)
+        |> sign_tx(robert)
+        |> send_tx()
+
+      # When robert only demands token from the user.
+      Util.empty?(beh.asset) ->
+        f = fn claim -> not Util.empty?(claim["sig"]) and not Util.empty?(claim["origin"]) end
+
+        case TransactionHelper.match?([f], claims) do
+          false -> %{error: "Need transaction and it's signature."}
+          [c] -> c["origin"] |> assemble_tx(c["sig"]) |> send_tx()
+        end
+
+      # When robert demands asset from the user.
+      true ->
+        f_sig = fn claim -> not Util.empty?(claim["sig"]) and not Util.empty?(claim["origin"]) end
+
+        case TransactionHelper.match?([f_sig], claims) do
+          [c] ->
+            c["origin"] |> assemble_tx(c["sig"]) |> send_tx()
+
+          false ->
+            f_asset = fn claim ->
+              claim["did_type"] == "asset" and not Util.empty?(claim["did"])
+            end
+
+            case TransactionHelper.match?([f_asset], claims) do
+              [c] ->
+                sender = %{address: user_addr, token: beh.token, asset: c["did"]}
+                receiver = %{address: robert.address, token: nil, asset: nil}
+
+                "TransferTx"
+                |> TransactionHelper.get_transaction_to_sign(sender, receiver)
+                |> require_signature(user_addr)
+
+              false ->
+                %{error: "Need transaction and it's signature."}
+            end
+        end
+    end
   end
 
-  defp get_itx_to_sign("TransferTx", [beh], from, _user_addr, assets) do
-    itx = ForgeAbi.TransferTx.new(assets: assets, to: from.address, value: to_tba(beh.token))
-    ForgeAbi.encode_any!(:transfer, itx)
-  end
-
-  defp get_itx_to_sign("ExchangeTx", [demand, offer], from, user_addr, assets) do
-    sender = ForgeAbi.ExchangeInfo.new(assets: assets, value: to_tba(demand.token))
-
-    receiver =
-      if offer == nil do
-        ForgeAbi.ExchangeInfo.new()
-      else
-        certs = gen_assets(from, user_addr, offer.asset)
-        ForgeAbi.ExchangeInfo.new(assets: certs, value: to_tba(offer.token))
-      end
-
-    itx = ForgeAbi.ExchangeTx.new(receiver: receiver, sender: sender, to: from.address)
-    ForgeAbi.encode_any!(:exchange, itx)
-  end
-
-  defp get_itx_to_sign("UpdateAssetTx", [beh], from, user_addr, [asset]) do
-    {_, cert} =
-      case ForgeSdk.get_asset_state(address: asset) do
-        nil -> raise "Could not find asset #{asset}."
-        state -> ForgeAbi.decode_any(state.data)
-      end
-
-    {func, _} = Code.eval_string(beh.function)
-    new_content = func.(cert.content)
-    new_cert = AssetUtil.gen_cert(from, user_addr, cert.title, new_content)
-    itx = ForgeAbi.UpdateAssetTx.new(address: asset, data: Certificate.encode(new_cert))
-    ForgeAbi.encode_any!(:update_asset, itx)
-  end
-
-  # defp get_itx_to_sign("ActivateAssetTx", [beh], from, user_addr, [asset]) do
-  # end
-
-  defp require_signature(tx_data, address) do
+  defp require_signature(tx, address) do
+    tx_data = Transaction.encode(tx)
     did_type = AbtDid.get_did_type(address)
     data = do_hash(did_type.hash_type, tx_data)
 
@@ -197,24 +224,41 @@ defmodule AbtDidWorkshopWeb.TransactionController do
     ]
   end
 
-  defp gen_assets(_from, _to, nil), do: []
-  defp gen_assets(_from, _to, ""), do: []
+  defp gen_asset(_from, _to, nil), do: nil
+  defp gen_asset(_from, _to, ""), do: nil
 
-  defp gen_assets(from, to, title) do
+  defp gen_asset(from, to, title) do
     case AssetUtil.init_cert(from, to, title) do
       {:error, reason} -> raise "Failed to create asset. Error: #{inspect(reason)}"
-      {_, asset_address} -> [asset_address]
+      {_, asset_address} -> asset_address
     end
   end
 
-  defp to_tba(nil), do: nil
+  defp sign_tx(tx, wallet) do
+    tx_data = Transaction.encode(tx)
+    sig = ForgeSdk.Wallet.Util.sign!(wallet, tx_data)
+    %{tx | signature: sig}
+  end
 
-  defp to_tba(token) do
-    ForgeAbi.Util.BigInt.biguint(token * @tba)
+  defp send_tx(tx) do
+    case ForgeSdk.send_tx(tx: tx) do
+      {:error, reason} -> %{error: reason}
+      hash -> {:ok, hash}
+    end
+  end
+
+  defp assemble_tx(tx_str, sig_str) do
+    tx = tx_str |> Multibase.decode!() |> Transaction.decode()
+    sig = Multibase.decode!(sig_str)
+    %{tx | signature: sig}
   end
 
   defp reply(%{error: error}, conn, _) do
     json(conn, %{error: error})
+  end
+
+  defp reply({:ok, response}, conn, _) do
+    json(conn, response)
   end
 
   defp reply(claims, conn, tx_id) do

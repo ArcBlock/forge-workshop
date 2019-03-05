@@ -2,6 +2,11 @@ defmodule Demo do
   @ed25519 %Mcrypto.Signer.Ed25519{}
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
 
+  def get_account(address, host \\ "localhost:4000") do
+    %HTTPoison.Response{body: response} = HTTPoison.get!(host <> "/api/state/account/#{address}")
+    Jason.decode!(response)
+  end
+
   def request(w, tx_id, host \\ "localhost:4000")
 
   def request(w, :cert, host) do
@@ -18,14 +23,14 @@ defmodule Demo do
   defp do_request(w, url) when is_binary(url) do
     %HTTPoison.Response{body: response} = HTTPoison.get!(url)
     response = Jason.decode!(response)
-    do_request(w, response)
+    handle_response(w, response)
   end
 
-  defp do_request(_, %{"error" => error}) do
+  defp handle_response(_, %{"error" => error}) do
     error
   end
 
-  defp do_request(w, %{"authInfo" => auth_info}) do
+  defp handle_response(w, %{"authInfo" => auth_info}) do
     info_body = get_body(auth_info)
     url = info_body["url"]
     claims = handle_claims(info_body["requestedClaims"], w)
@@ -34,7 +39,13 @@ defmodule Demo do
     %HTTPoison.Response{body: body} =
       HTTPoison.post!(url, req, [{"Content-type", "application/json"}])
 
-    Jason.decode!(body)
+    response = Jason.decode!(body)
+
+    handle_response(w, response)
+  end
+
+  defp handle_response(_w, param) do
+    param
   end
 
   defp handle_claims(claims, wallet) do
@@ -42,6 +53,7 @@ defmodule Demo do
   end
 
   defp handle_claim(%{"type" => "signature", "tx" => tx_str} = claim, wallet) do
+    IO.puts("The application is asking you to sign the following transaction.\n")
     tx_data = Multibase.decode!(tx_str)
     tx = ForgeAbi.Transaction.decode(tx_data)
     itx = ForgeAbi.decode_any(tx.itx)
@@ -61,6 +73,7 @@ defmodule Demo do
   end
 
   defp handle_claim(%{"type" => "signature"} = claim, wallet) do
+    IO.puts("The application is asking you to sign the following transaction.\n")
     data = claim["data"] |> Multibase.decode!()
     tx = claim["origin"] |> Multibase.decode!() |> ForgeAbi.Transaction.decode()
     itx = ForgeAbi.decode_any(tx.itx)

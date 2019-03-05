@@ -12,7 +12,7 @@ Transaction list:
           <!-- Tx name, description and tx type. -->
           <h5> <%= tx.name %> </h5>
           <p style="font-size: smaller"> <%= tx.description %> </p>
-          <%= String.upcase(tx.tx_type) %> 
+          <%= String.upcase(tx.tx_type) %> <%= tx.id %>
           <!-- Tx behaviors -->
           <ul class="collection">
             <%= for beh <- tx.tx_behaviors do %>
