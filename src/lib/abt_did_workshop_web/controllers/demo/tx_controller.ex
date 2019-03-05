@@ -84,16 +84,10 @@ defmodule AbtDidWorkshopWeb.TxController do
       [token_offer, token_demand] ->
         cond do
           demand_token <> demand_asset != "" and offer_token <> offer_asset != "" ->
-            create_exchange(conn, demo_id, tx_id, "both", token_offer, token_demand, tx)
-
-          demand_token <> demand_asset != "" ->
-            create_exchange(conn, demo_id, tx_id, "demand", token_offer, token_demand, tx)
-
-          offer_token <> offer_asset != "" ->
-            create_exchange(conn, demo_id, tx_id, "offer", token_offer, token_demand, tx)
+            create_exchange(conn, demo_id, tx_id, token_offer, token_demand, tx)
 
           true ->
-            go_to_new(conn, demo_id, tx_id, "Offer and demand cannot be empty at the same time.")
+            go_to_new(conn, demo_id, tx_id, "Must offer and demand something at the sametime.")
         end
     end
   end
@@ -171,7 +165,7 @@ defmodule AbtDidWorkshopWeb.TxController do
     do_upsert(conn, demo_id, tx_id, behaviors, tx)
   end
 
-  defp create_exchange(conn, demo_id, tx_id, beh, token_offer, token_demand, tx) do
+  defp create_exchange(conn, demo_id, tx_id, token_offer, token_demand, tx) do
     offer = %{
       behavior: "offer",
       asset: tx["exchange_offer_asset"],
@@ -186,13 +180,7 @@ defmodule AbtDidWorkshopWeb.TxController do
       tx_type: tx["tx_type"]
     }
 
-    behaviors =
-      case beh do
-        "both" -> [offer, demand]
-        "offer" -> [offer]
-        "demand" -> [demand]
-      end
-
+    behaviors = [offer, demand]
     do_upsert(conn, demo_id, tx_id, behaviors, tx)
   end
 
