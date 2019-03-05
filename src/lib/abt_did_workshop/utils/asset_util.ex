@@ -14,8 +14,6 @@ defmodule AbtDidWorkshop.AssetUtil do
     Transaction
   }
 
-  alias Google.Protobuf.Any
-
   @ed25519 %Mcrypto.Signer.Ed25519{}
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
 
@@ -85,7 +83,7 @@ defmodule AbtDidWorkshop.AssetUtil do
   end
 
   defp create_cert(wallet, cert) do
-    itx = CreateAssetTx.new(data: Any.new(type_url: "ws:x:certificate", value: cert))
+    itx = CreateAssetTx.new(data: ForgeAbi.encode_any!(:certificate, cert))
 
     asset =
       ForgeSdk.get_asset_address(
@@ -126,7 +124,6 @@ defmodule AbtDidWorkshop.AssetUtil do
       content: content,
       sig: sig
     )
-    |> Certificate.encode()
   end
 
   defp sign_cert(from_sk, from, to, iat, nbf, exp, title, content) do

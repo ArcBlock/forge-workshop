@@ -1,7 +1,6 @@
 defmodule AbtDidWorkshop.Tx.Helper do
   alias AbtDidWorkshop.{
     AssetUtil,
-    Certificate,
     Util
   }
 
@@ -191,8 +190,14 @@ defmodule AbtDidWorkshop.Tx.Helper do
 
     {func, _} = Code.eval_string(receiver.function)
     new_content = func.(cert.content)
-    new_cert = AssetUtil.gen_cert(receiver.address, sender.address, cert.title, new_content)
-    itx = UpdateAssetTx.new(address: sender.asset, data: Certificate.encode(new_cert))
+    new_cert = AssetUtil.gen_cert(receiver, sender.address, cert.title, new_content)
+
+    itx =
+      UpdateAssetTx.new(
+        address: sender.asset,
+        data: ForgeAbi.encode_any!(:certificate, new_cert)
+      )
+
     ForgeAbi.encode_any!(:update_asset, itx)
   end
 

@@ -12,6 +12,7 @@ defmodule AbtDidWorkshopWeb.TransactionController do
     Tx.Exchange,
     Tx.Helper,
     Tx.Transfer,
+    Tx.Update,
     TxBehavior,
     Util,
     WalletUtil
@@ -134,6 +135,9 @@ defmodule AbtDidWorkshopWeb.TransactionController do
       true -> Exchange.response_demand_asset(robert, user_addr, demand, offer, claims)
     end
   end
+
+  defp do_response("UpdateAssetTx", [%TxBehavior{} = beh], claims, robert, user_addr),
+    do: Update.response_update(robert, user_addr, beh, claims)
 
   defp reply({:error, error}, conn, _) do
     json(conn, %{error: error})
