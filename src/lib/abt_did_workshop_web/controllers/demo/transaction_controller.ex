@@ -26,7 +26,7 @@ defmodule AbtDidWorkshopWeb.TransactionController do
 
     case TxTable.get(tx_id) do
       nil ->
-        json(conn, %{error: "Cannot find transaction."})
+        json(conn, {:error, "Cannot find transaction."})
 
       tx ->
         tx.tx_type
@@ -43,7 +43,7 @@ defmodule AbtDidWorkshopWeb.TransactionController do
 
     case TxTable.get(tx_id) do
       nil ->
-        json(conn, %{error: "Cannot find transaction."})
+        json(conn, {:error, "Cannot find transaction."})
 
       tx ->
         tx.tx_type
@@ -53,7 +53,7 @@ defmodule AbtDidWorkshopWeb.TransactionController do
   end
 
   defp do_request(_, behaviors, _, _) when is_nil(behaviors) or behaviors == [] do
-    %{error: "Invliad transaction behaviors"}
+    {:error, "Invliad transaction behaviors"}
   end
 
   defp do_request("TransferTx", [%TxBehavior{} = beh], robert, user_addr) do
@@ -135,7 +135,7 @@ defmodule AbtDidWorkshopWeb.TransactionController do
     end
   end
 
-  defp reply(%{error: error}, conn, _) do
+  defp reply({:error, error}, conn, _) do
     json(conn, %{error: error})
   end
 

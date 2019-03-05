@@ -94,7 +94,7 @@ defmodule Demo do
 
   defp handle_claim(%{"type" => "did"} = claim, _) do
     desc = claim["meta"]["description"]
-    answer = IO.gets(desc <> "\n") |> String.trim_trailing("\n") |> String.downcase()
+    answer = IO.gets(desc <> "\n") |> String.trim_trailing("\n")
     Map.put(claim, "did", answer)
   end
 

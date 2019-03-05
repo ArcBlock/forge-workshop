@@ -15,8 +15,8 @@ defmodule AbtDidWorkshop.Tx.Transfer do
   def response_demand_token(claims) do
     f_sig = Helper.extract_sig()
 
-    case Helper.match?([f_sig], claims) do
-      false -> %{error: "Need transaction and it's signature."}
+    case Helper.get_claims([f_sig], claims) do
+      false -> {:error, "Need transaction and it's signature."}
       [c] -> c["origin"] |> Helper.assemble_tx(c["sig"]) |> Helper.send_tx()
     end
   end
@@ -24,25 +24,32 @@ defmodule AbtDidWorkshop.Tx.Transfer do
   def response_demand_asset(robert, user_addr, beh, claims) do
     f_sig = Helper.extract_sig()
 
-    case Helper.match?([f_sig], claims) do
+    case Helper.get_claims([f_sig], claims) do
       [c] ->
         c["origin"] |> Helper.assemble_tx(c["sig"]) |> Helper.send_tx()
 
       false ->
         f_asset = Helper.extract_asset()
 
-        case Helper.match?([f_asset], claims) do
+        case Helper.get_claims([f_asset], claims) do
           [c] ->
-            sender = %{address: user_addr, token: beh.token, asset: c["did"]}
-            receiver = %{address: robert.address, token: nil, asset: nil}
-
-            "TransferTx"
-            |> Helper.get_transaction_to_sign(sender, receiver)
-            |> Helper.require_signature(user_addr)
+            case Helper.validate_asset(beh.asset, c["did"]) do
+              :ok -> do_response_demand_asset(robert, user_addr, beh, c["did"])
+              {:error, reason} -> {:error, reason}
+            end
 
           false ->
-            %{error: "Need transaction and it's signature."}
+            {:error, "Need transaction and it's signature."}
         end
     end
+  end
+
+  defp do_response_demand_asset(robert, user_addr, beh, asset) do
+    sender = %{address: user_addr, token: beh.token, asset: asset}
+    receiver = %{address: robert.address, token: nil, asset: nil}
+
+    "TransferTx"
+    |> Helper.get_transaction_to_sign(sender, receiver)
+    |> Helper.require_signature(user_addr)
   end
 end

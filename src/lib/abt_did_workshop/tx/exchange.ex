@@ -15,9 +15,9 @@ defmodule AbtDidWorkshop.Tx.Exchange do
   def response_demand_token(robert, claims) do
     f_sig = Helper.extract_sig()
 
-    case Helper.match?([f_sig], claims) do
+    case Helper.get_claims([f_sig], claims) do
       false ->
-        %{error: "Need transaction and it's signature."}
+        {:error, "Need transaction and it's signature."}
 
       [c] ->
         c["origin"]
@@ -30,7 +30,7 @@ defmodule AbtDidWorkshop.Tx.Exchange do
   def response_demand_asset(robert, user_addr, demand, offer, claims) do
     f_sig = Helper.extract_sig()
 
-    case Helper.match?([f_sig], claims) do
+    case Helper.get_claims([f_sig], claims) do
       [c] ->
         c["origin"]
         |> Helper.assemble_tx(c["sig"])
@@ -40,19 +40,26 @@ defmodule AbtDidWorkshop.Tx.Exchange do
       false ->
         f_asset = Helper.extract_asset()
 
-        case Helper.match?([f_asset], claims) do
+        case Helper.get_claims([f_asset], claims) do
           [c] ->
-            sender = %{address: user_addr, token: demand.token, asset: c["did"]}
-            offer_asset = Helper.gen_asset(robert, user_addr, offer.asset)
-            receiver = %{address: robert.address, token: offer.token, asset: offer_asset}
-
-            "ExchangeTx"
-            |> Helper.get_transaction_to_sign(sender, receiver)
-            |> Helper.require_signature(user_addr)
+            case Helper.validate_asset(demand.asset, c["did"]) do
+              :ok -> do_response_demand_asset(robert, user_addr, demand, offer, c["did"])
+              {:error, reason} -> {:error, reason}
+            end
 
           false ->
-            %{error: "Need transaction and it's signature."}
+            {:error, "Need transaction and it's signature."}
         end
     end
+  end
+
+  def do_response_demand_asset(robert, user_addr, demand, offer, demand_asset) do
+    sender = %{address: user_addr, token: demand.token, asset: demand_asset}
+    offer_asset = Helper.gen_asset(robert, user_addr, offer.asset)
+    receiver = %{address: robert.address, token: offer.token, asset: offer_asset}
+
+    "ExchangeTx"
+    |> Helper.get_transaction_to_sign(sender, receiver)
+    |> Helper.require_signature(user_addr)
   end
 end

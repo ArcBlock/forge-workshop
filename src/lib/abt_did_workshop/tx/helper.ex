@@ -25,6 +25,25 @@ defmodule AbtDidWorkshop.Tx.Helper do
     end
   end
 
+  def validate_asset(title, asset_address) do
+    case ForgeSdk.get_asset_state(address: asset_address) do
+      nil ->
+        {:error, "Could not find asset."}
+
+      state ->
+        case ForgeAbi.decode_any(state.data) do
+          {:certificate, cert} ->
+            case cert.title do
+              ^title -> :ok
+              _ -> {:error, "Incorrect certificate title."}
+            end
+
+          _ ->
+            {:error, "Invalid asset."}
+        end
+    end
+  end
+
   # The sender, receiver is a map with three keys:
   # sender.address
   # sender.asset -- Assets that sender should provide
@@ -41,7 +60,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
     )
   end
 
-  def match?(expected, actual) do
+  def get_claims(expected, actual) do
     found =
       expected
       |> Enum.map(fn func -> Enum.find(actual, fn claim -> func.(claim) end) end)
@@ -134,7 +153,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
 
   def send_tx(tx) do
     case ForgeSdk.send_tx(tx: tx) do
-      {:error, reason} -> %{error: reason}
+      {:error, reason} -> {:error, reason}
       hash -> {:ok, hash}
     end
   end
