@@ -92,6 +92,15 @@
         <%= text_input f, :consume_asset, placeholder: "The title of the asset you want to consume.", value: behavior_value("ConsumeAssetTx_consume_asset", @changeset.data) %>
       </div>
     </div>
+    <span style="font-size: smaller">You can offer something to user after the ConsumeAssetTx is passed.</span>
+    <div class="row">
+      <div class="col s4">
+        <%= text_input f, :consume_offer_token, placeholder: "The token to offer afterwards.", value: behavior_value("ConsumeAssetTx_offer_token", @changeset.data) %>
+      </div>
+      <div class="col s8">
+        <%= text_input f, :consume_offer_asset, placeholder: "The title of the asset to offer afterwards.", value: behavior_value("ConsumeAssetTx_offer_asset", @changeset.data) %>
+      </div>
+    </div>
   </div>
   
   <div class="form-group" id="UpdateAssetTx">
@@ -109,6 +118,15 @@
         <%= text_input f, :update_func, placeholder: "The elixir function to update content, e.g.,  fn c -> c + 1 end", value: behavior_value("UpdateAssetTx_update_function", @changeset.data) %>
       </div>
     </div>
+    <span style="font-size: smaller">You can offer something to user after the UpdateAssetTx is passed.</span>
+    <div class="row">
+      <div class="col s4">
+        <%= text_input f, :update_offer_token, placeholder: "The token to offer afterwards.", value: behavior_value("UpdateAssetTx_offer_token", @changeset.data) %>
+      </div>
+      <div class="col s8">
+        <%= text_input f, :update_offer_asset, placeholder: "The title of the asset to offer afterwards.", value: behavior_value("UpdateAssetTx_offer_asset", @changeset.data) %>
+      </div>
+    </div>
   </div>
 
   <div class="form-group" id="ProofOfHolding">
@@ -120,10 +138,19 @@
     </div>
     <div class="row">
       <div class="col s6">
-        <%= text_input f, :poh_token, placeholder: "The token amout to hold.", value: behavior_value("ProofOfHolding_poh_token", @changeset.data) %>
+        <%= text_input f, :poh_token, placeholder: "The token amout to hold.", value: behavior_value("ProofOfHolding_offer_token", @changeset.data) %>
       </div>
       <div class="col s6">
-        <%= text_input f, :poh_asset, placeholder: "The title of the asset to hold.", value: behavior_value("ProofOfHolding_poh_asset", @changeset.data) %>
+        <%= text_input f, :poh_asset, placeholder: "The title of the asset to hold.", value: behavior_value("ProofOfHolding_offer_asset", @changeset.data) %>
+      </div>
+    </div>
+      <span style="font-size: smaller">You can offer something to user after the Proof of Holding is passed.</span>
+    <div class="row">
+      <div class="col s4">
+        <%= text_input f, :poh_offer_token, placeholder: "The token to offer afterwards.", value: behavior_value("ProofOfHolding_offer_token", @changeset.data) %>
+      </div>
+      <div class="col s8">
+        <%= text_input f, :poh_offer_asset, placeholder: "The title of the asset to offer afterwards.", value: behavior_value("ProofOfHolding_offer_asset", @changeset.data) %>
       </div>
     </div>
   </div>

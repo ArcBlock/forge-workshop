@@ -1,4 +1,6 @@
 defmodule AbtDidWorkshop.Tx.Update do
+  @moduledoc false
+
   alias AbtDidWorkshop.Tx.Helper
 
   def response_update(robert, user_addr, beh, claims) do

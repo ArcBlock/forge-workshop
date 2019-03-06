@@ -1,4 +1,6 @@
 defmodule AbtDidWorkshop.Tx.Poh do
+  @moduledoc false
+
   alias AbtDidWorkshop.Tx.Helper
 
   def response_poh(beh, claims, user_addr) do

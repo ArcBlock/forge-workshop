@@ -1,4 +1,6 @@
 defmodule AbtDidWorkshop.Tx.Consume do
+  @moduledoc false
+
   alias AbtDidWorkshop.Tx.Helper
 
   def response_consume(robert, user_addr, beh, claims) do

@@ -1,4 +1,6 @@
 defmodule AbtDidWorkshop.Tx.Exchange do
+  @moduledoc false
+
   alias AbtDidWorkshop.Tx.Helper
 
   def response_offer(robert, user_addr, beh) do

@@ -1,4 +1,6 @@
 defmodule AbtDidWorkshop.Tx.Helper do
+  @moduledoc false
+
   alias AbtDidWorkshop.{
     AssetUtil,
     Util

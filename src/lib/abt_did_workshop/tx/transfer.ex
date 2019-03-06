@@ -1,5 +1,9 @@
 defmodule AbtDidWorkshop.Tx.Transfer do
+  @moduledoc false
+
   alias AbtDidWorkshop.Tx.Helper
+
+  def response_offer(_, _, nil), do: {:ok, nil}
 
   def response_offer(robert, user_addr, beh) do
     asset = Helper.gen_asset(robert, user_addr, beh.asset)

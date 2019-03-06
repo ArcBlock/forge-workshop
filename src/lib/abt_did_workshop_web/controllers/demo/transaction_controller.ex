@@ -84,32 +84,36 @@ defmodule AbtDidWorkshopWeb.TransactionController do
     offer = Enum.find(behs, fn beh -> beh.behavior == "offer" end)
     demand = Enum.find(behs, fn beh -> beh.behavior == "demand" end)
 
-    cond do
+    if Util.empty?(demand.asset) do
       # When robert does not demand asset from the user.
-      Util.empty?(demand.asset) ->
-        sender = %{address: user_addr, token: demand.token, asset: nil}
-        offer_asset = Helper.gen_asset(robert, user_addr, offer.asset)
-        receiver = %{address: robert.address, token: offer.token, asset: offer_asset}
+      sender = %{address: user_addr, token: demand.token, asset: nil}
+      offer_asset = Helper.gen_asset(robert, user_addr, offer.asset)
+      receiver = %{address: robert.address, token: offer.token, asset: offer_asset}
 
-        "ExchangeTx"
-        |> Helper.get_transaction_to_sign(sender, receiver)
-        |> Helper.require_signature(user_addr)
+      "ExchangeTx"
+      |> Helper.get_transaction_to_sign(sender, receiver)
+      |> Helper.require_signature(user_addr)
 
       # When robert demands asset from the user.
-      true ->
-        Helper.require_asset(demand.asset)
+    else
+      Helper.require_asset(demand.asset)
     end
   end
 
-  defp do_request("UpdateAssetTx", [%TxBehavior{} = beh], _, _),
-    do: Helper.require_asset(beh.asset)
+  defp do_request("UpdateAssetTx", behaviors, _, _) do
+    update = Enum.find(behaviors, fn beh -> beh.behavior == "update" end)
+    Helper.require_asset(update.asset)
+  end
 
-  defp do_request("ConsumeAssetTx", [%TxBehavior{} = beh], _, _),
-    do: Helper.require_asset(beh.asset)
+  defp do_request("ConsumeAssetTx", behaviors, _, _) do
+    consume = Enum.find(behaviors, fn beh -> beh.behavior == "consume" end)
+    Helper.require_asset(consume.asset)
+  end
 
-  defp do_request("ProofOfHolding", [%TxBehavior{} = beh], _, _) do
-    hold_account = Helper.require_account(beh.token)
-    hold_asset = Helper.require_asset(beh.asset)
+  defp do_request("ProofOfHolding", behaviors, _, _) do
+    poh = Enum.find(behaviors, fn beh -> beh.behavior == "poh" end)
+    hold_account = Helper.require_account(poh.token)
+    hold_asset = Helper.require_asset(poh.asset)
     hold_account ++ hold_asset
   end
 
@@ -138,17 +142,71 @@ defmodule AbtDidWorkshopWeb.TransactionController do
     end
   end
 
-  defp do_response("UpdateAssetTx", [%TxBehavior{} = beh], claims, robert, user_addr),
-    do: Update.response_update(robert, user_addr, beh, claims)
+  defp do_response("UpdateAssetTx", behs, claims, robert, user_addr) do
+    offer = Enum.find(behs, fn beh -> beh.behavior == "offer" end)
+    update = Enum.find(behs, fn beh -> beh.behavior == "update" end)
 
-  defp do_response("ConsumeAssetTx", [%TxBehavior{} = beh], claims, robert, user_addr) do
-    Consume.response_consume(robert, user_addr, beh, claims)
+    robert
+    |> Update.response_update(user_addr, update, claims)
+    |> continue_offer(robert, user_addr, offer)
   end
 
-  defp do_response("ProofOfHolding", [%TxBehavior{} = beh], claims, _, user_addr) do
-    case Poh.response_poh(beh, claims, user_addr) do
-      :ok -> {:ok, "OK"}
-      {:error, reason} -> {:error, reason}
+  defp do_response("ConsumeAssetTx", behs, claims, robert, user_addr) do
+    offer = Enum.find(behs, fn beh -> beh.behavior == "offer" end)
+    consume = Enum.find(behs, fn beh -> beh.behavior == "consume" end)
+
+    robert
+    |> Consume.response_consume(user_addr, consume, claims)
+    |> continue_offer(robert, user_addr, offer)
+  end
+
+  defp do_response("ProofOfHolding", behs, claims, robert, user_addr) do
+    offer = Enum.find(behs, fn beh -> beh.behavior == "offer" end)
+    poh = Enum.find(behs, fn beh -> beh.behavior == "poh" end)
+
+    poh
+    |> Poh.response_poh(claims, user_addr)
+    |> continue_offer(robert, user_addr, offer)
+  end
+
+  defp continue_offer(result, _, _, nil), do: result
+
+  defp continue_offer(result, robert, user_addr, offer) do
+    case result do
+      :ok ->
+        Transfer.response_offer(robert, user_addr, offer)
+
+      {:ok, hash1} ->
+        async_offer(hash1, robert, user_addr, offer)
+        {:ok, hash1}
+
+      error ->
+        error
+    end
+  end
+
+  defp async_offer(hash, robert, user_addr, offer) do
+    Task.async(fn ->
+      tx = get_tx(hash)
+
+      case tx.code do
+        0 -> Transfer.response_offer(robert, user_addr, offer)
+        _ -> {:ok, hash}
+      end
+    end)
+  end
+
+  defp get_tx(hash), do: get_tx(hash, 0)
+  defp get_tx(_, 30_000), do: %{code: -1}
+
+  defp get_tx(hash, wait) do
+    case ForgeSdk.get_tx(hash: hash) do
+      {:error, _} ->
+        Process.sleep(1000)
+        get_tx(hash, wait + 1000)
+
+      tx ->
+        tx
     end
   end
 
