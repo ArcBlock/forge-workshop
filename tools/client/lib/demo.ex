@@ -67,6 +67,7 @@ defmodule Demo do
       case answer do
         "yes" -> ForgeSdk.Wallet.Util.sign!(wallet, tx_data)
         "y" -> ForgeSdk.Wallet.Util.sign!(wallet, tx_data)
+        _ -> ""
       end
 
     Map.put(claim, "sig", sig |> Multibase.encode!(:base58_btc))
@@ -87,6 +88,7 @@ defmodule Demo do
       case answer do
         "yes" -> sign(data, wallet)
         "y" -> sign(data, wallet)
+        _ -> ""
       end
 
     Map.put(claim, "sig", sig)

@@ -11,6 +11,7 @@ defmodule AbtDidWorkshopWeb.TransactionController do
     Tables.TxTable,
     Tx.Exchange,
     Tx.Helper,
+    Tx.Poh,
     Tx.Transfer,
     Tx.Update,
     TxBehavior,
@@ -138,6 +139,13 @@ defmodule AbtDidWorkshopWeb.TransactionController do
 
   defp do_response("UpdateAssetTx", [%TxBehavior{} = beh], claims, robert, user_addr),
     do: Update.response_update(robert, user_addr, beh, claims)
+
+  defp do_response("ProofOfHolding", [%TxBehavior{} = beh], claims, _, user_addr) do
+    case Poh.response_poh(beh, claims, user_addr) do
+      :ok -> {:ok, "OK"}
+      {:error, reason} -> {:error, reason}
+    end
+  end
 
   defp reply({:error, error}, conn, _) do
     json(conn, %{error: error})

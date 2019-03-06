@@ -14,6 +14,8 @@ defmodule AbtDidWorkshop.Tx.Helper do
 
   @tba 1_000_000_000_000_000
 
+  def tba, do: @tba
+
   def extract_sig do
     fn claim -> not Util.empty?(claim["sig"]) and not Util.empty?(claim["origin"]) end
   end
@@ -24,21 +26,27 @@ defmodule AbtDidWorkshop.Tx.Helper do
     end
   end
 
-  def validate_asset(title, asset_address) do
+  def validate_asset(nil, _, _), do: :ok
+
+  def validate_asset(title, asset_address, owner_address) do
     case ForgeSdk.get_asset_state(address: asset_address) do
       nil ->
         {:error, "Could not find asset."}
 
       state ->
-        case ForgeAbi.decode_any(state.data) do
-          {:certificate, cert} ->
-            case cert.title do
-              ^title -> :ok
-              _ -> {:error, "Incorrect certificate title."}
-            end
+        if state.owner != owner_address do
+          {:error, "The asset does not belong to the account."}
+        else
+          case ForgeAbi.decode_any(state.data) do
+            {:certificate, cert} ->
+              case cert.title do
+                ^title -> :ok
+                _ -> {:error, "Incorrect certificate title."}
+              end
 
-          _ ->
-            {:error, "Invalid asset."}
+            _ ->
+              {:error, "Invalid asset."}
+          end
         end
     end
   end
@@ -59,7 +67,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
     )
   end
 
-  def get_claims(expected, actual) do
+  def get_claims(expected, actual) when is_list(expected) do
     found =
       expected
       |> Enum.map(fn func -> Enum.find(actual, fn claim -> func.(claim) end) end)
@@ -70,6 +78,10 @@ defmodule AbtDidWorkshop.Tx.Helper do
     else
       false
     end
+  end
+
+  def get_claims(expected, actual) do
+    get_claims([expected], actual)
   end
 
   def require_signature(tx, address) do

@@ -17,7 +17,7 @@ defmodule AbtDidWorkshop.Tx.Exchange do
 
     case Helper.get_claims([f_sig], claims) do
       false ->
-        {:error, "Need transaction and it's signature."}
+        {:error, "Insufficient data to continue."}
 
       [c] ->
         c["origin"]
@@ -42,13 +42,13 @@ defmodule AbtDidWorkshop.Tx.Exchange do
 
         case Helper.get_claims([f_asset], claims) do
           [c] ->
-            case Helper.validate_asset(demand.asset, c["did"]) do
+            case Helper.validate_asset(demand.asset, c["did"], user_addr) do
               :ok -> do_response_demand_asset(robert, user_addr, demand, offer, c["did"])
               {:error, reason} -> {:error, reason}
             end
 
           false ->
-            {:error, "Need transaction and it's signature."}
+            {:error, "Insufficient data to continue."}
         end
     end
   end

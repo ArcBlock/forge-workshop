@@ -16,7 +16,7 @@ defmodule AbtDidWorkshop.Tx.Transfer do
     f_sig = Helper.extract_sig()
 
     case Helper.get_claims([f_sig], claims) do
-      false -> {:error, "Need transaction and it's signature."}
+      false -> {:error, "Insufficient data to continue."}
       [c] -> c["origin"] |> Helper.assemble_tx(c["sig"]) |> Helper.send_tx()
     end
   end
@@ -33,13 +33,13 @@ defmodule AbtDidWorkshop.Tx.Transfer do
 
         case Helper.get_claims([f_asset], claims) do
           [c] ->
-            case Helper.validate_asset(beh.asset, c["did"]) do
+            case Helper.validate_asset(beh.asset, c["did"], user_addr) do
               :ok -> do_response_demand_asset(robert, user_addr, beh, c["did"])
               {:error, reason} -> {:error, reason}
             end
 
           false ->
-            {:error, "Need transaction and it's signature."}
+            {:error, "Insufficient data to continue."}
         end
     end
   end

@@ -13,13 +13,13 @@ defmodule AbtDidWorkshop.Tx.Update do
 
         case Helper.get_claims([f_asset], claims) do
           [c] ->
-            case Helper.validate_asset(beh.asset, c["did"]) do
+            case Helper.validate_asset(beh.asset, c["did"], user_addr) do
               :ok -> do_response_update(robert, user_addr, beh, c["did"])
               {:error, reason} -> {:error, reason}
             end
 
           false ->
-            {:error, "Need transaction and it's signature."}
+            {:error, "Insufficient data to continue."}
         end
     end
   end
