@@ -9,6 +9,7 @@ defmodule AbtDidWorkshopWeb.TransactionController do
     AppState,
     Plugs.VerifySig,
     Tables.TxTable,
+    Tx.Consume,
     Tx.Exchange,
     Tx.Helper,
     Tx.Poh,
@@ -103,7 +104,7 @@ defmodule AbtDidWorkshopWeb.TransactionController do
   defp do_request("UpdateAssetTx", [%TxBehavior{} = beh], _, _),
     do: Helper.require_asset(beh.asset)
 
-  defp do_request("ActivateAssetTx", [%TxBehavior{} = beh], _, _),
+  defp do_request("ConsumeAssetTx", [%TxBehavior{} = beh], _, _),
     do: Helper.require_asset(beh.asset)
 
   defp do_request("ProofOfHolding", [%TxBehavior{} = beh], _, _) do
@@ -139,6 +140,10 @@ defmodule AbtDidWorkshopWeb.TransactionController do
 
   defp do_response("UpdateAssetTx", [%TxBehavior{} = beh], claims, robert, user_addr),
     do: Update.response_update(robert, user_addr, beh, claims)
+
+  defp do_response("ConsumeAssetTx", [%TxBehavior{} = beh], claims, robert, user_addr) do
+    Consume.response_consume(robert, user_addr, beh, claims)
+  end
 
   defp do_response("ProofOfHolding", [%TxBehavior{} = beh], claims, _, user_addr) do
     case Poh.response_poh(beh, claims, user_addr) do

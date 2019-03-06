@@ -17,7 +17,7 @@ defmodule AbtDidWorkshop.Tx.Transfer do
 
     case Helper.get_claims([f_sig], claims) do
       false -> {:error, "Insufficient data to continue."}
-      [c] -> c["origin"] |> Helper.assemble_tx(c["sig"]) |> Helper.send_tx()
+      [c] -> c["origin"] |> Helper.assemble_sig(c["sig"]) |> Helper.send_tx()
     end
   end
 
@@ -26,7 +26,7 @@ defmodule AbtDidWorkshop.Tx.Transfer do
 
     case Helper.get_claims([f_sig], claims) do
       [c] ->
-        c["origin"] |> Helper.assemble_tx(c["sig"]) |> Helper.send_tx()
+        c["origin"] |> Helper.assemble_sig(c["sig"]) |> Helper.send_tx()
 
       false ->
         f_asset = Helper.extract_asset()

@@ -51,22 +51,6 @@ defmodule AbtDidWorkshop.Tx.Helper do
     end
   end
 
-  # The sender, receiver is a map with three keys:
-  # sender.address
-  # sender.asset -- Assets that sender should provide
-  # sender.token -- Token that sender should provide.
-  # receiver could have one more key `function`
-  def get_transaction_to_sign(tx_type, sender, receiver) do
-    itx = get_itx_to_sign(tx_type, sender, receiver)
-
-    Transaction.new(
-      chain_id: "forge-local",
-      from: sender.address,
-      itx: itx,
-      nonce: ForgeSdk.get_nonce(sender.address) + 1
-    )
-  end
-
   def get_claims(expected, actual) when is_list(expected) do
     found =
       expected
@@ -82,6 +66,12 @@ defmodule AbtDidWorkshop.Tx.Helper do
 
   def get_claims(expected, actual) do
     get_claims([expected], actual)
+  end
+
+  def sign_tx(tx, wallet) do
+    tx_data = Transaction.encode(tx)
+    sig = ForgeSdk.Wallet.Util.sign!(wallet, tx_data)
+    %{tx | signature: sig}
   end
 
   def require_signature(tx, address) do
@@ -102,6 +92,50 @@ defmodule AbtDidWorkshop.Tx.Helper do
         sig: ""
       }
     ]
+  end
+
+  def assemble_sig(tx_str, sig_str) do
+    tx = tx_str |> Multibase.decode!() |> Transaction.decode()
+    sig = Multibase.decode!(sig_str)
+    %{tx | signature: sig}
+  end
+
+  def multi_sign(tx, wallet) do
+    msig = ForgeAbi.Multisig.new(signer: wallet.address)
+    tx1 = %{tx | signatures: [msig | tx.signatures]}
+    data = ForgeAbi.Transaction.encode(tx1)
+    sig = ForgeSdk.Wallet.Util.sign!(wallet, data)
+    %{tx | signatures: [%{msig | signature: sig} | tx.signatures]}
+  end
+
+  def require_multi_sig(tx, address) do
+    msig = ForgeAbi.Multisig.new(signer: address)
+    tx1 = %{tx | signatures: [msig | tx.signatures]}
+    tx_data = Transaction.encode(tx1)
+    did_type = AbtDid.get_did_type(address)
+    data = do_hash(did_type.hash_type, tx_data)
+
+    [
+      %{
+        type: "signature",
+        meta: %{
+          description: "Please sign this transaction.",
+          typeUrl: "fg:t:transaction"
+        },
+        data: Multibase.encode!(data, :base58_btc),
+        origin: Multibase.encode!(tx_data, :base58_btc),
+        method: did_type.hash_type,
+        sig: ""
+      }
+    ]
+  end
+
+  def assemble_multi_sig(tx_str, sig_str) do
+    tx = tx_str |> Multibase.decode!() |> Transaction.decode()
+    sig = Multibase.decode!(sig_str)
+    [msig | rest] = tx.signatures
+    msig = %{msig | signature: sig}
+    %{tx | signatures: [msig | rest]}
   end
 
   def require_asset(nil), do: []
@@ -148,20 +182,6 @@ defmodule AbtDidWorkshop.Tx.Helper do
     end
   end
 
-  def sign_tx(tx, wallet) do
-    tx_data = Transaction.encode(tx)
-    sig = ForgeSdk.Wallet.Util.sign!(wallet, tx_data)
-    %{tx | signature: sig}
-  end
-
-  def multi_sign(tx, wallet) do
-    msig = ForgeAbi.Multisig.new(signer: wallet.address)
-    tx1 = %{tx | signatures: [msig | tx.signatures]}
-    data = ForgeAbi.Transaction.encode(tx1)
-    sig = ForgeSdk.Wallet.Util.sign!(wallet, data)
-    %{tx | signatures: [%{msig | signature: sig} | tx.signatures]}
-  end
-
   def send_tx(tx) do
     case ForgeSdk.send_tx(tx: tx) do
       {:error, reason} -> {:error, reason}
@@ -169,10 +189,26 @@ defmodule AbtDidWorkshop.Tx.Helper do
     end
   end
 
-  def assemble_tx(tx_str, sig_str) do
-    tx = tx_str |> Multibase.decode!() |> Transaction.decode()
-    sig = Multibase.decode!(sig_str)
-    %{tx | signature: sig}
+  # The sender, receiver is a map with three keys:
+  # sender.address
+  # sender.asset -- Assets that sender should provide
+  # sender.token -- Token that sender should provide.
+  # receiver could have one more key `function`
+  def get_transaction_to_sign(tx_type, sender, receiver, sign? \\ false) do
+    itx = get_itx_to_sign(tx_type, sender, receiver)
+
+    tx =
+      Transaction.new(
+        chain_id: "forge-local",
+        from: sender.address,
+        itx: itx,
+        nonce: ForgeSdk.get_nonce(sender.address) + 1
+      )
+
+    case sign? do
+      false -> tx
+      true -> sign_tx(tx, sender.wallet)
+    end
   end
 
   defp get_itx_to_sign("TransferTx", sender, receiver) do
@@ -213,8 +249,15 @@ defmodule AbtDidWorkshop.Tx.Helper do
     ForgeAbi.encode_any!(:update_asset, itx)
   end
 
-  # defp get_itx_to_sign("ActivateAssetTx", [beh], from, user_addr, [asset]) do
-  # end
+  defp get_itx_to_sign("ConsumeAssetTx", sender, receiver) do
+    itx =
+      ForgeAbi.ConsumeAssetTx.new(
+        issuer: sender.address,
+        data: ForgeAbi.encode_any!(:address, receiver.asset)
+      )
+
+    ForgeAbi.encode_any!(:consume_asset, itx)
+  end
 
   defp to_tba(nil), do: nil
 

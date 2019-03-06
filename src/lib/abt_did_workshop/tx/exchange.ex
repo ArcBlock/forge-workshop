@@ -21,7 +21,7 @@ defmodule AbtDidWorkshop.Tx.Exchange do
 
       [c] ->
         c["origin"]
-        |> Helper.assemble_tx(c["sig"])
+        |> Helper.assemble_sig(c["sig"])
         |> Helper.multi_sign(robert)
         |> Helper.send_tx()
     end
@@ -33,7 +33,7 @@ defmodule AbtDidWorkshop.Tx.Exchange do
     case Helper.get_claims([f_sig], claims) do
       [c] ->
         c["origin"]
-        |> Helper.assemble_tx(c["sig"])
+        |> Helper.assemble_sig(c["sig"])
         |> Helper.multi_sign(robert)
         |> Helper.send_tx()
 

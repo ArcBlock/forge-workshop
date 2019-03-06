@@ -94,11 +94,11 @@ defmodule AbtDidWorkshopWeb.TxController do
 
   defp do_create(
          conn,
-         %{"demo_id" => demo_id, "tx_id" => tx_id, "tx_type" => "ActivateAssetTx"} = tx
+         %{"demo_id" => demo_id, "tx_id" => tx_id, "tx_type" => "ConsumeAssetTx"} = tx
        ) do
-    case tx["activate_asset"] do
+    case tx["consume_asset"] do
       "" -> go_to_new(conn, demo_id, tx_id, "Asset title cannot be empty.")
-      asset -> create_single(conn, demo_id, tx_id, "activate", nil, asset, tx)
+      asset -> create_single(conn, demo_id, tx_id, "consume", nil, asset, tx)
     end
   end
 

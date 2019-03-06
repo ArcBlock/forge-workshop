@@ -77,9 +77,7 @@ defmodule Demo do
     IO.puts("The application is asking you to sign the following transaction.\n")
     data = claim["data"] |> Multibase.decode!()
     tx = claim["origin"] |> Multibase.decode!() |> ForgeAbi.Transaction.decode()
-    itx = ForgeAbi.decode_any(tx.itx)
-    IO.inspect(tx)
-    IO.inspect(itx)
+    IO.inspect(ForgeSdk.display(tx))
 
     answer =
       IO.gets("Sign this transaction?\n") |> String.trim_trailing("\n") |> String.downcase()
