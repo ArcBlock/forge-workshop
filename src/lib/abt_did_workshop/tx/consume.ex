@@ -28,10 +28,10 @@ defmodule AbtDidWorkshop.Tx.Consume do
 
   defp do_response_consume(robert, user_addr, asset) do
     sender = %{address: robert.address, wallet: robert}
-    receiver = %{address: user_addr, asset: asset}
+    receiver = %{address: user_addr}
 
     "ConsumeAssetTx"
     |> Helper.get_transaction_to_sign(sender, receiver, true)
-    |> Helper.require_multi_sig(user_addr)
+    |> Helper.require_multi_sig(user_addr, asset)
   end
 end

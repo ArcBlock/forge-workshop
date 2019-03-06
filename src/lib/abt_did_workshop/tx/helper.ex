@@ -108,8 +108,8 @@ defmodule AbtDidWorkshop.Tx.Helper do
     %{tx | signatures: [%{msig | signature: sig} | tx.signatures]}
   end
 
-  def require_multi_sig(tx, address) do
-    msig = ForgeAbi.Multisig.new(signer: address)
+  def require_multi_sig(tx, address, asset) do
+    msig = ForgeAbi.Multisig.new(signer: address, data: ForgeAbi.encode_any!(:address, asset))
     tx1 = %{tx | signatures: [msig | tx.signatures]}
     tx_data = Transaction.encode(tx1)
     did_type = AbtDid.get_did_type(address)
@@ -249,13 +249,8 @@ defmodule AbtDidWorkshop.Tx.Helper do
     ForgeAbi.encode_any!(:update_asset, itx)
   end
 
-  defp get_itx_to_sign("ConsumeAssetTx", sender, receiver) do
-    itx =
-      ForgeAbi.ConsumeAssetTx.new(
-        issuer: sender.address,
-        data: ForgeAbi.encode_any!(:address, receiver.asset)
-      )
-
+  defp get_itx_to_sign("ConsumeAssetTx", sender, _receiver) do
+    itx = ForgeAbi.ConsumeAssetTx.new(issuer: sender.address)
     ForgeAbi.encode_any!(:consume_asset, itx)
   end
 
