@@ -201,7 +201,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
 
     tx =
       Transaction.new(
-        chain_id: "forge-local",
+        chain_id: ForgeSdk.get_chain_info().network,
         from: sender.address,
         itx: itx,
         nonce: ForgeSdk.get_nonce(sender.address) + 1
