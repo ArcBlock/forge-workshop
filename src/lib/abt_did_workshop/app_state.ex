@@ -45,6 +45,7 @@ defmodule AbtDidWorkshop.AppState do
       |> Enum.into(%{}, fn {k, v} -> {Atom.to_string(k), v} end)
       |> Map.put(:chainId, ForgeSdk.get_chain_info().network)
       |> Map.put(:chainHost, "http://#{Util.get_ip()}:8210/api/playground")
+      |> Map.put(:chainToken, "TBA")
       |> Map.put(:decimals, ForgeAbi.one_token() |> :math.log10() |> Kernel.trunc())
 
     path = Application.get_env(:abt_did_workshop, :deep_link_path)

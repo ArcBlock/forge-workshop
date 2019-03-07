@@ -14,9 +14,10 @@ defmodule AbtDidWorkshop.Tx.Helper do
     UpdateAssetTx
   }
 
-  @tba 1_000_000_000_000_000
+  def tba, do: ForgeAbi.one_token()
 
-  def tba, do: @tba
+  def hash(:keccak, data), do: Mcrypto.hash(%Mcrypto.Hasher.Keccak{}, data)
+  def hash(:sha3, data), do: Mcrypto.hash(%Mcrypto.Hasher.Sha3{}, data)
 
   def extract_sig do
     fn claim -> not Util.empty?(claim["sig"]) and not Util.empty?(claim["origin"]) end
@@ -79,7 +80,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
   def require_signature(tx, address) do
     tx_data = Transaction.encode(tx)
     did_type = AbtDid.get_did_type(address)
-    data = do_hash(did_type.hash_type, tx_data)
+    data = hash(did_type.hash_type, tx_data)
 
     [
       %{
@@ -115,7 +116,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
     tx1 = %{tx | signatures: [msig | tx.signatures]}
     tx_data = Transaction.encode(tx1)
     did_type = AbtDid.get_did_type(address)
-    data = do_hash(did_type.hash_type, tx_data)
+    data = hash(did_type.hash_type, tx_data)
 
     [
       %{
@@ -259,12 +260,9 @@ defmodule AbtDidWorkshop.Tx.Helper do
   defp to_tba(nil), do: nil
 
   defp to_tba(token) do
-    ForgeAbi.Util.BigInt.biguint(token * @tba)
+    ForgeAbi.token_to_arc(token)
   end
 
   defp to_assets(nil), do: []
   defp to_assets(asset), do: [asset]
-
-  defp do_hash(:keccak, data), do: Mcrypto.hash(%Mcrypto.Hasher.Keccak{}, data)
-  defp do_hash(:sha3, data), do: Mcrypto.hash(%Mcrypto.Hasher.Sha3{}, data)
 end
