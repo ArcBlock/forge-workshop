@@ -14,8 +14,6 @@ defmodule AbtDidWorkshop.AssetUtil do
     Transaction
   }
 
-  alias Google.Protobuf.Any
-
   @ed25519 %Mcrypto.Signer.Ed25519{}
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
 
@@ -58,13 +56,13 @@ defmodule AbtDidWorkshop.AssetUtil do
     ForgeSdk.send_tx(ForgeAbi.RequestSendTx.new(tx: tx))
   end
 
-  def init_certs(wallet, content, number) do
+  def init_certs(wallet, title, number) do
     state = ForgeSdk.get_account_state(address: wallet.address)
 
     if state.num_assets < 20 do
       Task.async(fn ->
         for i <- 1..number do
-          init_cert(wallet, content, i)
+          init_cert(wallet, title, i)
           Process.sleep(1000)
         end
       end)
@@ -74,42 +72,69 @@ defmodule AbtDidWorkshop.AssetUtil do
   @doc """
   Creates a certificate under `wallet`
   """
-  def init_cert(wallet, content, i) do
-    cert = gen_cert(wallet, content)
-    itx = CreateAssetTx.new(data: Any.new(type_url: "ws:x:certificate", value: cert))
+  def init_cert(wallet, title, i) when is_number(i) do
+    cert = gen_cert(wallet, "", title)
+    create_cert(wallet, cert)
+  end
+
+  def init_cert(from, to, title) do
+    cert = gen_cert(from, to, title)
+    create_cert(from, cert)
+  end
+
+  defp create_cert(wallet, cert) do
+    itx = CreateAssetTx.new(data: ForgeAbi.encode_any!(:certificate, cert))
+
+    asset =
+      ForgeSdk.get_asset_address(
+        itx: itx,
+        sender_address: wallet.address,
+        wallet_type: wallet.type
+      )
+
     nonce = ForgeSdk.get_nonce(wallet.address)
 
     tx =
       ForgeSdk.create_tx(
         from: wallet.address,
         itx: ForgeAbi.encode_any!(:create_asset, itx),
-        nonce: nonce + i,
+        nonce: nonce + 1,
         wallet: wallet
       )
 
-    # tx = ForgeSdk.create_asset(itx, send: :nosend, wallet: wallet, nonce: nonce)
-    req = RequestSendTx.new(tx: tx, wallet: wallet, commit: false)
-    ForgeSdk.send_tx(req)
+    req = RequestSendTx.new(tx: tx, wallet: wallet, commit: true)
+
+    case ForgeSdk.send_tx(req) do
+      {:error, reason} -> {:error, reason}
+      hash -> {hash, asset}
+    end
   end
 
-  defp gen_cert(w, content) do
+  def gen_cert(from, to, title, content \\ 0) do
     now = DateTime.utc_now() |> DateTime.to_unix()
-    exp = 0
-    sig = sign_cert(w.sk, w.address, now, exp, content)
+    nbf = exp = 0
+    sig = sign_cert(from.sk, from.address, to, now, nbf, exp, title, content)
 
-    Certificate.new(issuer: w.address, iat: now, exp: exp, content: content, sig: sig)
-    |> Certificate.encode()
+    Certificate.new(
+      from: from.address,
+      to: to,
+      iat: now,
+      exp: exp,
+      title: title,
+      content: content,
+      sig: sig
+    )
   end
 
-  defp sign_cert(sk, addr, iat, exp, content) do
+  defp sign_cert(from_sk, from, to, iat, nbf, exp, title, content) do
     signer =
-      case AbtDid.get_did_type(addr).key_type do
+      case AbtDid.get_did_type(from).key_type do
         :ed25519 -> @ed25519
         :secp256k1 -> @secp256k1
       end
 
-    data = "#{addr}|#{iat}|#{exp}|#{content}"
+    data = "#{from}|#{to}|#{iat}|#{nbf}|#{exp}|#{title}|#{content}"
 
-    Mcrypto.sign!(signer, data, sk)
+    Mcrypto.sign!(signer, data, from_sk)
   end
 end

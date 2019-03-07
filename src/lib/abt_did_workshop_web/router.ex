@@ -25,6 +25,10 @@ defmodule AbtDidWorkshopWeb.Router do
     get("/wallet", WalletController, :index)
     get("/wallet/auth", WalletController, :request_auth)
     post("/wallet/auth", WalletController, :response_auth)
+
+    resources("/demo", DemoController)
+    resources("/tx", TxController)
+    put("/tx", TxController, :create)
   end
 
   scope "/api", AbtDidWorkshopWeb do
@@ -40,5 +44,10 @@ defmodule AbtDidWorkshopWeb.Router do
     post("/cert/reward", CertController, :response_reward)
 
     post("/authinfo", ApiController, :auth_info)
+
+    get("/transaction/:id", TransactionController, :request)
+    post("/transaction/:id", TransactionController, :response)
+
+    get("/state/account/:addr", StateController, :account)
   end
 end

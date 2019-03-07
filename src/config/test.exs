@@ -8,3 +8,11 @@ config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+# Configure your database
+config :abt_did_workshop, AbtDidWorkshop.Repo,
+  username: "postgres",
+  password: "postgres",
+  database: "abt_did_workshop_test",
+  hostname: "localhost",
+  pool: Ecto.Adapters.SQL.Sandbox

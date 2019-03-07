@@ -76,10 +76,10 @@
         {Credo.Check.Readability.TrailingBlankLine},
         {Credo.Check.Readability.TrailingWhiteSpace},
         {Credo.Check.Readability.VariableNames},
-        {Credo.Check.Refactor.ABCSize, max_size: 50},
+        {Credo.Check.Refactor.ABCSize, max_size: 60},
         # {Credo.Check.Refactor.CaseTrivialMatches}, # deprecated in 0.4.0
         {Credo.Check.Refactor.CondStatements},
-        {Credo.Check.Refactor.FunctionArity, max_arity: 6},
+        {Credo.Check.Refactor.FunctionArity, max_arity: 8},
         {Credo.Check.Refactor.MatchInCondition},
         {Credo.Check.Refactor.PipeChainStart, false},
         {Credo.Check.Refactor.CyclomaticComplexity, max_complexity: 10},

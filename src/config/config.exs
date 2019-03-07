@@ -7,6 +7,15 @@
 # General application configuration
 use Mix.Config
 
+config :abt_did_workshop, AbtDidWorkshop.Repo,
+  database: "abt_did_workshop_repo",
+  username: "user",
+  password: "pass",
+  hostname: "localhost"
+
+config :abt_did_workshop,
+  ecto_repos: [AbtDidWorkshop.Repo]
+
 # Configures the endpoint
 config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
   url: [host: "localhost"],
@@ -65,6 +74,8 @@ config :abt_did_workshop, :app_info,
   copyright: "https://example-application/copyright",
   publisher: "did:abt:zNKSHDK5KTZ5bdxfHoKp6F2iibbpLriYJDSi"
 
+config :abt_did_workshop, :deep_link_path, "https://arcwallet.io/i/"
+
 # Configures Drab
 config :drab, AbtDidWorkshopWeb.Endpoint, otp_app: :abt_did_workshop
 
@@ -97,6 +108,8 @@ config :logger, :console,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+config :abt_did_workshop, :env, "#{Mix.env()}"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

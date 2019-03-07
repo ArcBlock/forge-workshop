@@ -4,6 +4,8 @@ defmodule AbtDidWorkshop.AppState do
   """
   use GenServer
 
+  alias AbtDidWorkshop.Util
+
   def start_link([]) do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
   end
@@ -41,8 +43,13 @@ defmodule AbtDidWorkshop.AppState do
       :abt_did_workshop
       |> Application.get_env(:app_info, [])
       |> Enum.into(%{}, fn {k, v} -> {Atom.to_string(k), v} end)
+      |> Map.put(:chainId, ForgeSdk.get_chain_info().network)
+      |> Map.put(:chainHost, "http://#{Util.get_ip()}:8210/api/playground")
+      |> Map.put(:chainToken, "TBA")
+      |> Map.put(:decimals, ForgeAbi.one_token() |> :math.log10() |> Kernel.trunc())
 
-    {:ok, %{info: app_info}}
+    path = Application.get_env(:abt_did_workshop, :deep_link_path)
+    {:ok, %{info: app_info, path: path}}
   end
 
   def handle_call({:add_path, path}, _from, state) do
@@ -68,11 +75,12 @@ defmodule AbtDidWorkshop.AppState do
   end
 
   def handle_call({:add_info, info}, _from, state) do
-    {:reply, :ok, Map.put(state, :info, info)}
+    new_info = Map.merge(state.info, info)
+    {:reply, :ok, Map.put(state, :info, new_info)}
   end
 
   def handle_call(:clear, _from, state) do
-    {:reply, :ok, %{info: state.info}}
+    {:reply, :ok, %{info: state.info, path: state.path}}
   end
 
   def handle_call(:get, _from, state) do

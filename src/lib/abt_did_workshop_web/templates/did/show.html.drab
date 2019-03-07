@@ -1,7 +1,7 @@
-<input id="qrValue" type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink() %>"></input>
+<input id="qrValue_1" type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink() %>"></input>
 <br>
 <div align="center">
-  <canvas id="canvas"></canvas>
+  <canvas id="canvas_1"></canvas>
 </div>
 
 <section class="columns">
@@ -90,4 +90,3 @@
     <% end %>
   </ul>
 <% end %>
-

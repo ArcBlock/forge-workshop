@@ -1,0 +1,65 @@
+<h4>Demo cases</h4>
+
+<ul class="collection">
+  <%= for demo <- @demos do %>
+    <li class="collection-item">
+      <div class="row">
+        <div class="col s5">
+          <div> 
+            <%= link(demo.title, to: Routes.tx_path(@conn, :index, demo_id: demo.id)) %>
+          </div>
+          <br>
+          <div style="font-size: small">
+            <%= demo.description %>
+          </div>
+        </div>
+
+        <div class="col s6">
+          <%= if demo.txs != [] do %>
+            <ul class="collection">
+              <%= for tx <- demo.txs do %>
+                <li class="collection-item" style="font-size: smaller"> 
+                  <%= tx.name %>
+                </li>
+              <% end %>
+            </ul>
+          <% end %>
+        </div>
+        <div class="col s1"></div>
+      </div>
+
+      <div class="row" style="font-size: smaller">
+        <div class="col s8"></div>
+        <div class="col s2">
+          <%= link("Edit", to: Routes.demo_path(@conn, :edit, demo)) %>
+        </div>
+        <div class="col s2">
+          <%= link("Delete", to: Routes.demo_path(@conn, :delete, demo), method: :delete) %>
+        </div>
+      </div>
+    </li>
+  <% end %>
+</ul>
+
+<br>
+<br>
+
+<%= form_for @changeset, Routes.demo_path(@conn, :create), fn f -> %>
+  <div class="row">
+    <div class="col s5">
+      <p>
+        <%= text_input f, :title, placeholder: "Case Title", class: "form-control" %>
+        <%= error_tag f, :title %>
+      </p>
+    </div>
+    <div class="col s7">
+      <p>
+        <%= text_input f, :description, placeholder: "Description (optional)" %>
+      </p>
+    </div>
+  </div>
+
+  <div class="right">
+    <%= submit "Add new Demo case", class: "btn btn-primary" %>
+  </div>
+<% end %>

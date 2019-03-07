@@ -1,3 +1,22 @@
+## 0.2.0 (March 07, 2019)
+  - Fix token
+  - Add more app info
+  - Fix chain id.
+  - Add bundle transactions.
+  - Fix consume tx error.
+  - Add consume asset tx.
+  - Add poh
+  - Finished Update Tx.
+  - Fixed transfer asset issue.
+  - Implement response auth for exchange
+  - Add response auth for transfer
+  - Finished Request Auth.
+  - Finished CRUD for demo and tx.
+  - Reconstruct the demo, tx and tx behavior.
+  - Merge branch 'master' into multi
+  - Add host to client tool
+  - Add implementations for multi-demos
+
 ## 0.1.10 (February 27, 2019)
   - Add an API to return authInfo for Event Chain.
 
