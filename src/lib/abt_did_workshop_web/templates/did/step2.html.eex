@@ -5,7 +5,8 @@
 <% end %>
 <br>
 <%= form_for @conn, Routes.did_path(@conn, :update_claims), fn f -> %>
-  <% info = AbtDidWorkshop.AppState.get().info %>
+  <% state = AbtDidWorkshop.AppState.get() %>
+  <% info = state.info %>
   <section class="column">
     <b>Input your application metadata</b>
     <div class="form-group">
@@ -43,7 +44,7 @@
     <div class="form-group">
       <p>
         <label>
-          <%= text_input(f, :path, value: "https://arcwallet.io/i/") %>
+          <%= text_input(f, :path, value: state.path) %>
         </label>
       </p>
     </div>

@@ -102,7 +102,7 @@ defmodule AbtDidWorkshop.AssetUtil do
         wallet: wallet
       )
 
-    req = RequestSendTx.new(tx: tx, wallet: wallet, commit: false)
+    req = RequestSendTx.new(tx: tx, wallet: wallet, commit: true)
 
     case ForgeSdk.send_tx(req) do
       {:error, reason} -> {:error, reason}

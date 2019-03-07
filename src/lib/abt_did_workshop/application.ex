@@ -5,7 +5,7 @@ defmodule AbtDidWorkshop.Application do
 
   def start(_type, _args) do
     filename = :abt_did_workshop |> Application.app_dir() |> Path.join("priv/forge.toml")
-    servers = ForgeSdk.init(:cert, "", filename)
+    servers = ForgeSdk.init(:abt_did_workshop, "", filename)
 
     children =
       servers ++
@@ -20,7 +20,7 @@ defmodule AbtDidWorkshop.Application do
     register_type_urls()
     opts = [strategy: :one_for_one, name: AbtDidWorkshop.Supervisor]
     result = Supervisor.start_link(children, opts)
-    init_certs()
+    AbtDidWorkshop.WalletUtil.init_robert()
     result
   end
 
@@ -35,11 +35,5 @@ defmodule AbtDidWorkshop.Application do
     ForgeAbi.register_type_urls([
       {:certificate, "ws:x:certificate", AbtDidWorkshop.Certificate}
     ])
-  end
-
-  defp init_certs do
-    {robert, _} = AbtDidWorkshop.WalletUtil.init_robert()
-    Process.sleep(5000)
-    AbtDidWorkshop.AssetUtil.init_certs(robert, "ABT", 40)
   end
 end

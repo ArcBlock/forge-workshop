@@ -74,6 +74,8 @@ config :abt_did_workshop, :app_info,
   copyright: "https://example-application/copyright",
   publisher: "did:abt:zNKSHDK5KTZ5bdxfHoKp6F2iibbpLriYJDSi"
 
+config :abt_did_workshop, :deep_link_path, "https://arcwallet.io/i/"
+
 # Configures Drab
 config :drab, AbtDidWorkshopWeb.Endpoint, otp_app: :abt_did_workshop
 
