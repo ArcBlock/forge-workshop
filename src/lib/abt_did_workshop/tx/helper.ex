@@ -36,8 +36,11 @@ defmodule AbtDidWorkshop.Tx.Helper do
       nil ->
         {:error, "Could not find asset."}
 
+      {:error, _} ->
+        {:error, "Could not find asset."}
+
       state ->
-        if state.owner != owner_address do
+        if Map.get(state, :owner) != owner_address do
           {:error, "The asset does not belong to the account."}
         else
           case ForgeAbi.decode_any(state.data) do
@@ -188,7 +191,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
   def send_tx(tx) do
     case ForgeSdk.send_tx(tx: tx) do
       {:error, reason} -> {:error, reason}
-      hash -> {:ok, hash}
+      hash -> {:ok, %{hash: hash}}
     end
   end
 

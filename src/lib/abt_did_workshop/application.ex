@@ -24,7 +24,7 @@ defmodule AbtDidWorkshop.Application do
     ])
   end
 
-  def get_children() do
+  def get_children do
     app_servers1 = [
       AbtDidWorkshopWeb.Endpoint,
       AbtDidWorkshop.UserDb,

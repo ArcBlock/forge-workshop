@@ -215,7 +215,11 @@ defmodule AbtDidWorkshopWeb.TransactionController do
   end
 
   defp reply({:ok, response}, conn, _) do
-    json(conn, response)
+    json(conn, %{response: response})
+  end
+
+  defp reply(:ok, conn, _) do
+    json(conn, %{response: "ok"})
   end
 
   defp reply(claims, conn, tx_id) do

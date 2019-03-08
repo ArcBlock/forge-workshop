@@ -37,7 +37,10 @@ defmodule Demo do
     req = prepare_request(w, %{requestedClaims: claims})
 
     %HTTPoison.Response{body: body} =
-      HTTPoison.post!(url, req, [{"Content-type", "application/json"}])
+      HTTPoison.post!(url, req, [{"Content-type", "application/json"}],
+        timeout: 80000,
+        recv_timeout: 80000
+      )
 
     response = Jason.decode!(body)
 
