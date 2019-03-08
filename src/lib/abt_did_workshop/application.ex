@@ -25,6 +25,14 @@ defmodule AbtDidWorkshop.Application do
   end
 
   def get_children do
+    env = Application.get_env(:abt_did_workshop, :env)
+
+    forge_env =
+      case env do
+        env when env in ["test", "dev"] -> "dev"
+        _ -> "staging"
+      end
+
     app_servers1 = [
       AbtDidWorkshopWeb.Endpoint,
       AbtDidWorkshop.UserDb,
@@ -32,14 +40,19 @@ defmodule AbtDidWorkshop.Application do
       AbtDidWorkshop.Repo
     ]
 
-    app_servers2 = [AbtDidWorkshop.AppState]
+    case env do
+      "test" ->
+        app_servers1
 
-    filename = :abt_did_workshop |> Application.app_dir() |> Path.join("priv/forge.toml")
-    forge_servers = ForgeSdk.init(:abt_did_workshop, "", filename)
+      _ ->
+        filename =
+          :abt_did_workshop
+          |> Application.app_dir()
+          |> Path.join("priv/forge_config")
+          |> Path.join("/forge_#{forge_env}.toml")
 
-    case Application.get_env(:abt_did_workshop, :env) do
-      "test" -> app_servers1
-      _ -> forge_servers ++ app_servers1 ++ app_servers2
+        forge_servers = ForgeSdk.init(:abt_did_workshop, "", filename)
+        forge_servers ++ app_servers1 ++ [AbtDidWorkshop.AppState]
     end
   end
 end

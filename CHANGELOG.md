@@ -1,3 +1,6 @@
+## 0.2.4 (March 08, 2019)
+  - Add staging config
+
 ## 0.2.3 (March 08, 2019)
   - Enrich the log.
 

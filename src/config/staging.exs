@@ -1,20 +1,3 @@
-# use Mix.Config
-
-# config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
-#   http: [port: 4000],
-#   debug_errors: true
-
-# # Do not print debug messages in production
-# config :logger, level: :info
-
-# # Configure your database
-# config :abt_did_workshop, AbtDidWorkshop.Repo,
-#   username: "postgres",
-#   password: "postgres",
-#   database: "abt_did_workshop_staging",
-#   hostname: "localhost",
-#   pool_size: 10
-
 use Mix.Config
 
 # For development, we disable any cache and enable
@@ -24,6 +7,7 @@ use Mix.Config
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
 config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
+  url: [host: "did-workshop.arcblock.co", port: 4000],
   http: [port: 4000],
   debug_errors: true,
   check_origin: false
