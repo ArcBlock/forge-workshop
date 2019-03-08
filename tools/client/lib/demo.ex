@@ -31,7 +31,7 @@ defmodule Demo do
   end
 
   defp handle_response(w, %{"authInfo" => auth_info}) do
-    info_body = get_body(auth_info)
+    info_body = get_body(auth_info) |> IO.inspect()
     url = info_body["url"]
     claims = handle_claims(info_body["requestedClaims"], w)
     req = prepare_request(w, %{requestedClaims: claims})
@@ -56,7 +56,7 @@ defmodule Demo do
   end
 
   defp handle_claim(%{"type" => "signature", "tx" => tx_str} = claim, wallet) do
-    IO.puts("The application is asking you to sign the following transaction.\n")
+    display_claim(claim)
     tx_data = Multibase.decode!(tx_str)
     tx = ForgeAbi.Transaction.decode(tx_data)
     itx = ForgeAbi.decode_any(tx.itx)
@@ -77,7 +77,7 @@ defmodule Demo do
   end
 
   defp handle_claim(%{"type" => "signature"} = claim, wallet) do
-    IO.puts("The application is asking you to sign the following transaction.\n")
+    display_claim(claim)
     data = claim["data"] |> Multibase.decode!()
     tx = claim["origin"] |> Multibase.decode!() |> ForgeAbi.Transaction.decode()
     IO.inspect(ForgeSdk.display(tx))
@@ -96,9 +96,13 @@ defmodule Demo do
   end
 
   defp handle_claim(%{"type" => "did"} = claim, _) do
-    desc = claim["meta"]["description"]
-    answer = IO.gets(desc <> "\n") |> String.trim_trailing("\n")
+    display_claim(claim)
+    answer = IO.gets("") |> String.trim_trailing("\n")
     Map.put(claim, "did", answer)
+  end
+
+  defp display_claim(%{"meta" => %{"description" => des}}) do
+    IO.puts(des <> "\n")
   end
 
   defp sign(data, wallet) do

@@ -1,5 +1,5 @@
 <div class="section">
-  <h4> <%= @demo.title %> </h4>
+  <h4> <%= @demo.name %> </h4>
   <p style="font-size: smaller"> <%= @demo.description %> </p>
 </div>
 
@@ -37,7 +37,7 @@ Transaction list:
         </div>
         <!-- QR Code -->
         <div class="col s4">
-          <input id='<%= "qrValue_#{tx.id}" %>' type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink(tx) %>"></input>
+          <input id='<%= "qrValue_#{tx.id}" %>' type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink(@demo.id, tx.id) %>"></input>
           <div align="center">
             <canvas id='<%= "canvas_#{tx.id}" %>'></canvas>
           </div>

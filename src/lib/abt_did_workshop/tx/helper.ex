@@ -80,7 +80,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
     %{tx | signature: sig}
   end
 
-  def require_signature(tx, address) do
+  def require_signature(tx, address, description) do
     tx_data = Transaction.encode(tx)
     did_type = AbtDid.get_did_type(address)
     data = hash(did_type.hash_type, tx_data)
@@ -89,7 +89,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
       %{
         type: "signature",
         meta: %{
-          description: "Please sign this transaction.",
+          description: "#{description}\nPlease sign this transaction.",
           typeUrl: "fg:t:transaction"
         },
         data: Multibase.encode!(data, :base58_btc),
@@ -114,7 +114,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
     %{tx | signatures: [%{msig | signature: sig} | tx.signatures]}
   end
 
-  def require_multi_sig(tx, address, asset) do
+  def require_multi_sig(tx, address, asset, description) do
     msig = ForgeAbi.Multisig.new(signer: address, data: ForgeAbi.encode_any!(:address, asset))
     tx1 = %{tx | signatures: [msig | tx.signatures]}
     tx_data = Transaction.encode(tx1)
@@ -125,7 +125,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
       %{
         type: "signature",
         meta: %{
-          description: "Please sign this transaction.",
+          description: "#{description}\nPlease sign this transaction.",
           typeUrl: "fg:t:transaction"
         },
         data: Multibase.encode!(data, :base58_btc),
@@ -144,14 +144,14 @@ defmodule AbtDidWorkshop.Tx.Helper do
     %{tx | signatures: [msig | rest]}
   end
 
-  def require_asset(nil), do: []
-  def require_asset(""), do: []
+  def require_asset(_, nil), do: []
+  def require_asset(_, ""), do: []
 
-  def require_asset(asset_title) do
+  def require_asset(description, asset_title) do
     [
       %{
         meta: %{
-          description: "Please provide asset: #{asset_title}."
+          description: "#{description}\nPlease provide asset: #{asset_title}."
         },
         type: "did",
         did_type: "asset",
@@ -161,14 +161,27 @@ defmodule AbtDidWorkshop.Tx.Helper do
     ]
   end
 
-  def require_account(nil), do: []
-  def require_account(0), do: []
-
-  def require_account(token) do
+  def require_account(description) do
     [
       %{
         meta: %{
-          description: "Please provide an account with at least #{token} TBA."
+          description: "#{description}\nPlease provide an account."
+        },
+        type: "did",
+        did_type: "account",
+        did: ""
+      }
+    ]
+  end
+
+  def require_account(_, nil), do: []
+  def require_account(_, 0), do: []
+
+  def require_account(description, token) do
+    [
+      %{
+        meta: %{
+          description: "#{description}\nPlease provide an account with at least #{token} TBA."
         },
         type: "did",
         did_type: "account",

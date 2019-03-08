@@ -11,6 +11,18 @@ defmodule AbtDidWorkshopWeb.DemoController do
   end
 
   def create(conn, %{"demo" => demo}) do
+    {pk, sk} = Mcrypto.keypair(%Mcrypto.Signer.Ed25519{})
+    did_type = %AbtDid.Type{hash_type: :sha3, key_type: :ed25519, role_type: :application}
+    did = AbtDid.sk_to_did(did_type, sk)
+
+    demo =
+      demo
+      |> Map.put("sk", Multibase.encode!(sk, :base58_btc))
+      |> Map.put("pk", Multibase.encode!(pk, :base58_btc))
+      |> Map.put("did", did)
+      |> Map.put("icon", get_icon(demo["icon"]))
+      |> Map.put("path", get_path(demo["path"]))
+
     case DemoTable.insert(demo) do
       {:ok, record} ->
         conn
@@ -58,4 +70,10 @@ defmodule AbtDidWorkshopWeb.DemoController do
         render(conn, "edit.html", changeset: changeset, demo: old_demo)
     end
   end
+
+  defp get_icon(""), do: Application.get_env(:abt_did_workshop, :app_info) |> Keyword.get(:icon)
+  defp get_icon(url), do: url
+
+  defp get_path(""), do: Application.get_env(:abt_did_workshop, :deep_link_path)
+  defp get_path(path), do: path
 end

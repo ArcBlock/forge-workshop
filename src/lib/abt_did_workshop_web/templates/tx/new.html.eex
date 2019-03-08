@@ -9,7 +9,7 @@
       <%= text_input f, :name, placeholder: "Transaction Name", class: "form-control" %>
     </p>
     <p>
-      <%= text_input f, :description, placeholder: "Description (optional)" %>
+      <%= text_input f, :description, placeholder: "Description (will be displayed to wallet user.)" %>
     </p>
     <p>
       <%= select f, :tx_type, ["TransferTx", "ExchangeTx", "ConsumeAssetTx", "UpdateAssetTx", [key: "Proof of Holding", value: "ProofOfHolding"]], prompt: "Choose your transaction type", id: :tx_type, value: init_tx_type %>
