@@ -7,12 +7,6 @@
 # General application configuration
 use Mix.Config
 
-config :abt_did_workshop, AbtDidWorkshop.Repo,
-  database: "abt_did_workshop_repo",
-  username: "user",
-  password: "pass",
-  hostname: "localhost"
-
 config :abt_did_workshop,
   ecto_repos: [AbtDidWorkshop.Repo]
 
@@ -76,9 +70,6 @@ config :abt_did_workshop, :app_info,
 
 config :abt_did_workshop, :deep_link_path, "https://arcwallet.io/i/"
 
-# Configures Drab
-config :drab, AbtDidWorkshopWeb.Endpoint, otp_app: :abt_did_workshop
-
 config :abt_did_workshop, :wallet,
   moniker_prefix: "stu",
   passphrase: "abcd1234"
@@ -95,11 +86,13 @@ config :abt_did_workshop, :robert,
       125, 70, 142, 146, 229>>,
   type: [address: 1, hash: 1, pk: 0, role: 0]
 
-# Configures default Drab file extension
-config :phoenix, :template_engines, drab: Drab.Live.Engine
-
+# Configures Drab
+config :drab, AbtDidWorkshopWeb.Endpoint, otp_app: :abt_did_workshop
 # Configures Drab for webpack
 config :drab, AbtDidWorkshopWeb.Endpoint, js_socket_constructor: "window.__socket"
+
+# Configures default Drab file extension
+config :phoenix, :template_engines, drab: Drab.Live.Engine
 
 # Configures Elixir's Logger
 config :logger, :console,

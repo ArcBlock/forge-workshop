@@ -36,6 +36,8 @@ defmodule AbtDidWorkshopWeb.TransactionController do
         |> do_request(tx.tx_behaviors, robert, user_addr)
         |> reply(conn, tx_id)
     end
+  rescue
+    e -> reply({:error, Exception.message(e)}, conn, id)
   end
 
   def response(conn, %{"id" => id}) do
@@ -53,6 +55,8 @@ defmodule AbtDidWorkshopWeb.TransactionController do
         |> do_response(tx.tx_behaviors, claims, robert, user_addr)
         |> reply(conn, tx_id)
     end
+  rescue
+    e -> reply({:error, Exception.message(e)}, conn, id)
   end
 
   defp do_request(_, behaviors, _, _) when is_nil(behaviors) or behaviors == [] do

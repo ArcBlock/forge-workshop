@@ -14,6 +14,8 @@ defmodule AbtDidWorkshop.Tx.Helper do
     UpdateAssetTx
   }
 
+  require Logger
+
   def tba, do: ForgeAbi.one_token()
 
   def hash(:keccak, data), do: Mcrypto.hash(%Mcrypto.Hasher.Keccak{}, data)
@@ -34,23 +36,46 @@ defmodule AbtDidWorkshop.Tx.Helper do
   def validate_asset(title, asset_address, owner_address) do
     case ForgeSdk.get_asset_state(address: asset_address) do
       nil ->
-        {:error, "Could not find asset."}
+        Logger.error("Could not find asset. Asset address: #{inspect(asset_address)}.")
+        {:error, "Could not find asset. Asset address: #{inspect(asset_address)}."}
 
-      {:error, _} ->
-        {:error, "Could not find asset."}
+      {:error, reason} ->
+        Logger.error(
+          "Could not find asset. Reason: #{inspect(reason)}. Asset address: #{
+            inspect(asset_address)
+          }."
+        )
+
+        {:error, "Could not find asset. Asset address: #{inspect(asset_address)}."}
 
       state ->
         if Map.get(state, :owner) != owner_address do
+          Logger.error(
+            "The asset does not belong to the account. Asset address: #{inspect(asset_address)}. Owner address: #{
+              inspect(owner_address)
+            }"
+          )
+
           {:error, "The asset does not belong to the account."}
         else
           case ForgeAbi.decode_any(state.data) do
             {:certificate, cert} ->
               case cert.title do
-                ^title -> :ok
-                _ -> {:error, "Incorrect certificate title."}
+                ^title ->
+                  :ok
+
+                _ ->
+                  Logger.error(
+                    "Incorrect certificate title. Expected: #{inspect(title)}, Actual: #{
+                      inspect(cert.title)
+                    }"
+                  )
+
+                  {:error, "Incorrect certificate title."}
               end
 
             _ ->
+              Logger.error("Invalid asset. Asset address: #{inspect(asset_address)}")
               {:error, "Invalid asset."}
           end
         end
@@ -196,15 +221,28 @@ defmodule AbtDidWorkshop.Tx.Helper do
 
   def gen_asset(from, to, title) do
     case AssetUtil.init_cert(from, to, title) do
-      {:error, reason} -> raise "Failed to create asset. Error: #{inspect(reason)}"
-      {_, asset_address} -> asset_address
+      {:error, reason} ->
+        Logger.error("Failed to create asset. Error: #{inspect(reason)}")
+        raise "Failed to create asset. Error: #{inspect(reason)}"
+
+      {_, asset_address} ->
+        asset_address
     end
   end
 
   def send_tx(tx) do
     case ForgeSdk.send_tx(tx: tx) do
-      {:error, reason} -> {:error, reason}
-      hash -> {:ok, %{hash: hash}}
+      {:error, reason} ->
+        Logger.error(
+          "Failed to send tx. Reason: #{inspect(reason)}. Transaction: #{
+            inspect(tx, limit: :infinity)
+          }"
+        )
+
+        {:error, reason}
+
+      hash ->
+        {:ok, %{hash: hash}}
     end
   end
 
