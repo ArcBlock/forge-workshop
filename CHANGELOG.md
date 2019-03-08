@@ -1,3 +1,6 @@
+## 0.2.2 (March 08, 2019)
+  - Add chain info back to app info.
+
 ## 0.2.1 (March 07, 2019)
   - Each demo use its own key and meta.
   - Fix response format.
