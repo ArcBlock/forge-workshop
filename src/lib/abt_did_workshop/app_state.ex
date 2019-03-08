@@ -39,6 +39,12 @@ defmodule AbtDidWorkshop.AppState do
   end
 
   def init(:ok) do
+    try do
+      ForgeAbi.one_token()
+    rescue
+      _ -> Application.put_env(:forge_abi, :decimal, 16)
+    end
+
     app_info =
       :abt_did_workshop
       |> Application.get_env(:app_info, [])
