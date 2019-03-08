@@ -3,13 +3,23 @@ defmodule AbtDidWorkshop.Tables.DemoTable do
 
   import Ecto.Query
 
-  alias AbtDidWorkshop.{Demo, Repo}
+  alias AbtDidWorkshop.{Demo, Repo, Tx}
 
   def get(id) do
     from(
       d in Demo,
       where: d.id == ^id,
       preload: [:txs]
+    )
+    |> Repo.one()
+  end
+
+  def get_by_tx_id(tx_id) do
+    from(
+      d in Demo,
+      join: t in Tx,
+      on: d.id == t.demo_id,
+      where: t.id == ^tx_id
     )
     |> Repo.one()
   end

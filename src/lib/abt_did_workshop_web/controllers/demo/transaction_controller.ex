@@ -6,8 +6,8 @@ defmodule AbtDidWorkshopWeb.TransactionController do
   use AbtDidWorkshopWeb, :controller
 
   alias AbtDidWorkshop.{
-    AppState,
     Plugs.VerifySig,
+    Tables.DemoTable,
     Tables.TxTable,
     Tx.Consume,
     Tx.Exchange,
@@ -63,7 +63,7 @@ defmodule AbtDidWorkshopWeb.TransactionController do
     cond do
       # When robert only offers something to the user.
       beh.behavior == "offer" ->
-        []
+        Helper.require_account(beh.description)
 
       # When robert only demands token from the user.
       Util.empty?(beh.asset) ->
@@ -72,11 +72,11 @@ defmodule AbtDidWorkshopWeb.TransactionController do
 
         "TransferTx"
         |> Helper.get_transaction_to_sign(sender, receiver)
-        |> Helper.require_signature(user_addr)
+        |> Helper.require_signature(user_addr, beh.description)
 
       # When robert demands asset from the user.
       true ->
-        Helper.require_asset(beh.asset)
+        Helper.require_asset(beh.description, beh.asset)
     end
   end
 
@@ -92,28 +92,28 @@ defmodule AbtDidWorkshopWeb.TransactionController do
 
       "ExchangeTx"
       |> Helper.get_transaction_to_sign(sender, receiver)
-      |> Helper.require_signature(user_addr)
+      |> Helper.require_signature(user_addr, demand.description)
 
       # When robert demands asset from the user.
     else
-      Helper.require_asset(demand.asset)
+      Helper.require_asset(demand.description, demand.asset)
     end
   end
 
   defp do_request("UpdateAssetTx", behaviors, _, _) do
     update = Enum.find(behaviors, fn beh -> beh.behavior == "update" end)
-    Helper.require_asset(update.asset)
+    Helper.require_asset(update.description, update.asset)
   end
 
   defp do_request("ConsumeAssetTx", behaviors, _, _) do
     consume = Enum.find(behaviors, fn beh -> beh.behavior == "consume" end)
-    Helper.require_asset(consume.asset)
+    Helper.require_asset(consume.description, consume.asset)
   end
 
   defp do_request("ProofOfHolding", behaviors, _, _) do
     poh = Enum.find(behaviors, fn beh -> beh.behavior == "poh" end)
-    hold_account = Helper.require_account(poh.token)
-    hold_asset = Helper.require_asset(poh.asset)
+    hold_account = Helper.require_account(poh.description, poh.token)
+    hold_asset = Helper.require_asset(poh.description, poh.asset)
     hold_account ++ hold_asset
   end
 
@@ -223,17 +223,17 @@ defmodule AbtDidWorkshopWeb.TransactionController do
   end
 
   defp reply(claims, conn, tx_id) do
-    app_state = AppState.get()
+    demo = DemoTable.get_by_tx_id(tx_id)
 
     extra = %{
       url: Util.get_callback() <> "transaction/#{tx_id}",
       requestedClaims: claims,
-      appInfo: app_state.info
+      appInfo: Map.take(demo, [:name, :subtitle, :description, :icon])
     }
 
     response = %{
-      appPk: app_state.pk |> Multibase.encode!(:base58_btc),
-      authInfo: AbtDid.Signer.gen_and_sign(app_state.did, app_state.sk, extra)
+      appPk: demo.pk,
+      authInfo: AbtDid.Signer.gen_and_sign(demo.did, Multibase.decode!(demo.sk), extra)
     }
 
     json(conn, response)

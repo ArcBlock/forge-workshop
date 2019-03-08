@@ -32,6 +32,6 @@ defmodule AbtDidWorkshop.Tx.Update do
 
     "UpdateAssetTx"
     |> Helper.get_transaction_to_sign(sender, receiver)
-    |> Helper.require_signature(user_addr)
+    |> Helper.require_signature(user_addr, beh.description)
   end
 end

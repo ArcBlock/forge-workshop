@@ -40,6 +40,9 @@ defmodule AbtDidWorkshopWeb.TxController do
   def create(conn, %{"tx" => %{"demo_id" => demo_id, "tx_id" => tx_id, "tx_type" => ""}}),
     do: go_to_new(conn, demo_id, tx_id, "Transaction type cannot be empty.")
 
+  def create(conn, %{"tx" => %{"demo_id" => demo_id, "tx_id" => tx_id, "description" => ""}}),
+    do: go_to_new(conn, demo_id, tx_id, "Transaction description cannot be empty.")
+
   def create(conn, %{"tx" => tx}) do
     do_create(conn, tx)
   end
@@ -84,8 +87,8 @@ defmodule AbtDidWorkshopWeb.TxController do
       [token_offer, token_demand] ->
         if demand_token <> demand_asset != "" and offer_token <> offer_asset != "" do
           behaviors =
-            to_beh("offer", tx["exchange_offer_asset"], token_offer, tx["tx_type"]) ++
-              to_beh("demand", tx["exchange_demand_asset"], token_demand, tx["tx_type"])
+            to_beh("offer", tx["exchange_offer_asset"], token_offer, tx) ++
+              to_beh("demand", tx["exchange_demand_asset"], token_demand, tx)
 
           do_upsert(conn, demo_id, tx_id, behaviors, tx)
         else
@@ -103,14 +106,14 @@ defmodule AbtDidWorkshopWeb.TxController do
         go_to_new(conn, demo_id, tx_id, "Asset title cannot be empty.")
 
       asset ->
-        case parse_token_amount([tx["poh_offer_token"]]) do
+        case parse_token_amount([tx["consume_offer_token"]]) do
           :error ->
             go_to_new(conn, demo_id, tx_id, "The token amount must be positive integer or empty")
 
           [offer_token] ->
             behaviors =
-              to_beh("consume", asset, nil, tx["tx_type"]) ++
-                to_beh("offer", tx["consume_offer_asset"], offer_token, tx["tx_type"])
+              to_beh("consume", asset, nil, tx) ++
+                to_beh("offer", tx["consume_offer_asset"], offer_token, tx)
 
             do_upsert(conn, demo_id, tx_id, behaviors, tx)
         end
@@ -143,8 +146,8 @@ defmodule AbtDidWorkshopWeb.TxController do
 
           [offer_token] ->
             behaviors =
-              to_beh("update", tx["update_asset"], nil, tx["tx_type"], tx["update_func"]) ++
-                to_beh("offer", tx["update_offer_asset"], offer_token, tx["tx_type"])
+              to_beh("update", tx["update_asset"], nil, tx, tx["update_func"]) ++
+                to_beh("offer", tx["update_offer_asset"], offer_token, tx)
 
             do_upsert(conn, demo_id, tx_id, behaviors, tx)
         end
@@ -166,18 +169,18 @@ defmodule AbtDidWorkshopWeb.TxController do
 
           _ ->
             behaviors =
-              to_beh("poh", tx["poh_asset"], poh_token, tx["tx_type"]) ++
-                to_beh("offer", tx["poh_offer_asset"], offer_token, tx["tx_type"])
+              to_beh("poh", tx["poh_asset"], poh_token, tx) ++
+                to_beh("offer", tx["poh_offer_asset"], offer_token, tx)
 
             do_upsert(conn, demo_id, tx_id, behaviors, tx)
         end
     end
   end
 
-  defp to_beh(beh, asset, token, tx_type, func \\ nil)
+  defp to_beh(beh, asset, token, tx, func \\ nil)
   defp to_beh(_, "", "", _, _), do: []
 
-  defp to_beh(beh, asset, token, tx_type, func) do
+  defp to_beh(beh, asset, token, tx, func) do
     asset =
       case asset do
         "" -> nil
@@ -196,13 +199,14 @@ defmodule AbtDidWorkshopWeb.TxController do
         asset: asset,
         function: func,
         token: token,
-        tx_type: tx_type
+        tx_type: tx["tx_type"],
+        description: tx["description"]
       }
     ]
   end
 
   defp create_single(conn, demo_id, tx_id, behavior, token, asset, tx, func \\ nil) do
-    behaviors = to_beh(behavior, asset, token, tx["tx_type"], func)
+    behaviors = to_beh(behavior, asset, token, tx, func)
     do_upsert(conn, demo_id, tx_id, behaviors, tx)
   end
 

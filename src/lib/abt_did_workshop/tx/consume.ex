@@ -18,7 +18,7 @@ defmodule AbtDidWorkshop.Tx.Consume do
         case Helper.get_claims([f_asset], claims) do
           [c] ->
             case Helper.validate_asset(beh.asset, c["did"], user_addr) do
-              :ok -> do_response_consume(robert, user_addr, c["did"])
+              :ok -> do_response_consume(robert, user_addr, c["did"], beh.description)
               {:error, reason} -> {:error, reason}
             end
 
@@ -28,12 +28,12 @@ defmodule AbtDidWorkshop.Tx.Consume do
     end
   end
 
-  defp do_response_consume(robert, user_addr, asset) do
+  defp do_response_consume(robert, user_addr, asset, description) do
     sender = %{address: robert.address, wallet: robert}
     receiver = %{address: user_addr}
 
     "ConsumeAssetTx"
     |> Helper.get_transaction_to_sign(sender, receiver, true)
-    |> Helper.require_multi_sig(user_addr, asset)
+    |> Helper.require_multi_sig(user_addr, asset, description)
   end
 end
