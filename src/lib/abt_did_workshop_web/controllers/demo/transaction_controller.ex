@@ -225,10 +225,18 @@ defmodule AbtDidWorkshopWeb.TransactionController do
   defp reply(claims, conn, tx_id) do
     demo = DemoTable.get_by_tx_id(tx_id)
 
+    app_info =
+      demo
+      |> Map.take([:name, :subtitle, :description, :icon])
+      |> Map.put(:chainId, ForgeSdk.get_chain_info().network)
+      |> Map.put(:chainHost, "http://#{Util.get_ip()}:8210/api/playground")
+      |> Map.put(:chainToken, "TBA")
+      |> Map.put(:decimals, ForgeAbi.one_token() |> :math.log10() |> Kernel.trunc())
+
     extra = %{
       url: Util.get_callback() <> "transaction/#{tx_id}",
       requestedClaims: claims,
-      appInfo: Map.take(demo, [:name, :subtitle, :description, :icon])
+      appInfo: app_info
     }
 
     response = %{
