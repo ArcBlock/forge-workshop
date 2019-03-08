@@ -1,3 +1,6 @@
+## 0.2.3 (March 08, 2019)
+  - Enrich the log.
+
 ## 0.2.2 (March 08, 2019)
   - Add chain info back to app info.
 
