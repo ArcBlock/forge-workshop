@@ -1,3 +1,8 @@
+## 0.2.1 (March 07, 2019)
+  - Each demo use its own key and meta.
+  - Fix response format.
+  - Forge 0.17.7
+
 ## 0.2.0 (March 07, 2019)
   - Fix token
   - Add more app info
