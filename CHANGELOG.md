@@ -1,3 +1,6 @@
+## 0.2.5 (March 08, 2019)
+  - Use new config for mix release
+
 ## 0.2.4 (March 08, 2019)
   - Add staging config
 
