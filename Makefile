@@ -19,6 +19,7 @@ format:
 
 init: submodule install dep
 	@echo "Initializing the repo..."
+	@cd src/assets; npm install; ./node_modules/.bin/webpack;
 
 travis-init: submodule extract-deps
 	@echo "Initialize software required for travis (normally ubuntu software)"
@@ -30,7 +31,6 @@ install:
 
 dep:
 	@echo "Install dependencies required for this repo..."
-	# @cd src/assets; npm install
 	@cd src; mix deps.get
 
 pre-build: install dep
