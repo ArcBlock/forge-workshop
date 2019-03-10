@@ -1,3 +1,6 @@
+## 0.2.6 (March 10, 2019)
+  - Change the log level
+
 ## 0.2.5 (March 08, 2019)
   - Use new config for mix release
 
