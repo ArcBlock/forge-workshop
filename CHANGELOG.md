@@ -1,3 +1,6 @@
+## 0.2.7 (March 10, 2019)
+  - Fix webpack issue on travis.
+
 ## 0.2.6 (March 10, 2019)
   - Change the log level
 
