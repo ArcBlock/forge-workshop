@@ -20,9 +20,11 @@ defmodule AbtDidWorkshopWeb.TransactionController do
     WalletUtil
   }
 
+  require Logger
+
   plug(VerifySig when action in [:response])
 
-  def request(conn, %{"id" => id, "userDid" => did}) do
+  def request(conn, %{"id" => id, "userDid" => did} = params) do
     tx_id = String.to_integer(id)
     user_addr = Util.did_to_address(did)
     {robert, _} = WalletUtil.init_robert()
@@ -37,7 +39,9 @@ defmodule AbtDidWorkshopWeb.TransactionController do
         |> reply(conn, tx_id)
     end
   rescue
-    e -> reply({:error, Exception.message(e)}, conn, id)
+    e ->
+      # Logger.error()
+      reply({:error, Exception.message(e)}, conn, id)
   end
 
   def response(conn, %{"id" => id}) do
