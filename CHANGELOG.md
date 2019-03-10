@@ -1,3 +1,6 @@
+## 0.2.8 (March 10, 2019)
+  - Add webpack to prebuild
+
 ## 0.2.7 (March 10, 2019)
   - Fix webpack issue on travis.
 
