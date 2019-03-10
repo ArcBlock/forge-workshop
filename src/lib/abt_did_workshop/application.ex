@@ -7,8 +7,7 @@ defmodule AbtDidWorkshop.Application do
     children = get_children()
     register_type_urls()
     opts = [strategy: :one_for_one, name: AbtDidWorkshop.Supervisor]
-    result = Supervisor.start_link(children, opts)
-    result
+    Supervisor.start_link(children, opts)
   end
 
   # Tell Phoenix to update the endpoint configuration
