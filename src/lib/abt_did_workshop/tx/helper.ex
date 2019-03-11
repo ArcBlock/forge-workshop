@@ -259,7 +259,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
         chain_id: ForgeSdk.get_chain_info().network,
         from: sender.address,
         itx: itx,
-        nonce: ForgeSdk.get_nonce(sender.address) + 1
+        nonce: :crypto.strong_rand_bytes(8) |> Base.encode16() |> String.to_integer(16)
       )
 
     case sign? do

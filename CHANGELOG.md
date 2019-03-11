@@ -1,3 +1,6 @@
+## 0.2.9 (March 11, 2019)
+  - Make nonce a random number.
+
 ## 0.2.8 (March 10, 2019)
   - Add webpack to prebuild
 
