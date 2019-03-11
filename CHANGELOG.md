@@ -1,3 +1,6 @@
+## 0.2.10 (March 11, 2019)
+  - Uptake new version of forge
+
 ## 0.2.9 (March 11, 2019)
   - Make nonce a random number.
 
