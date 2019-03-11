@@ -92,13 +92,11 @@ defmodule AbtDidWorkshop.AssetUtil do
         wallet_type: wallet.type
       )
 
-    nonce = ForgeSdk.get_nonce(wallet.address)
-
     tx =
       ForgeSdk.create_tx(
         from: wallet.address,
         itx: ForgeAbi.encode_any!(:create_asset, itx),
-        nonce: nonce + 1,
+        nonce: :crypto.strong_rand_bytes(8) |> Base.encode16() |> String.to_integer(16),
         wallet: wallet
       )
 
