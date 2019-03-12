@@ -43,7 +43,10 @@ defmodule AbtDidWorkshopWeb.Router do
     get("/cert/reward", CertController, :request_reward)
     post("/cert/reward", CertController, :response_reward)
 
-    post("/authinfo", ApiController, :auth_info)
+    # Util apis for event chains
+    post("/requireSig", ApiController, :require_sig)
+    post("/requireMultiSig", ApiController, :require_multi_sig)
+    post("/requireAsset", ApiController, :require_asset)
 
     get("/transaction/:id", TransactionController, :request)
     post("/transaction/:id", TransactionController, :response)
