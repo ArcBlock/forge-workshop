@@ -1,3 +1,6 @@
+## 0.2.11 (March 12, 2019)
+  - Add new claims
+
 ## 0.2.10 (March 11, 2019)
   - Uptake new version of forge
 
