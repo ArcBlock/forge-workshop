@@ -24,7 +24,9 @@ config :abt_did_workshop, :sample_keys, [
 
 config :abt_did_workshop, :profile, [
   {"fullName", "Full Name"},
-  {"ssn", "Social Security No."},
+  # {"ssn", "Social Security No."},
+  {"email", "Email"},
+  {"phone", "Phone"},
   {"birthday", "Birthday"}
 ]
 
