@@ -71,9 +71,9 @@
                   </tr>
                   <tr>
                     <td>Agreed?</td>
-                    <td style="word-wrap: break-word;"><%= agr["agreed"] %></td>
+                    <td style="word-wrap: break-word;"><%= agr["agreed"] || agr["agree"] %></td>
                   </tr>
-                  <%= if agr["agreed"] do %>
+                  <%= if agr["agreed"] || agr["agree"] do %>
                   <tr>
                     <td> Signature </td>
                     <td style="word-wrap: break-word;"> <%= agr["sig"] %> </td>

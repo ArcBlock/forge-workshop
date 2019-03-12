@@ -1,3 +1,11 @@
+## 0.2.12 (March 12, 2019)
+  - Fix displaying agree.
+  - Merge branch 'master' into claims
+  - Fix displaying agree.
+  - Fix displaying agree.
+  - bump version
+  - Add new claims
+
 ## 0.2.11 (March 12, 2019)
   - Add new claims
 
