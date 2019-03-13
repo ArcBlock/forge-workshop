@@ -5,7 +5,8 @@ defmodule AbtDidWorkshopWeb.AuthController do
 
   plug(VerifySig when action in [:response_auth])
 
-  def request_auth(conn, %{"userDid" => did}) do
+  def request_auth(conn, %{"userDid" => did} = param) do
+    IO.inspect(param, label: "@@@")
     user = UserDb.get(did)
 
     if user != nil and filled_all_claims?(user) do
@@ -18,7 +19,8 @@ defmodule AbtDidWorkshopWeb.AuthController do
   def request_auth(conn, _),
     do: send_resp(conn, 400, "The request must contain valid DID.")
 
-  def response_auth(conn, _) do
+  def response_auth(conn, param) do
+    IO.inspect(param, label: "###")
     user_did = conn.assigns.did
     user = UserDb.get(user_did)
 

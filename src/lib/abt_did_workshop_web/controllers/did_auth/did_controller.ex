@@ -4,19 +4,16 @@ defmodule AbtDidWorkshopWeb.DidController do
   alias AbtDid.Type, as: DidType
   alias AbtDidWorkshop.AppState
   alias AbtDidWorkshop.UserDb
+  alias AbtDidWorkshop.Tables.AppTable
+  alias AbtDidWorkshop.AppAuthState
 
   @ed25519 %Mcrypto.Signer.Ed25519{}
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
 
   def index(conn, _params) do
-    state = AppState.get()
-
-    case Map.get(state, :did) do
-      nil ->
-        render(conn, "step1.html")
-
-      _ ->
-        render(conn, "index.html", did: state.did)
+    case AppTable.get() do
+      nil -> render(conn, "step1.html")
+      state -> render(conn, "index.html", did: state.did)
     end
   end
 
@@ -64,9 +61,17 @@ defmodule AbtDidWorkshopWeb.DidController do
     }
 
     did = AbtDid.pk_to_did(did_type, pk)
-    AppState.add_key(sk, pk, did)
+    app_state = get_init_state()
 
-    render(conn, "step2.html")
+    app_state =
+      app_state
+      |> Map.put(:sk, Multibase.encode!(sk, :base58_btc))
+      |> Map.put(:pk, Multibase.encode!(pk, :base58_btc))
+      |> Map.put(:did, did)
+
+    changeset = AppAuthState.changeset(%AppAuthState{}, app_state)
+
+    render(conn, "step2.html", changeset: changeset)
   end
 
   def update_claims(conn, %{"path" => path} = params) when path != "" do
@@ -111,5 +116,11 @@ defmodule AbtDidWorkshopWeb.DidController do
     |> Enum.filter(fn {k, _} -> String.starts_with?(k, "app_info_") end)
     |> Enum.into(%{}, fn {"app_info_" <> k, v} -> {k, v} end)
     |> AppState.add_info()
+  end
+
+  defp get_init_state do
+    state = Application.get_env(:abt_did_workshop, :app_info) |> Enum.into(%{})
+    path = Application.get_env(:abt_did_workshop, :deep_link_path)
+    Map.put(state, :path, path)
   end
 end

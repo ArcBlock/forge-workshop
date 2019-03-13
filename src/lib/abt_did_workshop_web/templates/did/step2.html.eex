@@ -4,35 +4,36 @@
   </script>
 <% end %>
 <br>
-<%= form_for @conn, Routes.did_path(@conn, :update_claims), fn f -> %>
-  <% state = AbtDidWorkshop.AppState.get() %>
-  <% info = state.info %>
+<%= form_for @changeset, Routes.did_path(@conn, :update_claims), fn f -> %>
+  <%= text_input(f, :sk, type: "hidden") %>
+  <%= text_input(f, :pk, type: "hidden") %>
+  <%= text_input(f, :did, type: "hidden") %>
   <section class="column">
     <b>Input your application metadata</b>
     <div class="form-group">
       <p>
         <label>
-          <%= text_input(f, :app_info_name, value: info["name"]) %>
+          <%= text_input(f, :name) %>
           <span>Application name</span>
         </label>
         <label>
-          <%= text_input(f, :app_info_subtitle, value: info["subtitle"]) %>
+          <%= text_input(f, :subtitle) %>
           <span>Subtitle</span>
         </label>
         <label>
-          <%= text_input(f, :app_info_description, value: info["description"]) %>
+          <%= text_input(f, :description) %>
           <span>Description</span>
         </label>
         <label>
-          <%= text_input(f, :app_info_icon, value: info["icon"]) %>
+          <%= text_input(f, :icon) %>
           <span>Icon</span>
         </label>
         <label>
-          <%= text_input(f, :app_info_copyright, value: info["copyright"]) %>
+          <%= text_input(f, :copyright) %>
           <span>Copyright</span>
         </label>
         <label>
-          <%= text_input(f, :app_info_publisher, value: info["publisher"]) %>
+          <%= text_input(f, :publisher) %>
           <span>Publisher</span>
         </label>
       </p>
@@ -44,7 +45,7 @@
     <div class="form-group">
       <p>
         <label>
-          <%= text_input(f, :path, value: state.path) %>
+          <%= text_input(f, :path) %>
         </label>
       </p>
     </div>
