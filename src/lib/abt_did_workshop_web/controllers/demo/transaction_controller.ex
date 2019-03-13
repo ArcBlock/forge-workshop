@@ -184,7 +184,7 @@ defmodule AbtDidWorkshopWeb.TransactionController do
       :ok ->
         Transfer.response_offer(robert, user_addr, offer)
 
-      {:ok, hash1} ->
+      {:ok, %{hash: hash1}} ->
         async_offer(hash1, robert, user_addr, offer)
         {:ok, hash1}
 
