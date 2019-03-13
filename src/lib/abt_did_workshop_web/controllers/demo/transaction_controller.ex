@@ -194,6 +194,8 @@ defmodule AbtDidWorkshopWeb.TransactionController do
   end
 
   defp async_offer(hash, robert, user_addr, offer) do
+    IO.inspect(binding(), label: "@@@")
+
     Task.async(fn ->
       tx = get_tx(hash)
 
