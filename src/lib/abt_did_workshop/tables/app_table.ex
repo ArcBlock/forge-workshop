@@ -6,11 +6,18 @@ defmodule AbtDidWorkshop.Tables.AppTable do
 
   def get() do
     from(a in AppAuthState)
-    |> Repo.one()
+    |> Repo.all()
+    |> List.first()
   end
 
   def delete() do
     from(a in AppAuthState)
     |> Repo.delete_all()
+  end
+
+  def insert(state) do
+    %AppAuthState{}
+    |> AppAuthState.changeset(state)
+    |> Repo.insert()
   end
 end

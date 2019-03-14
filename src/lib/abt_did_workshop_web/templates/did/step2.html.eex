@@ -4,76 +4,50 @@
   </script>
 <% end %>
 <br>
-<%= form_for @changeset, Routes.did_path(@conn, :update_claims), fn f -> %>
+<section class="row">
+  <b>Configur the metadata for your application.</b>
+</section>
+<%= form_for @changeset, Routes.did_path(@conn, :upsert_app_state), fn f -> %>
   <%= text_input(f, :sk, type: "hidden") %>
   <%= text_input(f, :pk, type: "hidden") %>
   <%= text_input(f, :did, type: "hidden") %>
   <section class="column">
-    <b>Input your application metadata</b>
     <div class="form-group">
-      <p>
-        <label>
+        <p>
           <%= text_input(f, :name) %>
-          <span>Application name</span>
-        </label>
-        <label>
+          <%= error_tag(f, :name) %>
+          <label> <span>Application name</span></label>
+        </p>
+        <p>
           <%= text_input(f, :subtitle) %>
-          <span>Subtitle</span>
-        </label>
-        <label>
+          <%= error_tag(f, :subtitle) %>
+          <label><span>Subtitle</span></label>
+        </p>
+        <p>
           <%= text_input(f, :description) %>
-          <span>Description</span>
-        </label>
-        <label>
+          <%= error_tag(f, :description) %>
+          <label><span>Description</span></label>
+        </p>
+        <p>
           <%= text_input(f, :icon) %>
-          <span>Icon</span>
-        </label>
-        <label>
+          <%= error_tag(f, :icon) %>
+          <label><span>Icon</span></label>
+        </p>
+        <p>
           <%= text_input(f, :copyright) %>
-          <span>Copyright</span>
-        </label>
-        <label>
+          <%= error_tag(f, :copyright) %>
+          <label><span>Copyright</span></label>
+        </p>
+        <p>
           <%= text_input(f, :publisher) %>
-          <span>Publisher</span>
-        </label>
-      </p>
-    </div>
-  </section>
-
-  <section class="column">
-    <b>Input your deep link path</b>
-    <div class="form-group">
-      <p>
-        <label>
+          <%= error_tag(f, :publisher) %>
+          <label><span>Publisher</span></label>
+        </p>
+        <p>
           <%= text_input(f, :path) %>
-        </label>
+          <%= error_tag(f, :path) %>
+          <label><span>Deeplink path</span></label>
       </p>
-    </div>
-  </section>
-  
-  <section class="column">
-    <b><p>Choose your claims</p></b>
-    <div class="form-group">
-      <%= for {claim_id, claim_descrip} <- Application.get_env(:abt_did_workshop, :profile) do %>
-        <p>
-          <label>
-            <%= checkbox f, "claim_profile_" <> claim_id  %>
-            <span><%= claim_descrip %></span>
-          </label>
-        </p>
-      <% end %>
-    </div>
-
-    <div class="form-group">
-      <%= for agr <- Application.get_env(:abt_did_workshop, :agreement) do %>
-        <% meta = agr.meta %>
-        <p>
-          <label>
-            <%= checkbox f, "claim_agreement_" <> meta.id %>
-            <span><%= meta.description %></span>
-          </label>
-        </p>
-      <% end %>
     </div>
   </section>
   <%= submit "SUBMIT", class: "btn btn-primary" %>

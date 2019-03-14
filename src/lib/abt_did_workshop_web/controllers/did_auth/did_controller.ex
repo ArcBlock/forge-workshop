@@ -41,9 +41,8 @@ defmodule AbtDidWorkshopWeb.DidController do
     end
   end
 
-  def regenerate(conn, _) do
-    AppState.clear()
-    UserDb.clear()
+  def start_over(conn, _) do
+    AppTable.delete()
     redirect(conn, to: "/")
   end
 
@@ -74,21 +73,20 @@ defmodule AbtDidWorkshopWeb.DidController do
     render(conn, "step2.html", changeset: changeset)
   end
 
-  def update_claims(conn, %{"path" => path} = params) when path != "" do
-    store_claims(params)
-    store_app_info(params)
-    AppState.add_path(path)
+  def upsert_app_state(conn, %{"app_auth_state" => state}) do
+    # store_claims(params)
+    # store_app_info(params)
+    # AppState.add_path(path)
 
-    redirect(conn, to: "/did")
+    # redirect(conn, to: "/did")
+
+    case AppTable.insert(state) |> IO.inspect(label: "@@@") do
+      {:ok, record} -> render(conn, "step3.html")
+      {:error, changeset} -> render(conn, "step2.html", changeset: changeset)
+    end
   end
 
-  def update_claims(conn, _) do
-    conn
-    |> put_flash(:error, "Invalid deep link or secret key")
-    |> render("step2.html")
-  end
-
-  defp store_claims(params) do
+  def store_claims(conn, params) do
     claims =
       params
       |> Map.to_list()

@@ -18,9 +18,10 @@ defmodule AbtDidWorkshopWeb.Router do
     get("/", DidController, :index)
     post("/did", DidController, :create_did)
     get("/did", DidController, :show)
-    post("/did/claims", DidController, :update_claims)
+    post("/did/app", DidController, :upsert_app_state)
+    post("/did/claims", DidController, :store_claims)
     get("/did/claims", DidController, :continue)
-    get("/did/regenerate", DidController, :regenerate)
+    post("/did/start_over", DidController, :start_over)
 
     get("/wallet", WalletController, :index)
     get("/wallet/auth", WalletController, :request_auth)

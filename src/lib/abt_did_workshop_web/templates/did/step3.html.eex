@@ -1,0 +1,34 @@
+<br>
+<section class="row">
+<b>Choose the required claims for DID authentication.</b>
+</section>
+<%= form_for @conn, Routes.did_path(@conn, :create_did), fn f -> %>
+  <section class="column">
+    <p>Choose the required profile.</p>
+    <div class="form-group">
+      <%= for {claim_id, claim_descrip} <- Application.get_env(:abt_did_workshop, :profile) do %>
+        <p>
+          <label>
+            <%= checkbox f, "claim_profile_" <> claim_id  %>
+            <span><%= claim_descrip %></span>
+          </label>
+        </p>
+      <% end %>
+    </div>
+
+    <p>Choose the required agreements.</p>
+    <div class="form-group">
+      <%= for agr <- Application.get_env(:abt_did_workshop, :agreement) do %>
+        <% meta = agr.meta %>
+        <p>
+          <label>
+            <%= checkbox f, "claim_agreement_" <> meta.id %>
+            <span><%= meta.description %></span>
+          </label>
+        </p>
+      <% end %>
+    </div>
+  </section>
+
+  <%= submit "SUBMIT", class: "btn btn-primary" %>
+<% end %>
