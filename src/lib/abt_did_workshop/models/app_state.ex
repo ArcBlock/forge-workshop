@@ -42,6 +42,11 @@ defmodule AbtDidWorkshop.AppAuthState do
   def get_info(nil), do: %{}
 
   def get_info(state) do
-    Map.take(state, [:name, :subtitle, :description, :icon, :copyright, :publisher, :path])
+    state
+    |> Map.take([:name, :subtitle, :description, :icon, :copyright, :publisher, :path])
+    |> Map.put(:chainId, ForgeSdk.get_chain_info().network)
+    |> Map.put(:chainHost, "http://#{AbtDidWorkshop.Util.get_ip()}:8210/api/")
+    |> Map.put(:chainToken, "TBA")
+    |> Map.put(:decimals, ForgeAbi.one_token() |> :math.log10() |> Kernel.trunc())
   end
 end
