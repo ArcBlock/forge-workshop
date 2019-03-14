@@ -253,14 +253,12 @@ defmodule AbtDidWorkshopWeb.TransactionController do
       |> Map.put(:chainToken, "TBA")
       |> Map.put(:decimals, ForgeAbi.one_token() |> :math.log10() |> Kernel.trunc())
 
-    extra =
-      %{
-        url: Util.get_callback() <> "transaction/#{tx.id}",
-        requestedClaims: claims,
-        appInfo: app_info,
-        workflow: %{description: tx.description}
-      }
-      |> IO.inspect(label: "@@@")
+    extra = %{
+      url: Util.get_callback() <> "transaction/#{tx.id}",
+      requestedClaims: claims,
+      appInfo: app_info,
+      workflow: %{description: tx.description}
+    }
 
     response = %{
       appPk: demo.pk,
