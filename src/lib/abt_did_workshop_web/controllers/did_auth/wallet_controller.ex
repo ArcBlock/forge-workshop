@@ -138,7 +138,7 @@ defmodule AbtDidWorkshopWeb.WalletController do
     %HTTPoison.Response{body: response} =
       HTTPoison.post!(url, body, [{"content-type", "application/json"}])
 
-    case Jason.decode(response) |> IO.inspect(label: "@@@") do
+    case Jason.decode(response) do
       {:ok, %{"response" => "ok"}} ->
         conn
         |> put_flash(:info, "Authentication Succeeded!")
