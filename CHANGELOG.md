@@ -1,3 +1,7 @@
+## 0.2.16 (March 14, 2019)
+  - Init robert when starting up.
+  - Uptake forge 0.18.3
+
 ## 0.2.15 (March 13, 2019)
   - Fix reply arity issue
   - Fix reply arity issue
