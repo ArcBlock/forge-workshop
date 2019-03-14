@@ -1,3 +1,6 @@
+## 0.2.13 (March 13, 2019)
+  - Handle continuing tx.
+
 ## 0.2.12 (March 12, 2019)
   - Fix displaying agree.
   - Merge branch 'master' into claims
