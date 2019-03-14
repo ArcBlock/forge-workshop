@@ -1,3 +1,20 @@
+## 0.2.16 (March 14, 2019)
+  - Init robert when starting up.
+  - Uptake forge 0.18.3
+
+## 0.2.15 (March 13, 2019)
+  - Fix reply arity issue
+  - Fix reply arity issue
+  - Fix local ip issue.
+  - Merge branch 'master' into bug-3-13
+  - Return ok if auth succeeded.
+  - Return ok if auth succeeded.
+
+## 0.2.14 (March 13, 2019)
+  - Add chain info for event chain apis.
+  - Merge branch 'master' into new-api
+  - Add new apis for event chain
+
 ## 0.2.13 (March 13, 2019)
   - Handle continuing tx.
 

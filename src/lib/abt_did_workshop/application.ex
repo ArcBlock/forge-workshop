@@ -1,13 +1,21 @@
 defmodule AbtDidWorkshop.Application do
   @moduledoc false
 
+  alias AbtDidWorkshop.WalletUtil
   alias AbtDidWorkshopWeb.Endpoint
 
   def start(_type, _args) do
     children = get_children()
     register_type_urls()
     opts = [strategy: :one_for_one, name: AbtDidWorkshop.Supervisor]
-    Supervisor.start_link(children, opts)
+    result = Supervisor.start_link(children, opts)
+    env = Application.get_env(:abt_did_workshop, :env)
+
+    if env == "prod" or env == "staging" do
+      WalletUtil.init_robert()
+    end
+
+    result
   end
 
   # Tell Phoenix to update the endpoint configuration
