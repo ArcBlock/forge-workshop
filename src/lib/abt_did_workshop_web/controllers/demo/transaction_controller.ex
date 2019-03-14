@@ -41,7 +41,7 @@ defmodule AbtDidWorkshopWeb.TransactionController do
   rescue
     e ->
       # Logger.error()
-      reply({:error, Exception.message(e)}, conn)
+      reply({:error, Exception.message(e)}, conn, nil)
   end
 
   def response(conn, %{"id" => id}) do
@@ -60,7 +60,7 @@ defmodule AbtDidWorkshopWeb.TransactionController do
         |> reply(conn, tx)
     end
   rescue
-    e -> reply({:error, Exception.message(e)}, conn)
+    e -> reply({:error, Exception.message(e)}, conn, nil)
   end
 
   defp do_request(_, behaviors, _, _) when is_nil(behaviors) or behaviors == [] do
@@ -230,15 +230,15 @@ defmodule AbtDidWorkshopWeb.TransactionController do
     end
   end
 
-  defp reply({:error, error}, conn) do
+  defp reply({:error, error}, conn, _) do
     json(conn, %{error: error})
   end
 
-  defp reply({:ok, response}, conn) do
+  defp reply({:ok, response}, conn, _) do
     json(conn, %{response: response})
   end
 
-  defp reply(:ok, conn) do
+  defp reply(:ok, conn, _) do
     json(conn, %{response: "ok"})
   end
 
@@ -253,12 +253,14 @@ defmodule AbtDidWorkshopWeb.TransactionController do
       |> Map.put(:chainToken, "TBA")
       |> Map.put(:decimals, ForgeAbi.one_token() |> :math.log10() |> Kernel.trunc())
 
-    extra = %{
-      url: Util.get_callback() <> "transaction/#{tx.id}",
-      requestedClaims: claims,
-      appInfo: app_info,
-      workflow: %{description: tx.description}
-    }
+    extra =
+      %{
+        url: Util.get_callback() <> "transaction/#{tx.id}",
+        requestedClaims: claims,
+        appInfo: app_info,
+        workflow: %{description: tx.description}
+      }
+      |> IO.inspect(label: "@@@")
 
     response = %{
       appPk: demo.pk,
