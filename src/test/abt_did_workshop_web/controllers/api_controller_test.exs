@@ -1,11 +1,13 @@
 defmodule AbtDidWorkshopWeb.ApiControllerTest do
   use AbtDidWorkshopWeb.ConnCase
 
+  import Mock
+
   alias AbtDidWorkshop.Util
 
   test "POST /api/requireMultiSig", %{conn: conn} do
     {sk1, pk1, did1} = get_keys()
-    {sk2, pk2, did2} = get_keys()
+    {_sk2, _pk2, did2} = get_keys()
 
     tx =
       ForgeAbi.Transaction.new(
@@ -34,12 +36,22 @@ defmodule AbtDidWorkshopWeb.ApiControllerTest do
       }
       |> Jason.encode!()
 
-    conn = query(conn, "/api/requireMultiSig", body)
-    response = Jason.decode!(conn.resp_body)
-    assert response["appPk"] == Multibase.encode!(pk1, :base58_btc)
-    auth_info = Util.get_body(response["authInfo"])
-    assert auth_info["appInfo"] != nil
-    assert auth_info["requestedClaims"] != nil
+    with_mocks([
+      {ForgeSdk, [], [get_chain_info: fn -> %{network: "forge-dummy"} end]},
+      {ForgeAbi, [], [one_token: fn -> 10 end]}
+    ]) do
+      conn = query(conn, "/api/requireMultiSig", body)
+      response = Jason.decode!(conn.resp_body)
+      assert response["appPk"] == Multibase.encode!(pk1, :base58_btc)
+      auth_info = Util.get_body(response["authInfo"])
+      assert auth_info["requestedClaims"] != nil
+      app_info = auth_info["appInfo"]
+      assert app_info != nil
+      assert app_info["chainId"] == "forge-dummy"
+      assert String.ends_with?(app_info["chainHost"], ":8210/api")
+      assert app_info["chainToken"] == "TBA"
+      assert app_info["decimals"] == 1
+    end
   end
 
   defp query(conn, url, data) do

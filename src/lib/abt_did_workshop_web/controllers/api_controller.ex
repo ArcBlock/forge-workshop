@@ -2,6 +2,7 @@ defmodule AbtDidWorkshopWeb.ApiController do
   use AbtDidWorkshopWeb, :controller
 
   alias AbtDidWorkshop.Tx.Helper
+  alias AbtDidWorkshop.Util
 
   def require_sig(conn, %{"tx" => tx_str, "url" => url, "description" => des} = param) do
     wallet = get_wallet(param)
