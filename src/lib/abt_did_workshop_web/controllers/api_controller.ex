@@ -103,7 +103,11 @@ defmodule AbtDidWorkshopWeb.ApiController do
         subtitle: "A simple chain to host and join events.",
         description:
           "Event Chains lets you easily create and manage events, buy and sale evnet tickets.",
-        icon: "http://did-workshop.arcblock.co:5000/static/images/eventchain.png"
+        icon: "http://did-workshop.arcblock.co:5000/static/images/eventchain.png",
+        chainId: ForgeSdk.get_chain_info().network,
+        chainHost: "http://#{Util.get_ip()}:8210/api",
+        chainToken: "TBA",
+        decimals: ForgeAbi.one_token() |> :math.log10() |> Kernel.trunc()
       },
       requestedClaims: claims
     }
