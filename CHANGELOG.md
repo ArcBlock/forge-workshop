@@ -1,3 +1,8 @@
+## 0.2.14 (March 13, 2019)
+  - Add chain info for event chain apis.
+  - Merge branch 'master' into new-api
+  - Add new apis for event chain
+
 ## 0.2.13 (March 13, 2019)
   - Handle continuing tx.
 
