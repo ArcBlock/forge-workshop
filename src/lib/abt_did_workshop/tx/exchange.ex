@@ -62,6 +62,9 @@ defmodule AbtDidWorkshop.Tx.Exchange do
 
     "ExchangeTx"
     |> Helper.get_transaction_to_sign(sender, receiver)
-    |> Helper.require_signature(user_addr, demand.description)
+    |> Helper.require_signature(
+      user_addr,
+      "Pleas confirm this exchange by signing the transaction."
+    )
   end
 end

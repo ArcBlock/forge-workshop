@@ -36,12 +36,12 @@ defmodule AbtDidWorkshopWeb.TransactionController do
       tx ->
         tx.tx_type
         |> do_request(tx.tx_behaviors, robert, user_addr)
-        |> reply(conn, tx_id)
+        |> reply(conn, tx)
     end
   rescue
     e ->
       # Logger.error()
-      reply({:error, Exception.message(e)}, conn, id)
+      reply({:error, Exception.message(e)}, conn)
   end
 
   def response(conn, %{"id" => id}) do
@@ -57,10 +57,10 @@ defmodule AbtDidWorkshopWeb.TransactionController do
       tx ->
         tx.tx_type
         |> do_response(tx.tx_behaviors, claims, robert, user_addr)
-        |> reply(conn, tx_id)
+        |> reply(conn, tx)
     end
   rescue
-    e -> reply({:error, Exception.message(e)}, conn, id)
+    e -> reply({:error, Exception.message(e)}, conn)
   end
 
   defp do_request(_, behaviors, _, _) when is_nil(behaviors) or behaviors == [] do
@@ -71,7 +71,7 @@ defmodule AbtDidWorkshopWeb.TransactionController do
     cond do
       # When robert only offers something to the user.
       beh.behavior == "offer" ->
-        Helper.require_account(beh.description)
+        Helper.require_account("Please select an account to receive the transfer.")
 
       # When robert only demands token from the user.
       Util.empty?(beh.asset) ->
@@ -80,11 +80,14 @@ defmodule AbtDidWorkshopWeb.TransactionController do
 
         "TransferTx"
         |> Helper.get_transaction_to_sign(sender, receiver)
-        |> Helper.require_signature(user_addr, beh.description)
+        |> Helper.require_signature(
+          user_addr,
+          "Pleas confirm this transfer by signing the transaction."
+        )
 
       # When robert demands asset from the user.
       true ->
-        Helper.require_asset(beh.description, beh.asset)
+        Helper.require_asset("Please select asset #{beh.asset} to continue.", beh.asset)
     end
   end
 
@@ -100,28 +103,37 @@ defmodule AbtDidWorkshopWeb.TransactionController do
 
       "ExchangeTx"
       |> Helper.get_transaction_to_sign(sender, receiver)
-      |> Helper.require_signature(user_addr, demand.description)
+      |> Helper.require_signature(
+        user_addr,
+        "Pleas confirm this exchange by signing the transaction."
+      )
 
       # When robert demands asset from the user.
     else
-      Helper.require_asset(demand.description, demand.asset)
+      Helper.require_asset("Please select asset #{demand.asset} to continue.", demand.asset)
     end
   end
 
   defp do_request("UpdateAssetTx", behaviors, _, _) do
     update = Enum.find(behaviors, fn beh -> beh.behavior == "update" end)
-    Helper.require_asset(update.description, update.asset)
+    Helper.require_asset("Please select asset #{update.asset} to continue.", update.asset)
   end
 
   defp do_request("ConsumeAssetTx", behaviors, _, _) do
     consume = Enum.find(behaviors, fn beh -> beh.behavior == "consume" end)
-    Helper.require_asset(consume.description, consume.asset)
+    Helper.require_asset("Please select asset #{consume.asset} to continue.", consume.asset)
   end
 
   defp do_request("ProofOfHolding", behaviors, _, _) do
     poh = Enum.find(behaviors, fn beh -> beh.behavior == "poh" end)
-    hold_account = Helper.require_account(poh.description, poh.token)
-    hold_asset = Helper.require_asset(poh.description, poh.asset)
+
+    hold_account =
+      Helper.require_account(
+        "Please select an account with at least #{poh.token} TBA.",
+        poh.token
+      )
+
+    hold_asset = Helper.require_asset("Please select asset #{poh.asset} to continue.", poh.asset)
     hold_account ++ hold_asset
   end
 
@@ -218,33 +230,34 @@ defmodule AbtDidWorkshopWeb.TransactionController do
     end
   end
 
-  defp reply({:error, error}, conn, _) do
+  defp reply({:error, error}, conn) do
     json(conn, %{error: error})
   end
 
-  defp reply({:ok, response}, conn, _) do
+  defp reply({:ok, response}, conn) do
     json(conn, %{response: response})
   end
 
-  defp reply(:ok, conn, _) do
+  defp reply(:ok, conn) do
     json(conn, %{response: "ok"})
   end
 
-  defp reply(claims, conn, tx_id) do
-    demo = DemoTable.get_by_tx_id(tx_id)
+  defp reply(claims, conn, tx) do
+    demo = DemoTable.get_by_tx_id(tx.id)
 
     app_info =
       demo
       |> Map.take([:name, :subtitle, :description, :icon])
       |> Map.put(:chainId, ForgeSdk.get_chain_info().network)
-      |> Map.put(:chainHost, "http://#{Util.get_ip()}:8210/api/playground")
+      |> Map.put(:chainHost, "http://#{Util.get_ip()}:8210/api/")
       |> Map.put(:chainToken, "TBA")
       |> Map.put(:decimals, ForgeAbi.one_token() |> :math.log10() |> Kernel.trunc())
 
     extra = %{
-      url: Util.get_callback() <> "transaction/#{tx_id}",
+      url: Util.get_callback() <> "transaction/#{tx.id}",
       requestedClaims: claims,
-      appInfo: app_info
+      appInfo: app_info,
+      workflow: %{description: tx.description}
     }
 
     response = %{
