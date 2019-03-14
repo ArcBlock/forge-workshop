@@ -4,13 +4,13 @@ defmodule AbtDidWorkshop.Tables.AppTable do
   import Ecto.Query
   alias AbtDidWorkshop.{AppAuthState, Repo}
 
-  def get() do
+  def get do
     from(a in AppAuthState)
     |> Repo.all()
     |> List.first()
   end
 
-  def delete() do
+  def delete do
     from(a in AppAuthState)
     |> Repo.delete_all()
   end

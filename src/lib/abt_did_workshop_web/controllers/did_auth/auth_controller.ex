@@ -12,7 +12,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
     if user != nil and filled_entire_profile?(app.claims["profile"], user) do
       json(conn, gen_and_sign())
     else
-      json(conn, require_auth() |> IO.inspect(label: "@@@@@"))
+      json(conn, require_auth())
     end
   end
 

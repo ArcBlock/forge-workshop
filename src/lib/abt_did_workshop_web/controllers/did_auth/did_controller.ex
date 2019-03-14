@@ -2,10 +2,7 @@ defmodule AbtDidWorkshopWeb.DidController do
   use AbtDidWorkshopWeb, :controller
 
   alias AbtDid.Type, as: DidType
-  alias AbtDidWorkshop.UserDb
-  alias AbtDidWorkshop.Tables.AppTable
-  alias AbtDidWorkshop.AppAuthState
-  alias AbtDidWorkshop.Repo
+  alias AbtDidWorkshop.{AppAuthState, Repo, Tables.AppTable, UserDb}
 
   @ed25519 %Mcrypto.Signer.Ed25519{}
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
