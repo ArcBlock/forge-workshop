@@ -1,3 +1,11 @@
+## 0.2.17 (March 14, 2019)
+  - Remove AppState from application startup.
+  - Persist app info in DB for DID auth.
+  - Merge branch 'master' into persist
+  - Add upsert app.
+  - Merge branch 'master' into persist
+  - Add app state table
+
 ## 0.2.16 (March 14, 2019)
   - Init robert when starting up.
   - Uptake forge 0.18.3
