@@ -54,6 +54,9 @@ defmodule AbtDidWorkshop.Tx.Transfer do
 
     "TransferTx"
     |> Helper.get_transaction_to_sign(sender, receiver)
-    |> Helper.require_signature(user_addr, beh.description)
+    |> Helper.require_signature(
+      user_addr,
+      "Pleas confirm this transfer by signing the transaction."
+    )
   end
 end

@@ -32,7 +32,8 @@ defmodule AbtDidWorkshopWeb.ApiControllerTest do
         pk: Multibase.encode!(pk1, :base58_btc),
         sk: Multibase.encode!(sk1, :base58_btc),
         address: did1,
-        description: "dummy description"
+        description: "dummy description",
+        workflow: "dummy workflow"
       }
       |> Jason.encode!()
 
@@ -45,6 +46,7 @@ defmodule AbtDidWorkshopWeb.ApiControllerTest do
       assert response["appPk"] == Multibase.encode!(pk1, :base58_btc)
       auth_info = Util.get_body(response["authInfo"])
       assert auth_info["requestedClaims"] != nil
+      assert auth_info["workflow"] == %{"description" => "dummy workflow"}
       app_info = auth_info["appInfo"]
       assert app_info != nil
       assert app_info["chainId"] == "forge-dummy"

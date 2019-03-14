@@ -65,7 +65,7 @@
                   <tr>
                     <td>URI</td>
                     <td style="word-wrap: break-word;">
-                    <% uri = AbtDidWorkshop.Util.get_agreement_uri(agr["uri"]) %>
+                    <% uri = agr["uri"] %>
                     <a href='<%= uri %>'><%= uri %></a>
                     </td>
                   </tr>

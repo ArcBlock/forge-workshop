@@ -1,3 +1,11 @@
+## 0.2.15 (March 13, 2019)
+  - Fix reply arity issue
+  - Fix reply arity issue
+  - Fix local ip issue.
+  - Merge branch 'master' into bug-3-13
+  - Return ok if auth succeeded.
+  - Return ok if auth succeeded.
+
 ## 0.2.14 (March 13, 2019)
   - Add chain info for event chain apis.
   - Merge branch 'master' into new-api

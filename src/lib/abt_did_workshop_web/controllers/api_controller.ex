@@ -4,7 +4,10 @@ defmodule AbtDidWorkshopWeb.ApiController do
   alias AbtDidWorkshop.Tx.Helper
   alias AbtDidWorkshop.Util
 
-  def require_sig(conn, %{"tx" => tx_str, "url" => url, "description" => des} = param) do
+  def require_sig(
+        conn,
+        %{"tx" => tx_str, "url" => url, "description" => des, "workflow" => workflow} = param
+      ) do
     wallet = get_wallet(param)
     tx_data = Multibase.decode!(tx_str)
     tx = ForgeAbi.Transaction.decode(tx_data)
@@ -24,14 +27,17 @@ defmodule AbtDidWorkshopWeb.ApiController do
       }
     ]
 
-    reply(conn, wallet, url, claims)
+    reply(conn, wallet, url, claims, workflow)
   end
 
   def require_sig(conn, _) do
     json(conn, %{error: "Insufficient data."})
   end
 
-  def require_multi_sig(conn, %{"tx" => tx_str, "url" => url, "description" => des} = param) do
+  def require_multi_sig(
+        conn,
+        %{"tx" => tx_str, "url" => url, "description" => des, "workflow" => workflow} = param
+      ) do
     wallet = get_wallet(param)
     tx_data = Multibase.decode!(tx_str)
     tx = ForgeAbi.Transaction.decode(tx_data)
@@ -52,14 +58,17 @@ defmodule AbtDidWorkshopWeb.ApiController do
       }
     ]
 
-    reply(conn, wallet, url, claims)
+    reply(conn, wallet, url, claims, workflow)
   end
 
   def require_multi_sig(conn, _) do
     json(conn, %{error: "Insufficient data."})
   end
 
-  def require_asset(conn, %{"target" => target, "url" => url, "description" => des} = param) do
+  def require_asset(
+        conn,
+        %{"target" => target, "url" => url, "description" => des, "workflow" => workflow} = param
+      ) do
     wallet = get_wallet(param)
 
     claims = [
@@ -74,7 +83,7 @@ defmodule AbtDidWorkshopWeb.ApiController do
       }
     ]
 
-    reply(conn, wallet, url, claims)
+    reply(conn, wallet, url, claims, workflow)
   end
 
   def require_asset(conn, _) do
@@ -96,7 +105,7 @@ defmodule AbtDidWorkshopWeb.ApiController do
     end
   end
 
-  defp reply(conn, wallet, url, claims) do
+  defp reply(conn, wallet, url, claims, workflow) do
     extra = %{
       url: url,
       appInfo: %{
@@ -110,7 +119,8 @@ defmodule AbtDidWorkshopWeb.ApiController do
         chainToken: "TBA",
         decimals: ForgeAbi.one_token() |> :math.log10() |> Kernel.trunc()
       },
-      requestedClaims: claims
+      requestedClaims: claims,
+      workflow: %{description: workflow}
     }
 
     response = %{

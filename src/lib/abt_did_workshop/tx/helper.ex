@@ -114,7 +114,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
       %{
         type: "signature",
         meta: %{
-          description: "#{description}\nPlease sign this transaction.",
+          description: description,
           typeUrl: "fg:t:transaction"
         },
         data: Multibase.encode!(data, :base58_btc),
@@ -150,7 +150,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
       %{
         type: "signature",
         meta: %{
-          description: "#{description}\nPlease sign this transaction.",
+          description: description,
           typeUrl: "fg:t:transaction"
         },
         data: Multibase.encode!(data, :base58_btc),
@@ -176,7 +176,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
     [
       %{
         meta: %{
-          description: "#{description}\nPlease provide asset: #{asset_title}."
+          description: description
         },
         type: "did",
         did_type: "asset",
@@ -190,7 +190,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
     [
       %{
         meta: %{
-          description: "#{description}\nPlease provide an account."
+          description: description
         },
         type: "did",
         did_type: "account",
@@ -206,7 +206,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
     [
       %{
         meta: %{
-          description: "#{description}\nPlease provide an account with at least #{token} TBA."
+          description: description
         },
         type: "did",
         did_type: "account",
