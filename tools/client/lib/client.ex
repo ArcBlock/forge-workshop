@@ -4,7 +4,7 @@ defmodule Client do
   """
 
   def get_wallet(host \\ "localhost:4000") do
-    %HTTPoison.Response{body: body} = HTTPoison.post!(host <> "/api/cert/recover-wallet", "")
+    %HTTPoison.Response{body: body} = HTTPoison.post!(host <> "/api/wallet/recover", "")
 
     w = Jason.decode!(body)
 

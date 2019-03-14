@@ -19,8 +19,8 @@ defmodule AbtDidWorkshopWeb.Router do
     post("/did", DidController, :create_did)
     get("/did", DidController, :show)
     post("/did/app", DidController, :upsert_app_state)
-    post("/did/claims", DidController, :store_claims)
-    get("/did/claims", DidController, :continue)
+    post("/did/claims", DidController, :upsert_claims)
+    get("/did/claims", DidController, :reselect_claims)
     post("/did/start_over", DidController, :start_over)
 
     get("/wallet", WalletController, :index)
@@ -38,11 +38,7 @@ defmodule AbtDidWorkshopWeb.Router do
     post("/auth", AuthController, :response_auth)
     get("/agreement/:id", AgreementController, :get)
 
-    post("/cert/recover-wallet", CertController, :recover_wallet)
-    get("/cert/issue", CertController, :request_issue)
-    post("/cert/issue", CertController, :response_issue)
-    get("/cert/reward", CertController, :request_reward)
-    post("/cert/reward", CertController, :response_reward)
+    post("/wallet/recover", WalletController, :recover_wallet)
 
     # Util apis for event chains
     post("/requireSig", ApiController, :require_sig)

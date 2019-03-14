@@ -13,7 +13,7 @@
   <br>
   <section class="row">
     <section class="column" align="center">
-      <%= form_for @conn, Routes.did_path(@conn, :continue), [method: "get"], fn _ -> %>
+      <%= form_for @conn, Routes.did_path(@conn, :show), [method: "get"], fn _ -> %>
         <%= submit "Continue", class: "btn btn-primary" %>
       <% end %>
     </section>

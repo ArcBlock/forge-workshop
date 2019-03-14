@@ -1,36 +1,36 @@
 defmodule AbtDidWorkshopWeb.AuthController do
   use AbtDidWorkshopWeb, :controller
 
-  alias AbtDidWorkshop.{AppState, Plugs.VerifySig, UserDb, Util}
+  alias AbtDidWorkshop.{AppAuthState, Plugs.VerifySig, Tables.AppTable, UserDb, Util}
 
   plug(VerifySig when action in [:response_auth])
 
-  def request_auth(conn, %{"userDid" => did} = param) do
-    IO.inspect(param, label: "@@@")
+  def request_auth(conn, %{"userDid" => did}) do
     user = UserDb.get(did)
+    app = AppTable.get()
 
-    if user != nil and filled_all_claims?(user) do
+    if user != nil and filled_entire_profile?(app.claims["profile"], user) do
       json(conn, gen_and_sign())
     else
-      json(conn, request_reg())
+      json(conn, require_auth() |> IO.inspect(label: "@@@@@"))
     end
   end
 
   def request_auth(conn, _),
     do: send_resp(conn, 400, "The request must contain valid DID.")
 
-  def response_auth(conn, param) do
-    IO.inspect(param, label: "###")
+  def response_auth(conn, _) do
     user_did = conn.assigns.did
     user = UserDb.get(user_did)
+    app = AppTable.get()
 
     if user != nil and conn.assigns.claims == [] do
-      case filled_all_claims?(user) do
+      case filled_entire_profile?(app.claims["profile"], user) do
         true ->
           json(conn, %{response: :ok})
 
         false ->
-          json(conn, request_reg())
+          json(conn, require_auth())
       end
     else
       do_response_auth_add(conn)
@@ -64,7 +64,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
   end
 
   defp match_claims?(claims) do
-    expected = AppState.get().profile
+    expected = AppTable.get().claims["profile"]
     actual = get_profile(claims)
     check_profile(expected, actual)
   end
@@ -99,58 +99,52 @@ defmodule AbtDidWorkshopWeb.AuthController do
     end
   end
 
-  defp request_reg do
-    claims = gen_claims()
-    callback = Util.get_callback() <> "auth/"
-
-    gen_and_sign(%{
-      url: callback,
-      action: "responseAuth",
-      requestedClaims: claims,
-      appInfo: AppState.get().info
-    })
+  defp require_auth do
+    gen_claims()
+    |> gen_and_sign()
   end
 
-  defp gen_and_sign(extra \\ %{}) do
-    state = AppState.get()
-    did_type = AbtDid.get_did_type(state.did)
-    auth_info = AbtDid.Signer.gen_and_sign(did_type, state.sk, extra)
+  defp gen_and_sign(claims \\ []) do
+    state = AppTable.get()
+
+    extra = %{
+      url: Util.get_callback() <> "auth/",
+      action: "responseAuth",
+      requestedClaims: claims,
+      appInfo: AppAuthState.get_info(state)
+    }
 
     %{
-      appPk: state.pk |> Multibase.encode!(:base58_btc),
-      authInfo: auth_info
+      appPk: state.pk,
+      authInfo: AbtDid.Signer.gen_and_sign(state.did, Multibase.decode!(state.sk), extra)
     }
   end
 
   defp gen_claims do
-    profile_claim = gen_profile()
-    agreement_claims = gen_agreement()
+    state = AppTable.get()
+    profile_claim = gen_profile(state.claims["profile"])
+    agreement_claims = gen_agreement(state.claims["agreements"])
     profile_claim ++ agreement_claims
   end
 
-  defp gen_profile do
-    case AppState.get().profile do
-      [] ->
-        []
+  defp gen_profile([]), do: []
 
-      profile ->
-        [
-          %{
-            type: "profile",
-            meta: %{
-              description: "Please provide your profile information."
-            },
-            items: profile
-          }
-        ]
-    end
+  defp gen_profile(profile) do
+    [
+      %{
+        type: "profile",
+        meta: %{
+          description: "Please provide your profile information."
+        },
+        items: profile
+      }
+    ]
   end
 
-  defp gen_agreement do
-    case AppState.get().agreements do
-      [] -> []
-      agreements -> Enum.map(agreements, &gen_agreement/1)
-    end
+  defp gen_agreement([]), do: []
+
+  defp gen_agreement(agreements) when is_list(agreements) do
+    Enum.map(agreements, &gen_agreement/1)
   end
 
   defp gen_agreement(id) do
@@ -162,8 +156,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
     |> Map.delete(:content)
   end
 
-  defp filled_all_claims?(user) do
-    app_sate = AppState.get()
-    Enum.all?(app_sate.profile, fn claim_id -> Map.get(user, claim_id) != nil end)
+  defp filled_entire_profile?(profile, user) do
+    Enum.all?(profile, fn claim_id -> Map.get(user, claim_id) != nil end)
   end
 end

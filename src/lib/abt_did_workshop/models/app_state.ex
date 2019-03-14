@@ -18,6 +18,7 @@ defmodule AbtDidWorkshop.AppAuthState do
     field(:sk, :string)
     field(:pk, :string)
     field(:did, :string)
+    field(:claims, :map)
   end
 
   def changeset(struct, params \\ %{}) do
@@ -32,8 +33,15 @@ defmodule AbtDidWorkshop.AppAuthState do
       :path,
       :sk,
       :pk,
-      :did
+      :did,
+      :claims
     ])
     |> validate_required([:name, :subtitle, :description, :icon, :path, :sk, :pk, :did])
+  end
+
+  def get_info(nil), do: %{}
+
+  def get_info(state) do
+    Map.take(state, [:name, :subtitle, :description, :icon, :copyright, :publisher, :path])
   end
 end
