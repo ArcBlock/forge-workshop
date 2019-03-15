@@ -15,6 +15,12 @@ defmodule AbtDidWorkshop.Application do
       WalletUtil.init_robert()
     end
 
+    try do
+      ForgeAbi.one_token()
+    rescue
+      _ -> Application.put_env(:forge_abi, :decimal, 16)
+    end
+
     result
   end
 
