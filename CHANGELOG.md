@@ -1,3 +1,6 @@
+## 0.2.18 (March 14, 2019)
+  - Fix the one token error.
+
 ## 0.2.17 (March 14, 2019)
   - Remove AppState from application startup.
   - Persist app info in DB for DID auth.
