@@ -2,50 +2,44 @@ defmodule AbtDidWorkshopWeb.DidController do
   use AbtDidWorkshopWeb, :controller
 
   alias AbtDid.Type, as: DidType
-  alias AbtDidWorkshop.AppState
-  alias AbtDidWorkshop.UserDb
+  alias AbtDidWorkshop.{AppAuthState, Repo, Tables.AppTable, UserDb}
 
   @ed25519 %Mcrypto.Signer.Ed25519{}
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
 
   def index(conn, _params) do
-    state = AppState.get()
-
-    case Map.get(state, :did) do
-      nil ->
-        render(conn, "step1.html")
-
-      _ ->
-        render(conn, "index.html", did: state.did)
+    case AppTable.get() do
+      nil -> render(conn, "step1.html")
+      state -> render(conn, "index.html", did: state.did)
     end
   end
 
   def show(conn, _params) do
-    app_state = AppState.get()
+    app_state = AppTable.get()
 
     cond do
-      Map.get(app_state, :sk) == nil ->
+      app_state == nil ->
         render(conn, "step1.html", alert: "You must create an application DID first.")
 
-      Map.get(app_state, :path) == nil ->
-        render(conn, "step2.html", alert: "Deep link path is required.")
+      Map.get(app_state, :name) == nil ->
+        render(conn, "step2.html", alert: "Please configure meta data for application.")
 
       true ->
-        render(conn, "show.html", sk: app_state.sk, users: AbtDidWorkshop.UserDb.get_all())
+        render(conn, "show.html", app_state: app_state, users: UserDb.get_all())
     end
   end
 
-  def continue(conn, _) do
-    app_state = AppState.get()
+  def reselect_claims(conn, _) do
+    app_state = AppTable.get()
 
-    case Map.get(app_state, :sk) do
-      nil -> redirect(conn, to: "/")
-      _ -> render(conn, "step2.html")
+    case app_state do
+      nil -> render(conn, "step1.html", alert: "You must create an application DID first.")
+      _ -> render(conn, "step3.html", id: app_state.id)
     end
   end
 
-  def regenerate(conn, _) do
-    AppState.clear()
+  def start_over(conn, _) do
+    AppTable.delete()
     UserDb.clear()
     redirect(conn, to: "/")
   end
@@ -64,52 +58,52 @@ defmodule AbtDidWorkshopWeb.DidController do
     }
 
     did = AbtDid.pk_to_did(did_type, pk)
-    AppState.add_key(sk, pk, did)
+    app_state = get_init_state()
 
-    render(conn, "step2.html")
+    app_state =
+      app_state
+      |> Map.put(:sk, Multibase.encode!(sk, :base58_btc))
+      |> Map.put(:pk, Multibase.encode!(pk, :base58_btc))
+      |> Map.put(:did, did)
+
+    changeset = AppAuthState.changeset(%AppAuthState{}, app_state)
+
+    render(conn, "step2.html", changeset: changeset)
   end
 
-  def update_claims(conn, %{"path" => path} = params) when path != "" do
-    store_claims(params)
-    store_app_info(params)
-    AppState.add_path(path)
-
-    redirect(conn, to: "/did")
+  def upsert_app_state(conn, %{"app_auth_state" => state}) do
+    case AppTable.insert(state) do
+      {:ok, record} -> render(conn, "step3.html", id: record.id)
+      {:error, changeset} -> render(conn, "step2.html", changeset: changeset)
+    end
   end
 
-  def update_claims(conn, _) do
-    conn
-    |> put_flash(:error, "Invalid deep link or secret key")
-    |> render("step2.html")
-  end
-
-  defp store_claims(params) do
-    claims =
-      params
-      |> Map.to_list()
-      |> Enum.filter(fn {key, value} -> String.starts_with?(key, "claim_") and "true" == value end)
-      |> Enum.map(fn {key, _} -> key end)
-
+  def upsert_claims(conn, %{"id" => app_id} = params) do
     profile =
-      claims
-      |> Enum.filter(fn claim -> String.starts_with?(claim, "claim_profile_") end)
-      |> Enum.map(fn "claim_profile_" <> claim -> claim end)
-
-    AppState.add_profile(profile)
+      params
+      |> Enum.filter(fn {key, value} ->
+        String.starts_with?(key, "profile_") and value == "true"
+      end)
+      |> Enum.map(fn {"profile_" <> claim, _} -> claim end)
 
     agreements =
-      claims
-      |> Enum.filter(fn claim -> String.starts_with?(claim, "claim_agreement_") end)
-      |> Enum.map(fn "claim_agreement_" <> claim -> claim end)
+      params
+      |> Enum.filter(fn {key, value} ->
+        String.starts_with?(key, "agreement_") and value == "true"
+      end)
+      |> Enum.map(fn {"agreement_" <> claim, _} -> claim end)
 
-    AppState.add_agreements(agreements)
+    AppAuthState
+    |> Repo.get!(app_id)
+    |> AppAuthState.changeset(%{claims: %{profile: profile, agreements: agreements}})
+    |> Repo.update!()
+
+    redirect(conn, to: Routes.did_path(conn, :show))
   end
 
-  defp store_app_info(params) do
-    params
-    |> Map.to_list()
-    |> Enum.filter(fn {k, _} -> String.starts_with?(k, "app_info_") end)
-    |> Enum.into(%{}, fn {"app_info_" <> k, v} -> {k, v} end)
-    |> AppState.add_info()
+  defp get_init_state do
+    state = Application.get_env(:abt_did_workshop, :app_info) |> Enum.into(%{})
+    path = Application.get_env(:abt_did_workshop, :deep_link_path)
+    Map.put(state, :path, path)
   end
 end

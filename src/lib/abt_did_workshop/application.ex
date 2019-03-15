@@ -40,16 +40,15 @@ defmodule AbtDidWorkshop.Application do
         _ -> "staging"
       end
 
-    app_servers1 = [
+    app_servers = [
       AbtDidWorkshopWeb.Endpoint,
       AbtDidWorkshop.UserDb,
-      AbtDidWorkshop.AssetsDb,
       AbtDidWorkshop.Repo
     ]
 
     case env do
       "test" ->
-        app_servers1
+        app_servers
 
       _ ->
         filename =
@@ -59,7 +58,7 @@ defmodule AbtDidWorkshop.Application do
           |> Path.join("/forge_#{forge_env}.toml")
 
         forge_servers = ForgeSdk.init(:abt_did_workshop, "", filename)
-        forge_servers ++ app_servers1 ++ [AbtDidWorkshop.AppState]
+        forge_servers ++ app_servers
     end
   end
 end

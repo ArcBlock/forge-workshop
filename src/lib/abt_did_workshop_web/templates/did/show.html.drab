@@ -1,4 +1,4 @@
-<input id="qrValue_1" type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink() %>"></input>
+<input id="qrValue_1" type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink(@app_state.id) %>"></input>
 <br>
 <div align="center">
   <canvas id="canvas_1"></canvas>
@@ -6,7 +6,7 @@
 
 <section class="columns">
   The QR Code contains following deep link. 
-  <pre> <%= AbtDidWorkshop.Util.gen_deeplink() %> </pre>
+  <pre> <%= AbtDidWorkshop.Util.gen_deeplink(@app_state.id) %> </pre>
 </section>
 <section class="row">
   <section class="column" align="center">
@@ -15,7 +15,7 @@
     <% end %>
   </section>
   <section class="column" align="center">
-    <%= form_for @conn, Routes.did_path(@conn, :continue), [method: "get"], fn _ -> %>
+    <%= form_for @conn, Routes.did_path(@conn, :reselect_claims), [method: "get"], fn _ -> %>
       <%= submit "Reselect claims", class: "btn btn-primary" %>
     <% end %>
   </section>
@@ -23,7 +23,7 @@
 
 <p>
     The Secret Key of the DID is:
-   <pre><%= Multibase.encode!(@sk, :base58_btc) %></pre>
+   <pre><%= Multibase.encode!(@app_state.sk, :base58_btc) %></pre>
 </p>
 
 <a name="known_users"></a>
@@ -44,7 +44,7 @@
               <td> Publick Key </td>
               <td style="word-wrap: break-word;"> <%= user.pk %> </td>
             </tr>
-            <%= for claim_id <- AbtDidWorkshop.AppState.get().profile do %>
+            <%= for claim_id <- AbtDidWorkshop.Tables.AppTable.get().claims["profile"] do %>
               <tr>
                 <td>
                   <%= claim_id %>
@@ -71,7 +71,13 @@
                   </tr>
                   <tr>
                     <td>Agreed?</td>
-                    <td style="word-wrap: break-word;"><%= agr["agreed"] || agr["agree"] %></td>
+                    <td style="word-wrap: break-word;">
+                      <%= if agr["agreed"] || agr["agree"] do %>
+                        true
+                      <% else %>
+                        false
+                      <% end %>
+                    </td>
                   </tr>
                   <%= if agr["agreed"] || agr["agree"] do %>
                   <tr>

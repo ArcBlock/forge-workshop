@@ -6,7 +6,7 @@
     <div class="form-group">
       <p>
         <label>
-          <%= text_input(f, :path, value: AbtDidWorkshop.Util.gen_deeplink()) %>
+          <%= text_input(f, :path, value: AbtDidWorkshop.Util.gen_deeplink(@app_state.id)) %>
           <span>Deep link scanned from QR code</span>
         </label>
       </p>

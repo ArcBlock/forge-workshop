@@ -4,75 +4,50 @@
   </script>
 <% end %>
 <br>
-<%= form_for @conn, Routes.did_path(@conn, :update_claims), fn f -> %>
-  <% state = AbtDidWorkshop.AppState.get() %>
-  <% info = state.info %>
+<section class="row">
+  <b>Configur the metadata for your application.</b>
+</section>
+<%= form_for @changeset, Routes.did_path(@conn, :upsert_app_state), fn f -> %>
+  <%= text_input(f, :sk, type: "hidden") %>
+  <%= text_input(f, :pk, type: "hidden") %>
+  <%= text_input(f, :did, type: "hidden") %>
   <section class="column">
-    <b>Input your application metadata</b>
     <div class="form-group">
-      <p>
-        <label>
-          <%= text_input(f, :app_info_name, value: info["name"]) %>
-          <span>Application name</span>
-        </label>
-        <label>
-          <%= text_input(f, :app_info_subtitle, value: info["subtitle"]) %>
-          <span>Subtitle</span>
-        </label>
-        <label>
-          <%= text_input(f, :app_info_description, value: info["description"]) %>
-          <span>Description</span>
-        </label>
-        <label>
-          <%= text_input(f, :app_info_icon, value: info["icon"]) %>
-          <span>Icon</span>
-        </label>
-        <label>
-          <%= text_input(f, :app_info_copyright, value: info["copyright"]) %>
-          <span>Copyright</span>
-        </label>
-        <label>
-          <%= text_input(f, :app_info_publisher, value: info["publisher"]) %>
-          <span>Publisher</span>
-        </label>
-      </p>
-    </div>
-  </section>
-
-  <section class="column">
-    <b>Input your deep link path</b>
-    <div class="form-group">
-      <p>
-        <label>
-          <%= text_input(f, :path, value: state.path) %>
-        </label>
-      </p>
-    </div>
-  </section>
-  
-  <section class="column">
-    <b><p>Choose your claims</p></b>
-    <div class="form-group">
-      <%= for {claim_id, claim_descrip} <- Application.get_env(:abt_did_workshop, :profile) do %>
         <p>
-          <label>
-            <%= checkbox f, "claim_profile_" <> claim_id  %>
-            <span><%= claim_descrip %></span>
-          </label>
+          <%= text_input(f, :name) %>
+          <%= error_tag(f, :name) %>
+          <label> <span>Application name</span></label>
         </p>
-      <% end %>
-    </div>
-
-    <div class="form-group">
-      <%= for agr <- Application.get_env(:abt_did_workshop, :agreement) do %>
-        <% meta = agr.meta %>
         <p>
-          <label>
-            <%= checkbox f, "claim_agreement_" <> meta.id %>
-            <span><%= meta.description %></span>
-          </label>
+          <%= text_input(f, :subtitle) %>
+          <%= error_tag(f, :subtitle) %>
+          <label><span>Subtitle</span></label>
         </p>
-      <% end %>
+        <p>
+          <%= text_input(f, :description) %>
+          <%= error_tag(f, :description) %>
+          <label><span>Description</span></label>
+        </p>
+        <p>
+          <%= text_input(f, :icon) %>
+          <%= error_tag(f, :icon) %>
+          <label><span>Icon</span></label>
+        </p>
+        <p>
+          <%= text_input(f, :copyright) %>
+          <%= error_tag(f, :copyright) %>
+          <label><span>Copyright</span></label>
+        </p>
+        <p>
+          <%= text_input(f, :publisher) %>
+          <%= error_tag(f, :publisher) %>
+          <label><span>Publisher</span></label>
+        </p>
+        <p>
+          <%= text_input(f, :path) %>
+          <%= error_tag(f, :path) %>
+          <label><span>Deeplink path</span></label>
+      </p>
     </div>
   </section>
   <%= submit "SUBMIT", class: "btn btn-primary" %>

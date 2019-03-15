@@ -1,7 +1,7 @@
 defmodule AbtDidWorkshop.Util do
   @moduledoc false
 
-  alias AbtDidWorkshop.{AppState, Demo, Repo}
+  alias AbtDidWorkshop.{AppAuthState, Demo, Repo}
 
   def str_to_bin(str) do
     case Base.decode16(str, case: :mixed) do
@@ -37,12 +37,6 @@ defmodule AbtDidWorkshop.Util do
     "http://#{get_ip()}:#{get_port()}" <> uri
   end
 
-  def shorten(str, pre_len, post_len) do
-    {pre, _} = String.split_at(str, pre_len - 1)
-    {_, post} = String.split_at(str, String.length(str) - post_len)
-    pre <> "..." <> post
-  end
-
   def get_body(jwt) do
     jwt
     |> String.split(".")
@@ -51,19 +45,36 @@ defmodule AbtDidWorkshop.Util do
     |> Jason.decode!()
   end
 
-  def gen_deeplink do
-    url = (get_callback() <> "auth/") |> URI.encode_www_form()
-    app_state = AppState.get()
-    path = String.trim_trailing(app_state.path, "/")
-    app_pk = Multibase.encode!(app_state.pk, :base58_btc)
-    "#{path}?appPk=#{app_pk}&appDid=#{app_state.did}&action=requestAuth&url=#{url}"
+  def gen_deeplink(app_id) do
+    app_state = Repo.get(AppAuthState, app_id)
+    gen_deeplink(app_state.path, app_state.pk, app_state.did, get_callback() <> "auth/")
   end
 
   def gen_deeplink(demo_id, tx_id) do
-    url = (get_callback() <> "transaction/#{tx_id}") |> URI.encode_www_form()
     demo = Repo.get(Demo, demo_id)
-    path = String.trim_trailing(demo.path, "/")
-    "#{path}?appPk=#{demo.pk}&appDid=#{demo.did}&action=requestAuth&url=#{url}"
+    gen_deeplink(demo.path, demo.pk, demo.did, get_callback() <> "transaction/#{tx_id}")
+  end
+
+  defp gen_deeplink(path, pk, did, url) do
+    path = String.trim_trailing(path, "/")
+
+    pk =
+      if String.valid?(pk) do
+        pk
+      else
+        Multibase.encode!(pk, :base58_btc)
+      end
+
+    did =
+      if String.starts_with?(did, "did:abt:") do
+        did
+      else
+        "did:abt:" <> did
+      end
+
+    url = URI.encode_www_form(url)
+
+    "#{path}?appPk=#{pk}&appDid=#{did}&action=requestAuth&url=#{url}"
   end
 
   def hex_to_bin("0x" <> hex), do: hex_to_bin(hex)

@@ -1,19 +1,30 @@
 defmodule AbtDidWorkshopWeb.WalletController do
   use AbtDidWorkshopWeb, :controller
 
-  alias AbtDidWorkshop.AppState
-  alias AbtDidWorkshop.Util
+  alias AbtDidWorkshop.{Tables.AppTable, Util, WalletUtil}
 
   @ed25519 %Mcrypto.Signer.Ed25519{}
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
 
+  def recover_wallet(conn, _) do
+    [{wallet, _}] = WalletUtil.init_wallets(1)
+
+    json(conn, %{
+      address: wallet.address,
+      pk: Base.encode16(wallet.pk),
+      sk: Base.encode16(wallet.sk),
+      type: wallet.type
+    })
+  end
+
   def index(conn, _params) do
-    if Map.get(AppState.get(), :sk, nil) == nil do
-      conn
-      |> redirect(to: Routes.did_path(conn, :index))
-    else
-      keys = Application.get_env(:abt_did_workshop, :sample_keys, [])
-      render(conn, "index.html", keys: keys)
+    case AppTable.get() do
+      nil ->
+        redirect(conn, to: Routes.did_path(conn, :index))
+
+      app_state ->
+        keys = Application.get_env(:abt_did_workshop, :sample_keys, [])
+        render(conn, "index.html", keys: keys, app_state: app_state)
     end
   end
 
@@ -171,7 +182,7 @@ defmodule AbtDidWorkshopWeb.WalletController do
     |> Enum.map(fn agr ->
       case agr.agreed do
         true -> sign_agreement(agr, params["sk"], params["did"])
-        false -> agr
+        _ -> agr
       end
     end)
   end
