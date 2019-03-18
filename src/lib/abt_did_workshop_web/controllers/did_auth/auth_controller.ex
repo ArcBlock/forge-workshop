@@ -27,7 +27,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
     if user != nil and conn.assigns.claims == [] do
       case filled_entire_profile?(app.claims["profile"], user) do
         true ->
-          json(conn, %{response: :ok})
+          json(conn, %{response: %{result: :ok}})
 
         false ->
           json(conn, require_auth())
@@ -41,7 +41,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
     case match_claims?(conn.assigns.claims) do
       true ->
         add_user(conn.assigns.pk, conn.assigns.did, conn.assigns.claims)
-        json(conn, %{response: :ok})
+        json(conn, %{response: %{result: :ok}})
 
       false ->
         send_resp(conn, 422, "Authentication failed.")

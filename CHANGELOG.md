@@ -1,3 +1,6 @@
+## 0.2.19 (March 18, 2019)
+  - Change the response format if only :ok is returned.
+
 ## 0.2.18 (March 14, 2019)
   - Fix the one token error.
 
