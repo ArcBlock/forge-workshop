@@ -8,7 +8,7 @@ Transaction list:
   <%= for tx <- @txs do %>
     <li class="collection-item">
       <div class="row">
-        <div class="col s8">
+        <div class="col s12 m4 l6">
           <!-- Tx name, description and tx type. -->
           <h5> <%= tx.name %> </h5>
           <p style="font-size: smaller"> <%= tx.description %> </p>
@@ -18,17 +18,17 @@ Transaction list:
             <%= for beh <- tx.tx_behaviors do %>
               <li class="collection-item" style="font-size: smaller"> 
                 <div class="row">
-                  <div class="col s2 m2">
+                  <div class="col s12 m12">
                     <%= beh.behavior %>
                   </div>
                   <%= if beh.token != nil do %>
-                    <div class="col s5"> <%= beh.token %> TBA </div>
+                    <div class="col s12 m12 l4"> <%= beh.token %> TBA </div>
                   <% end %>
                   <%= if beh.asset != nil and beh.asset != "" do %>
-                    <div class="col s5"> <%= beh.asset %></div>
+                    <div class="col s12 m12 l4"> <%= beh.asset %></div>
                   <% end %>
                   <%= if beh.function != nil and beh.function != "" do %>
-                    <div class="col s5"> <%= beh.function %></div>
+                    <div class="col s12 m12 l4"> <%= beh.function %></div>
                   <% end %>
                 </div>
               </li>
@@ -36,7 +36,7 @@ Transaction list:
           </ul>
         </div>
         <!-- QR Code -->
-        <div class="col s4">
+        <div class="col s12 m8 l6">
           <input id='<%= "qrValue_#{tx.id}" %>' type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink(@demo.id, tx.id) %>"></input>
           <div align="center">
             <canvas id='<%= "canvas_#{tx.id}" %>'></canvas>
