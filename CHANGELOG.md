@@ -1,3 +1,6 @@
+## 0.2.21 (March 19, 2019)
+  - Made the tx index page responsive
+
 ## 0.2.20 (March 18, 2019)
   - Wrap hash in response
 
