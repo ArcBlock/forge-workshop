@@ -203,6 +203,8 @@ defmodule AbtDidWorkshopWeb.TransactionController do
       error ->
         error
     end
+
+    result
   end
 
   defp async_offer(hash, robert, user_addr, offer) do
