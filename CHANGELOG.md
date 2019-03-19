@@ -1,3 +1,6 @@
+## 0.2.20 (March 18, 2019)
+  - Wrap hash in response
+
 ## 0.2.19 (March 18, 2019)
   - Change the response format if only :ok is returned.
 
