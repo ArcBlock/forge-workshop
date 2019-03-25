@@ -242,7 +242,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
         {:error, reason}
 
       hash ->
-        {:ok, %{hash: hash}}
+        {:ok, %{hash: hash, tx: tx |> Transaction.encode() |> Multibase.encode!(:base58_btc)}}
     end
   end
 
