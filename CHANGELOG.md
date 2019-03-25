@@ -1,3 +1,6 @@
+## 0.2.22 (March 25, 2019)
+  - Return tx data along with hash.
+
 ## 0.2.21 (March 19, 2019)
   - Made the tx index page responsive
 
