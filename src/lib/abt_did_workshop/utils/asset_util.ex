@@ -7,7 +7,7 @@ defmodule AbtDidWorkshop.AssetUtil do
     CreateAssetTx,
     ExchangeInfo,
     ExchangeTx,
-    RequestGetAssets,
+    RequestListAssets,
     RequestGetAssetState,
     RequestSendTx,
     RequestSignData,
@@ -18,8 +18,8 @@ defmodule AbtDidWorkshop.AssetUtil do
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
 
   def get_assets(wallet) do
-    req = RequestGetAssets.new(owner_address: wallet.address)
-    ForgeSdk.get_assets(req)
+    req = RequestListAssets.new(owner_address: wallet.address)
+    ForgeSdk.list_assets(req)
   end
 
   def get_asset_state(address) do
@@ -32,7 +32,7 @@ defmodule AbtDidWorkshop.AssetUtil do
 
     certs =
       [owner_address: owner.address]
-      |> ForgeSdk.get_assets()
+      |> ForgeSdk.list_assets()
       |> elem(0)
       |> Enum.filter(fn %{owner: addr} -> addr == owner.address end)
 

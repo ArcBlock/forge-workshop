@@ -3,7 +3,7 @@ defmodule AbtDidWorkshopWeb.StateController do
 
   def account(conn, %{"addr" => addr}) do
     account = AbtDidWorkshop.WalletUtil.get_account_state(addr)
-    {assets, _} = ForgeSdk.get_assets(owner_address: addr)
+    {assets, _} = ForgeSdk.list_assets(owner_address: addr)
 
     certs =
       Enum.into(assets, %{}, fn asset ->

@@ -314,7 +314,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
   defp to_tba(nil), do: nil
 
   defp to_tba(token) do
-    ForgeAbi.token_to_arc(token)
+    ForgeAbi.token_to_unit(token)
   end
 
   defp to_assets(nil), do: []
