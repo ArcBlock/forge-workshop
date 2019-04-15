@@ -24,7 +24,7 @@ defmodule AbtDidWorkshopWeb.TransactionController do
 
   plug(VerifySig when action in [:response])
 
-  def request(conn, %{"id" => id, "userDid" => did} = params) do
+  def request(conn, %{"id" => id, "userDid" => did}) do
     tx_id = String.to_integer(id)
     user_addr = Util.did_to_address(did)
     {robert, _} = WalletUtil.init_robert()

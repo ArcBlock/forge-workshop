@@ -33,7 +33,7 @@ defmodule AbtDidWorkshop.Application do
 
   defp register_type_urls do
     ForgeAbi.register_type_urls([
-      {:certificate, "ws:x:certificate", AbtDidWorkshop.Certificate}
+      {:workshop_asset, "ws:x:workshop_asset", AbtDidWorkshop.WorkshopAsset}
     ])
   end
 

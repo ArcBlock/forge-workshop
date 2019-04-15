@@ -1,7 +1,7 @@
 defmodule AbtDidWorkshop.AssetUtil do
   @moduledoc false
 
-  alias AbtDidWorkshop.Certificate
+  alias AbtDidWorkshop.WorkshopAsset
 
   alias ForgeAbi.{
     CreateAssetTx,
@@ -113,7 +113,7 @@ defmodule AbtDidWorkshop.AssetUtil do
     nbf = exp = 0
     sig = sign_cert(from.sk, from.address, to, now, nbf, exp, title, content)
 
-    Certificate.new(
+    WorkshopAsset.new(
       from: from.address,
       to: to,
       iat: now,

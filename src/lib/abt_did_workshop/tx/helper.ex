@@ -59,19 +59,19 @@ defmodule AbtDidWorkshop.Tx.Helper do
           {:error, "The asset does not belong to the account."}
         else
           case ForgeAbi.decode_any(state.data) do
-            {:certificate, cert} ->
+            {:workshop_asset, cert} ->
               case cert.title do
                 ^title ->
                   :ok
 
                 _ ->
                   Logger.error(
-                    "Incorrect certificate title. Expected: #{inspect(title)}, Actual: #{
+                    "Incorrect workshop asset title. Expected: #{inspect(title)}, Actual: #{
                       inspect(cert.title)
                     }"
                   )
 
-                  {:error, "Incorrect certificate title."}
+                  {:error, "Incorrect workshop asset title."}
               end
 
             _ ->
@@ -300,7 +300,7 @@ defmodule AbtDidWorkshop.Tx.Helper do
     itx =
       UpdateAssetTx.new(
         address: sender.asset,
-        data: ForgeAbi.encode_any!(:certificate, new_cert)
+        data: ForgeAbi.encode_any!(:workshop_asset, new_cert)
       )
 
     ForgeAbi.encode_any!(:update_asset, itx)
