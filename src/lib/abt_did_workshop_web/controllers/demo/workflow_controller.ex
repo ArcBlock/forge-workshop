@@ -102,7 +102,6 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
       _ ->
         claim["origin"]
         |> TxUtil.assemble_multi_sig(claim["sig"])
-        |> IO.inspect(label: "###")
         |> TxUtil.send_tx()
         |> reply(conn)
     end

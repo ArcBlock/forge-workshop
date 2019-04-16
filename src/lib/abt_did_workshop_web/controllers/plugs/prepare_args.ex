@@ -1,4 +1,7 @@
 defmodule AbtDidWorkshop.Plugs.PrepareArgs do
+  @moduledoc """
+  Prepare common arguments.
+  """
   import Plug.Conn
   import Phoenix.Controller
 

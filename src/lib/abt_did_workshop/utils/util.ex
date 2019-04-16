@@ -61,7 +61,7 @@ defmodule AbtDidWorkshop.Util do
     "http://#{get_ip()}:#{get_port()}" <> uri
   end
 
-  def get_chainhost() do
+  def get_chainhost do
     if Application.get_env(:abt_did_workshop, :forge_node) == nil do
       filename =
         :abt_did_workshop |> Application.app_dir() |> Path.join("priv/forge_config/forge.toml")
