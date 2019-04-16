@@ -177,7 +177,8 @@ defmodule AbtDidWorkshop.TxUtil do
     ]
   end
 
-  defp do_require_multi_sig(tx, user, description, asset) when is_binary(asset) do
+  defp do_require_multi_sig(tx, user, description, asset)
+       when is_binary(asset) or is_nil(asset) do
     msig =
       case tx.itx.__struct__ do
         ConsumeAssetTx ->

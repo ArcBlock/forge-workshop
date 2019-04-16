@@ -49,7 +49,7 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
     asset =
       conn.assigns.claims
       |> Enum.find(fn
-        %{"type" => "did", "didType" => "asset", "did" => did} -> did != ""
+        %{"type" => "did", "did_type" => "asset", "did" => did} -> did != ""
         _ -> false
       end)
       |> Map.get("did")
@@ -201,7 +201,7 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
         ]
 
       # When robert only demands token from the user.
-      beh.behavior == "demand" and beh.asset != "" ->
+      beh.behavior == "demand" and Util.empty?(beh.asset) ->
         [
           RequireAccount.new("Please select an account to transfer out."),
           RequireSig.new("Please confirm this transfer by signing the transaction.")
