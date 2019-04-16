@@ -5,10 +5,10 @@ defmodule Client do
 
   @ed25519 %Mcrypto.Signer.Ed25519{}
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
-  @localhost "localhost:8210"
+  @localhost "localhost:4000"
 
   def create_wallet(host \\ @localhost) do
-    %HTTPoison.Response{body: body} = HTTPoison.post!(host <> "/workshop/api/wallet/recover", "")
+    %HTTPoison.Response{body: body} = HTTPoison.post!(host <> "/api/wallet/recover", "")
     w = Jason.decode!(body)
 
     ForgeAbi.WalletInfo.new(
@@ -19,8 +19,7 @@ defmodule Client do
   end
 
   def wallet_state(address, host \\ @localhost) do
-    %HTTPoison.Response{body: response} =
-      HTTPoison.get!(host <> "/workshop/api/wallet/#{address}")
+    %HTTPoison.Response{body: response} = HTTPoison.get!(host <> "/api/wallet/#{address}")
 
     Jason.decode!(response)
   end
@@ -28,13 +27,13 @@ defmodule Client do
   def request(w, tx_id, host \\ @localhost)
 
   def request(w, :cert, host) do
-    url = host <> "/workshop/api/cert/issue?userDid=#{w.address}"
+    url = host <> "/api/cert/issue?userDid=#{w.address}"
     do_request(w, url)
   end
 
   def request(w, tx_id, host) do
     pk = Multibase.encode!(w.pk, :base58_btc)
-    url = host <> "/workshop/api/workflow/#{tx_id}?userDid=#{w.address}&userPk=#{pk}"
+    url = host <> "/api/workflow/#{tx_id}?userDid=#{w.address}&userPk=#{pk}"
 
     do_request(w, url)
   end

@@ -34,7 +34,7 @@ config :abt_did_workshop,
         description: "Data policy",
         id: "1"
       },
-      uri: "/workshop/api/agreement/1",
+      uri: "/api/agreement/1",
       hash: %{
         method: "sha256",
         digest: "z73jC7FoJMSpmLwsrWF7oT5xBGYaMRNrWs7ajBEB2vuJh"
@@ -48,7 +48,7 @@ config :abt_did_workshop,
         description: "Terms of Service",
         id: "2"
       },
-      uri: "/workshop/api/agreement/2",
+      uri: "/api/agreement/2",
       hash: %{
         method: "sha3",
         digest: "z62acdB8rK5kpUarnPiDfBnEHxcjpuwhNt1BdAUYDaeN5"

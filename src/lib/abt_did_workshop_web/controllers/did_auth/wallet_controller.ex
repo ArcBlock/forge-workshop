@@ -168,7 +168,7 @@ defmodule AbtDidWorkshopWeb.WalletController do
       HTTPoison.post!(url, body, [{"content-type", "application/json"}])
 
     case Jason.decode(response) do
-      {:ok, %{"response" => "ok"}} ->
+      {:ok, %{"response" => _}} ->
         conn
         |> put_flash(:info, "Authentication Succeeded!")
         |> redirect(to: Routes.did_path(conn, :show))

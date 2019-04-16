@@ -20,8 +20,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
     do: send_resp(conn, 400, "The request must contain valid DID.")
 
   def response_auth(conn, _) do
-    user_did = conn.assigns.did
-    user = UserDb.get(user_did)
+    user = UserDb.get(conn.assigns.user.address)
     app = AppState.get()
 
     if user != nil and conn.assigns.claims == [] do
@@ -40,7 +39,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
   defp do_response_auth_add(conn) do
     case match_claims?(conn.assigns.claims) do
       true ->
-        add_user(conn.assigns.pk, conn.assigns.did, conn.assigns.claims)
+        add_user(conn.assigns.user.pk, conn.assigns.user.address, conn.assigns.claims)
         json(conn, %{response: %{result: :ok}})
 
       false ->

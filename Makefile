@@ -6,13 +6,14 @@ PROTO_GEN_PATH=$(TOP_DIR)/src/lib/gen
 
 BUILD_NAME=abt_did_workshop
 VERSION=$(strip $(shell cat version))
-ELIXIR_VERSION=$(strip $(shell cat src/.elixir_version))
-OTP_VERSION=$(strip $(shell cat src/.otp_version))
+ELIXIR_VERSION=$(strip $(shell cat .elixir_version))
+OTP_VERSION=$(strip $(shell cat .otp_version))
 
 build:
 	@echo "Building the software..."
-	@rm -rf src/_build/dev/lib/abt_did_workshop
+	@rm -rf _build/dev/lib/abt_did_workshop
 	@make format
+	@cd tools/client; mix compile; mix format;
 
 format:
 	@cd src; mix compile; mix format;

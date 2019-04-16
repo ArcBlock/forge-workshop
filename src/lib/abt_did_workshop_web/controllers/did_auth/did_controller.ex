@@ -71,7 +71,7 @@ defmodule AbtDidWorkshopWeb.DidController do
     render(conn, "step2.html", changeset: changeset)
   end
 
-  def upsert_app_state(conn, %{"app_auth_state" => state}) do
+  def upsert_app_state(conn, %{"app_state" => state}) do
     case AppState.insert(state) do
       {:ok, record} -> render(conn, "step3.html", id: record.id)
       {:error, changeset} -> render(conn, "step2.html", changeset: changeset)

@@ -54,7 +54,7 @@ defmodule AbtDidWorkshop.Util do
   end
 
   def get_callback do
-    "http://#{get_ip()}:#{get_port()}/workshop/api/"
+    "http://#{get_ip()}:#{get_port()}/api/"
   end
 
   def get_agreement_uri(uri) do
@@ -62,7 +62,26 @@ defmodule AbtDidWorkshop.Util do
   end
 
   def get_chainhost() do
-    "http://#{get_ip()}:#{get_port()}/api/"
+    if Application.get_env(:abt_did_workshop, :forge_node) == nil do
+      filename =
+        :abt_did_workshop |> Application.app_dir() |> Path.join("priv/forge_config/forge.toml")
+
+      config = filename |> File.read!() |> Toml.decode!()
+
+      host =
+        config
+        |> get_in(["forge", "sock_grpc"])
+        |> String.split("//")
+        |> List.last()
+        |> String.split(":")
+        |> List.first()
+
+      web_port = get_in(config, ["forge", "web", "port"])
+      Application.put_env(:abt_did_workshop, :forge_node, %{host: host, web_port: web_port})
+    end
+
+    forge_node = Application.get_env(:abt_did_workshop, :forge_node)
+    "http://#{forge_node.host}:#{forge_node.web_port}/api/"
   end
 
   def get_body(jwt) do
@@ -80,7 +99,7 @@ defmodule AbtDidWorkshop.Util do
 
   def gen_deeplink(demo_id, tx_id) do
     demo = Repo.get(Demo, demo_id)
-    gen_deeplink(demo.path, demo.pk, demo.did, get_callback() <> "transaction/#{tx_id}")
+    gen_deeplink(demo.path, demo.pk, demo.did, get_callback() <> "workflow/#{tx_id}")
   end
 
   defp gen_deeplink(path, pk, did, url) do

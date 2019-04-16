@@ -39,7 +39,7 @@ defmodule AbtDidWorkshopWeb.Router do
     get("/agreement/:id", AgreementController, :get)
 
     post("/wallet/recover", WalletController, :create_wallet)
-    get("/wallet/state/:addr", WalletController, :wallet_state)
+    get("/wallet/:addr", WalletController, :wallet_state)
 
     get("/workflow/:id", WorkflowController, :request)
     post("/workflow/account/:id", WorkflowController, :response_account)

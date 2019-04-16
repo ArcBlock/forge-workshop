@@ -33,7 +33,7 @@ defmodule AbtDidWorkshop.Application do
     ])
   end
 
-  def get_children do
+  defp get_children do
     env = Util.config(:env)
     app_servers = [Endpoint, UserDb, Repo]
 
@@ -43,10 +43,7 @@ defmodule AbtDidWorkshop.Application do
 
       _ ->
         filename =
-          :abt_did_workshop
-          |> Application.app_dir()
-          |> Path.join("priv/forge_config")
-          |> Path.join("/forge.toml")
+          :abt_did_workshop |> Application.app_dir() |> Path.join("priv/forge_config/forge.toml")
 
         forge_servers = ForgeSdk.init(:abt_did_workshop, "", filename)
         forge_servers ++ app_servers

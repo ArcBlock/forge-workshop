@@ -1,9 +1,10 @@
 defmodule AbtDidWorkshop.MixProject do
   use Mix.Project
 
-  @version File.cwd!() |> Path.join("../version") |> File.read!() |> String.trim()
-  @elixir_version File.cwd!() |> Path.join(".elixir_version") |> File.read!() |> String.trim()
-  @otp_version File.cwd!() |> Path.join(".otp_version") |> File.read!() |> String.trim()
+  @top "../"
+  @version @top |> Path.join("version") |> File.read!() |> String.trim()
+  @elixir_version @top |> Path.join(".elixir_version") |> File.read!() |> String.trim()
+  @otp_version @top |> Path.join(".otp_version") |> File.read!() |> String.trim()
 
   def get_version, do: @version
   def get_elixir_version, do: @elixir_version
@@ -15,6 +16,8 @@ defmodule AbtDidWorkshop.MixProject do
       version: @version,
       elixir: @elixir_version,
       elixirc_paths: elixirc_paths(Mix.env()),
+      deps_path: Path.join(@top, "deps"),
+      build_path: Path.join(@top, "_build"),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       deps: deps()
