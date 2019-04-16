@@ -12,8 +12,17 @@
       <%= text_input f, :description, placeholder: "Description (will be displayed to wallet user.)" %>
     </p>
     <p>
-      <%= select f, :tx_type, ["TransferTx", "ExchangeTx", "ConsumeAssetTx", "UpdateAssetTx", [key: "Proof of Holding", value: "ProofOfHolding"]], prompt: "Choose your transaction type", id: :tx_type, value: init_tx_type %>
+      <%= select f, :tx_type, ["PokeTx", "TransferTx", "ExchangeTx", "ConsumeAssetTx", "UpdateAssetTx", [key: "Proof of Holding", value: "ProofOfHolding"]], prompt: "Choose your transaction type", id: :tx_type, value: init_tx_type %>
     </p>
+  </div>
+
+  <div class="form-group" id="PokeTx">
+      <div class="section">
+        <h7> PokeTx </h7>
+        <div class="divider"></div>
+        <br/>
+        <p style="font-size: smaller"> Poke transaction can be executed daily for each account to get some token reward. </p>
+      </div>
   </div>
 
   <div class="form-group" id="TransferTx">
@@ -161,7 +170,7 @@
 
 <script>
 function showSubForm(form_id) {
-  list = ["TransferTx", "ExchangeTx", "ConsumeAssetTx", "UpdateAssetTx", "ProofOfHolding"]
+  list = ["PokeTx", "TransferTx", "ExchangeTx", "ConsumeAssetTx", "UpdateAssetTx", "ProofOfHolding"]
   list.forEach(function (id) {
     if (form_id == "") {
       $('#' + id).hide();
