@@ -1,27 +1,26 @@
 defmodule AbtDidWorkshopWeb.TxController do
   use AbtDidWorkshopWeb, :controller
 
-  alias AbtDidWorkshop
-  alias AbtDidWorkshop.{Tables.DemoTable, Tables.TxTable, Tx}
+  alias AbtDidWorkshop.{Demo, Tx}
 
   def index(conn, %{"demo_id" => demo_id}) do
-    demo = DemoTable.get(demo_id)
-    txs = TxTable.get_all(demo_id)
+    demo = Demo.get(demo_id)
+    txs = Tx.get_all(demo_id)
     render(conn, "index.html", txs: txs, demo: demo)
   end
 
   def new(conn, %{"demo_id" => demo_id}) do
-    # offers = demo_id |> String.to_integer() |> TxTable.get_offer_txs()
+    # offers = demo_id |> String.to_integer() |> Tx.get_offer_txs()
     render(conn, "new.html", changeset: Tx.changeset(%Tx{}, %{}), demo_id: demo_id, tx_id: "")
   end
 
   def edit(conn, %{"id" => tx_id, "demo_id" => demo_id}) do
-    changeset = tx_id |> String.to_integer() |> TxTable.get() |> Tx.changeset()
+    changeset = tx_id |> String.to_integer() |> Tx.get() |> Tx.changeset()
     render(conn, "new.html", changeset: changeset, demo_id: demo_id, tx_id: tx_id)
   end
 
   def delete(conn, %{"id" => tx_id, "demo_id" => demo_id}) do
-    case TxTable.delete(tx_id) do
+    case Tx.delete(tx_id) do
       {:ok, _} ->
         conn
         |> put_flash(:info, "Transaction Deleted.")
@@ -45,6 +44,10 @@ defmodule AbtDidWorkshopWeb.TxController do
 
   def create(conn, %{"tx" => tx}) do
     do_create(conn, tx)
+  end
+
+  defp do_create(conn, %{"demo_id" => demo_id, "tx_id" => tx_id, "tx_type" => "PokeTx"} = tx) do
+    create_single(conn, demo_id, tx_id, "", "", "", tx)
   end
 
   defp do_create(conn, %{"demo_id" => demo_id, "tx_id" => tx_id, "tx_type" => "TransferTx"} = tx) do
@@ -219,7 +222,7 @@ defmodule AbtDidWorkshopWeb.TxController do
     }
 
     try do
-      TxTable.upsert(transaction, tx_id, demo_id)
+      Tx.upsert(transaction, tx_id, demo_id)
 
       conn
       |> put_flash(:info, "Transaction upserted.")

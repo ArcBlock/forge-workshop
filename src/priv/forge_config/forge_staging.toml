@@ -1,9 +1,0 @@
-[app]
-name = "AbtDidWorkshop"
-version = "0.1.0"
-# sock_tcp = "tcp://127.0.0.1:27219"
-# sock_grpc = "tcp://127.0.0.1:37210"
-
-[forge]
-pub_sub_key = "bztothemoon!"
-sock_grpc = "tcp://127.0.0.1:28210"

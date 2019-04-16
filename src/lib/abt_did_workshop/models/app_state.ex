@@ -1,11 +1,15 @@
-defmodule AbtDidWorkshop.AppAuthState do
+defmodule AbtDidWorkshop.AppState do
   @moduledoc """
-  Represents the datastructure for AppAuthState.
+  Represents the datastructure for AppState.
   """
 
   use Ecto.Schema
 
   import Ecto.Changeset
+  import Ecto.Query
+
+  alias AbtDidWorkshop.{AppState, Util}
+  alias AbtDidWorkshop.Repo
 
   schema("app_state") do
     field(:name, :string)
@@ -42,11 +46,34 @@ defmodule AbtDidWorkshop.AppAuthState do
   def get_info(nil), do: %{}
 
   def get_info(state) do
+    chain_info = ForgeSdk.get_chain_info()
+    forge_state = ForgeSdk.get_forge_state()
+
     state
     |> Map.take([:name, :subtitle, :description, :icon, :copyright, :publisher, :path])
-    |> Map.put(:chainId, ForgeSdk.get_chain_info().network)
-    |> Map.put(:chainHost, "http://#{AbtDidWorkshop.Util.get_ip()}:8210/api/")
-    |> Map.put(:chainToken, "TBA")
-    |> Map.put(:decimals, ForgeAbi.one_token() |> :math.log10() |> Kernel.trunc())
+    |> Map.merge(%{
+      chainId: chain_info.network,
+      chainVersion: chain_info.version,
+      chainHost: Util.get_chainhost(),
+      chainToken: forge_state.token.symbol,
+      decimals: forge_state.token.decimal
+    })
+  end
+
+  def get do
+    from(a in AppState)
+    |> Repo.all()
+    |> List.first()
+  end
+
+  def delete do
+    from(a in AppState)
+    |> Repo.delete_all()
+  end
+
+  def insert(state) do
+    %AppState{}
+    |> AppState.changeset(state)
+    |> Repo.insert()
   end
 end

@@ -1,13 +1,13 @@
 defmodule AbtDidWorkshopWeb.AuthController do
   use AbtDidWorkshopWeb, :controller
 
-  alias AbtDidWorkshop.{AppAuthState, Plugs.VerifySig, Tables.AppTable, UserDb, Util}
+  alias AbtDidWorkshop.{AppState, Plugs.VerifySig, UserDb, Util}
 
   plug(VerifySig when action in [:response_auth])
 
   def request_auth(conn, %{"userDid" => did}) do
     user = UserDb.get(did)
-    app = AppTable.get()
+    app = AppState.get()
 
     if user != nil and filled_entire_profile?(app.claims["profile"], user) do
       json(conn, gen_and_sign())
@@ -22,7 +22,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
   def response_auth(conn, _) do
     user_did = conn.assigns.did
     user = UserDb.get(user_did)
-    app = AppTable.get()
+    app = AppState.get()
 
     if user != nil and conn.assigns.claims == [] do
       case filled_entire_profile?(app.claims["profile"], user) do
@@ -64,7 +64,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
   end
 
   defp match_claims?(claims) do
-    expected = AppTable.get().claims["profile"]
+    expected = AppState.get().claims["profile"]
     actual = get_profile(claims)
     check_profile(expected, actual)
   end
@@ -105,13 +105,13 @@ defmodule AbtDidWorkshopWeb.AuthController do
   end
 
   defp gen_and_sign(claims \\ []) do
-    state = AppTable.get()
+    state = AppState.get()
 
     extra = %{
       url: Util.get_callback() <> "auth/",
       action: "responseAuth",
       requestedClaims: claims,
-      appInfo: AppAuthState.get_info(state)
+      appInfo: AppState.get_info(state)
     }
 
     %{
@@ -121,7 +121,7 @@ defmodule AbtDidWorkshopWeb.AuthController do
   end
 
   defp gen_claims do
-    state = AppTable.get()
+    state = AppState.get()
     profile_claim = gen_profile(state.claims["profile"])
     agreement_claims = gen_agreement(state.claims["agreements"])
     profile_claim ++ agreement_claims
@@ -148,8 +148,8 @@ defmodule AbtDidWorkshopWeb.AuthController do
   end
 
   defp gen_agreement(id) do
-    :abt_did_workshop
-    |> Application.get_env(:agreement, [])
+    :agreement
+    |> AbtDidWorkshop.Util.config()
     |> Enum.filter(fn agr -> agr.meta.id == id end)
     |> List.first()
     |> Map.update!(:uri, &Util.get_agreement_uri/1)

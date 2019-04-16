@@ -3,8 +3,8 @@ defmodule AbtDidWorkshopWeb.AgreementController do
 
   def get(conn, %{"id" => id}) do
     text =
-      :abt_did_workshop
-      |> Application.get_env(:agreement, [])
+      :agreement
+      |> AbtDidWorkshop.Util.config()
       |> Enum.filter(fn agr -> agr.meta.id == id end)
       |> List.first()
       |> Map.get(:content)

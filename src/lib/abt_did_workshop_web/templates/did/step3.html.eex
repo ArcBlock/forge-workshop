@@ -7,7 +7,7 @@
   <section class="column">
     <p>Choose the required profile.</p>
     <div class="form-group">
-      <%= for {claim_id, claim_descrip} <- Application.get_env(:abt_did_workshop, :profile) do %>
+      <%= for {claim_id, claim_descrip} <- AbtDidWorkshop.Util.config(:profile) do %>
         <p>
           <label>
             <%= checkbox f, "profile_" <> claim_id  %>
@@ -19,7 +19,7 @@
 
     <p>Choose the required agreements.</p>
     <div class="form-group">
-      <%= for agr <- Application.get_env(:abt_did_workshop, :agreement) do %>
+      <%= for agr <- AbtDidWorkshop.Util.config(:agreement) do %>
         <% meta = agr.meta %>
         <p>
           <label>

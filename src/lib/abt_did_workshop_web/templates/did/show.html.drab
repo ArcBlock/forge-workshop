@@ -44,7 +44,7 @@
               <td> Publick Key </td>
               <td style="word-wrap: break-word;"> <%= user.pk %> </td>
             </tr>
-            <%= for claim_id <- AbtDidWorkshop.Tables.AppTable.get().claims["profile"] do %>
+            <%= for claim_id <- AbtDidWorkshop.AppState.get().claims["profile"] do %>
               <tr>
                 <td>
                   <%= claim_id %>

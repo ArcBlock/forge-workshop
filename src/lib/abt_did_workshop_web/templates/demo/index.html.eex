@@ -68,12 +68,12 @@
   <div class="row">
     <div class="col s6">
       <p>
-        <%= text_input f, :icon, placeholder: "Icon url, default value: #{Application.get_env(:abt_did_workshop, :app_info) |> Keyword.get(:icon)}" %>
+        <%= text_input f, :icon, placeholder: "Icon url, default value: #{AbtDidWorkshop.Util.config([:app_info, :icon])}" %>
       </p>
     </div>
     <div class="col s6">
       <p>
-        <%= text_input f, :path, placeholder: "Deep link path, default value: #{Application.get_env(:abt_did_workshop, :deep_link_path)}" %>
+        <%= text_input f, :path, placeholder: "Deep link path, default value: #{AbtDidWorkshop.Util.config(:deep_link_path)}" %>
       </p>
     </div>
   </div>

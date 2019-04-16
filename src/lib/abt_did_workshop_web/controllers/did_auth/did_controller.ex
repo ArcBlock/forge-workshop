@@ -2,20 +2,20 @@ defmodule AbtDidWorkshopWeb.DidController do
   use AbtDidWorkshopWeb, :controller
 
   alias AbtDid.Type, as: DidType
-  alias AbtDidWorkshop.{AppAuthState, Repo, Tables.AppTable, UserDb}
+  alias AbtDidWorkshop.{AppState, Repo, UserDb, Util}
 
   @ed25519 %Mcrypto.Signer.Ed25519{}
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
 
   def index(conn, _params) do
-    case AppTable.get() do
+    case AppState.get() do
       nil -> render(conn, "step1.html")
       state -> render(conn, "index.html", did: state.did)
     end
   end
 
   def show(conn, _params) do
-    app_state = AppTable.get()
+    app_state = AppState.get()
 
     cond do
       app_state == nil ->
@@ -30,7 +30,7 @@ defmodule AbtDidWorkshopWeb.DidController do
   end
 
   def reselect_claims(conn, _) do
-    app_state = AppTable.get()
+    app_state = AppState.get()
 
     case app_state do
       nil -> render(conn, "step1.html", alert: "You must create an application DID first.")
@@ -39,7 +39,7 @@ defmodule AbtDidWorkshopWeb.DidController do
   end
 
   def start_over(conn, _) do
-    AppTable.delete()
+    AppState.delete()
     UserDb.clear()
     redirect(conn, to: "/")
   end
@@ -66,13 +66,13 @@ defmodule AbtDidWorkshopWeb.DidController do
       |> Map.put(:pk, Multibase.encode!(pk, :base58_btc))
       |> Map.put(:did, did)
 
-    changeset = AppAuthState.changeset(%AppAuthState{}, app_state)
+    changeset = AppState.changeset(%AppState{}, app_state)
 
     render(conn, "step2.html", changeset: changeset)
   end
 
   def upsert_app_state(conn, %{"app_auth_state" => state}) do
-    case AppTable.insert(state) do
+    case AppState.insert(state) do
       {:ok, record} -> render(conn, "step3.html", id: record.id)
       {:error, changeset} -> render(conn, "step2.html", changeset: changeset)
     end
@@ -93,17 +93,17 @@ defmodule AbtDidWorkshopWeb.DidController do
       end)
       |> Enum.map(fn {"agreement_" <> claim, _} -> claim end)
 
-    AppAuthState
+    AppState
     |> Repo.get!(app_id)
-    |> AppAuthState.changeset(%{claims: %{profile: profile, agreements: agreements}})
+    |> AppState.changeset(%{claims: %{profile: profile, agreements: agreements}})
     |> Repo.update!()
 
     redirect(conn, to: Routes.did_path(conn, :show))
   end
 
   defp get_init_state do
-    state = Application.get_env(:abt_did_workshop, :app_info) |> Enum.into(%{})
-    path = Application.get_env(:abt_did_workshop, :deep_link_path)
+    state = Util.config(:app_info)
+    path = Util.config(:deep_link_path)
     Map.put(state, :path, path)
   end
 end

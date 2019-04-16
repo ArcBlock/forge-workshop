@@ -1,7 +1,7 @@
 defmodule AbtDidWorkshop.Application do
   @moduledoc false
 
-  alias AbtDidWorkshop.WalletUtil
+  alias AbtDidWorkshop.{Repo, UserDb, Util, WalletUtil, WorkshopAsset}
   alias AbtDidWorkshopWeb.Endpoint
 
   def start(_type, _args) do
@@ -9,17 +9,13 @@ defmodule AbtDidWorkshop.Application do
     register_type_urls()
     opts = [strategy: :one_for_one, name: AbtDidWorkshop.Supervisor]
     result = Supervisor.start_link(children, opts)
-    env = Application.get_env(:abt_did_workshop, :env)
 
-    if env == "prod" or env == "staging" do
-      WalletUtil.init_robert()
-    end
-
-    try do
-      ForgeAbi.one_token()
-    rescue
-      _ -> Application.put_env(:forge_abi, :decimal, 16)
-    end
+    spawn(fn ->
+      Process.sleep(5_000)
+      %{decimal: decimal} = ForgeSdk.get_forge_state().token
+      Application.put_env(:forge_abi, :decimal, decimal)
+      WalletUtil.get_robert()
+    end)
 
     result
   end
@@ -33,24 +29,13 @@ defmodule AbtDidWorkshop.Application do
 
   defp register_type_urls do
     ForgeAbi.register_type_urls([
-      {:workshop_asset, "ws:x:workshop_asset", AbtDidWorkshop.WorkshopAsset}
+      {:workshop_asset, "ws:x:workshop_asset", WorkshopAsset}
     ])
   end
 
   def get_children do
-    env = Application.get_env(:abt_did_workshop, :env)
-
-    forge_env =
-      case env do
-        env when env in ["test", "dev"] -> "dev"
-        _ -> "staging"
-      end
-
-    app_servers = [
-      AbtDidWorkshopWeb.Endpoint,
-      AbtDidWorkshop.UserDb,
-      AbtDidWorkshop.Repo
-    ]
+    env = Util.config(:env)
+    app_servers = [Endpoint, UserDb, Repo]
 
     case env do
       "test" ->
@@ -61,7 +46,7 @@ defmodule AbtDidWorkshop.Application do
           :abt_did_workshop
           |> Application.app_dir()
           |> Path.join("priv/forge_config")
-          |> Path.join("/forge_#{forge_env}.toml")
+          |> Path.join("/forge.toml")
 
         forge_servers = ForgeSdk.init(:abt_did_workshop, "", filename)
         forge_servers ++ app_servers

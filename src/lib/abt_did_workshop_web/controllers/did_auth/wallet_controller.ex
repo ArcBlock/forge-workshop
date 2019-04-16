@@ -1,12 +1,12 @@
 defmodule AbtDidWorkshopWeb.WalletController do
   use AbtDidWorkshopWeb, :controller
 
-  alias AbtDidWorkshop.{Tables.AppTable, Util, WalletUtil}
+  alias AbtDidWorkshop.{AppState, Util, WalletUtil}
 
   @ed25519 %Mcrypto.Signer.Ed25519{}
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
 
-  def recover_wallet(conn, _) do
+  def create_wallet(conn, _) do
     [{wallet, _}] = WalletUtil.init_wallets(1)
 
     json(conn, %{
@@ -17,13 +17,31 @@ defmodule AbtDidWorkshopWeb.WalletController do
     })
   end
 
+  def wallet_state(conn, %{"addr" => addr}) do
+    account = AbtDidWorkshop.WalletUtil.get_account_state(addr)
+    {assets, _} = ForgeSdk.list_assets(owner_address: addr)
+
+    certs =
+      Enum.into(assets, %{}, fn asset ->
+        {_, cert} =
+          [address: asset.address]
+          |> ForgeSdk.get_asset_state()
+          |> Map.get(:data)
+          |> ForgeAbi.decode_any()
+
+        {asset.address, [cert.title, cert.content]}
+      end)
+
+    json(conn, Map.put(account, :assets, certs))
+  end
+
   def index(conn, _params) do
-    case AppTable.get() do
+    case AppState.get() do
       nil ->
         redirect(conn, to: Routes.did_path(conn, :index))
 
       app_state ->
-        keys = Application.get_env(:abt_did_workshop, :sample_keys, [])
+        keys = Util.config(:sample_keys)
         render(conn, "index.html", keys: keys, app_state: app_state)
     end
   end
@@ -171,8 +189,8 @@ defmodule AbtDidWorkshopWeb.WalletController do
         {"agreement_" <> id, "false"} -> {id, false}
       end)
 
-    :abt_did_workshop
-    |> Application.get_env(:agreement)
+    :agreement
+    |> Util.config()
     |> Enum.map(fn agr ->
       agr
       |> Map.delete(:content)
