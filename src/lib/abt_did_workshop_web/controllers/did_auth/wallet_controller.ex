@@ -18,7 +18,7 @@ defmodule AbtDidWorkshopWeb.WalletController do
   end
 
   def wallet_state(conn, %{"addr" => addr}) do
-    account = AbtDidWorkshop.WalletUtil.get_account_state(addr)
+    account = WalletUtil.get_account_state(addr)
     {assets, _} = ForgeSdk.list_assets(owner_address: addr)
 
     certs =
