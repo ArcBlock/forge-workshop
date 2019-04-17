@@ -1,3 +1,6 @@
+## 0.3.1 (April 17, 2019)
+  - Resolve forge node host ip.
+  
 ## 0.3.0 (April 17, 2019)
   - Refactor workshop
 

@@ -76,7 +76,7 @@ defmodule AbtDidWorkshop.Util do
     end
 
     forge_node = Application.get_env(:abt_did_workshop, :forge_node)
-    "http://#{forge_node.host}:#{forge_node.web_port}/api/"
+    "http://#{resolve_host(forge_node.host)}:#{forge_node.web_port}/api/"
   end
 
   def get_body(jwt) do
@@ -128,4 +128,8 @@ defmodule AbtDidWorkshop.Util do
   def empty?(nil), do: true
   def empty?(""), do: true
   def empty?(_), do: false
+
+  defp resolve_host("127.0.0.1"), do: get_ip()
+  defp resolve_host("localhost"), do: get_ip()
+  defp resolve_host(host), do: host
 end
