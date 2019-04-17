@@ -1,3 +1,6 @@
+## 0.3.0 (April 17, 2019)
+  - Refactor workshop
+
 ## 0.2.22 (March 25, 2019)
   - Return tx data along with hash.
 

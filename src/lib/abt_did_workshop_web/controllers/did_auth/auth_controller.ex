@@ -147,8 +147,6 @@ defmodule AbtDidWorkshopWeb.AuthController do
   end
 
   defp gen_agreement(id) do
-    IO.inspect(id, label: "@@@")
-
     :agreement
     |> AbtDidWorkshop.Util.config()
     |> Enum.filter(fn agr -> agr.meta.id == id end)
