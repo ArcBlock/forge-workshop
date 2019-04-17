@@ -23,9 +23,9 @@ config :logger, :console,
 config :phoenix, :stacktrace_depth, 20
 
 # Configure your database
-config :abt_did_workshop, AbtDidWorkshop.Repo,
-  username: "postgres",
-  password: "postgres",
-  database: "abt_did_workshop_staging",
-  hostname: "localhost",
-  pool_size: 10
+# config :abt_did_workshop, AbtDidWorkshop.Repo,
+#   username: "postgres",
+#   password: "postgres",
+#   database: "abt_did_workshop_staging",
+#   hostname: "localhost",
+#   pool_size: 10

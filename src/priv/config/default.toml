@@ -1,0 +1,13 @@
+[forge]
+pub_sub_key = "bztothemoon!"
+sock_grpc = "tcp://127.0.0.1:27210"
+
+ [forge.web]
+ port = 8210
+
+[workshop]
+path = "~/.workshop"
+
+# the index db path
+# sqlite://workshop.sqlite3 or postgres://postgres:postgres@localhost:5432/workshop
+db = "sqlite://workshop.sqlite3"

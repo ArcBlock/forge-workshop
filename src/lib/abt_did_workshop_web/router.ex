@@ -38,16 +38,13 @@ defmodule AbtDidWorkshopWeb.Router do
     post("/auth", AuthController, :response_auth)
     get("/agreement/:id", AgreementController, :get)
 
-    post("/wallet/recover", WalletController, :recover_wallet)
+    post("/wallet/recover", WalletController, :create_wallet)
+    get("/wallet/:addr", WalletController, :wallet_state)
 
-    # Util apis for event chains
-    post("/requireSig", ApiController, :require_sig)
-    post("/requireMultiSig", ApiController, :require_multi_sig)
-    post("/requireAsset", ApiController, :require_asset)
-
-    get("/transaction/:id", TransactionController, :request)
-    post("/transaction/:id", TransactionController, :response)
-
-    get("/state/account/:addr", StateController, :account)
+    get("/workflow/:id", WorkflowController, :request)
+    post("/workflow/account/:id", WorkflowController, :response_account)
+    post("/workflow/asset/:id", WorkflowController, :response_asset)
+    post("/workflow/sig/:id", WorkflowController, :response_sig)
+    post("/workflow/multisig/:id", WorkflowController, :response_multi_sig)
   end
 end

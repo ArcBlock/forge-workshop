@@ -14,6 +14,18 @@ defmodule AbtDidWorkshop.WalletUtil do
     WalletType
   }
 
+  def check_balance(token, _) when token in [nil, 0], do: true
+
+  def check_balance(token, user_addr) do
+    case ForgeSdk.get_account_state(address: user_addr) do
+      nil ->
+        false
+
+      state ->
+        state.balance >= ForgeAbi.token_to_unit(token)
+    end
+  end
+
   def get_account_state(address) do
     state = ForgeSdk.get_account_state(address: address)
 
@@ -27,8 +39,7 @@ defmodule AbtDidWorkshop.WalletUtil do
   end
 
   def init_wallets(number) do
-    moniker_prefix =
-      :abt_did_workshop |> Application.get_env(:wallet) |> Keyword.get(:moniker_prefix)
+    moniker_prefix = AbtDidWorkshop.Util.config([:wallet, :moniker_prefix])
 
     for i <- 1..number do
       {w, _} = create_wallet()
@@ -38,7 +49,7 @@ defmodule AbtDidWorkshop.WalletUtil do
   end
 
   def create_wallet do
-    passphrase = :abt_did_workshop |> Application.get_env(:wallet) |> Keyword.get(:passphrase)
+    passphrase = AbtDidWorkshop.Util.config([:wallet, :passphrase])
 
     type =
       WalletType.new(
@@ -64,14 +75,46 @@ defmodule AbtDidWorkshop.WalletUtil do
     ForgeSdk.send_tx(req_send)
   end
 
+  def poke(wallet) do
+    %{address: address} = ForgeSdk.get_forge_state().poke_config
+
+    itx =
+      ForgeAbi.PokeTx.new(
+        address: address,
+        date: DateTime.utc_now() |> DateTime.to_date() |> Date.to_string()
+      )
+
+    ForgeSdk.poke(itx, wallet: wallet)
+  end
+
+  def get_robert do
+    %{address: addr, pk: pk, sk: sk} = AbtDidWorkshop.Util.config(:robert)
+    state = ForgeSdk.get_account_state(address: addr)
+
+    if state == nil or state.balance < ForgeAbi.token_to_unit(100) do
+      init_robert()
+    end
+
+    WalletInfo.new(address: addr, pk: pk, sk: sk)
+  end
+
   def init_robert do
-    type =
-      :abt_did_workshop |> Application.get_env(:robert) |> Keyword.get(:type) |> WalletType.new()
-
-    [address: addr, pk: pk, sk: sk, type: _] = Application.get_env(:abt_did_workshop, :robert)
-    w = WalletInfo.new(address: addr, pk: pk, sk: sk, type: type)
-
+    %{address: addr, pk: pk, sk: sk} = AbtDidWorkshop.Util.config(:robert)
+    w = WalletInfo.new(address: addr, pk: pk, sk: sk)
     hash = declare_wallet(w, "robert")
+
+    Task.async(fn ->
+      wallets = init_wallets(100)
+      Process.sleep(5_000)
+      Enum.each(wallets, fn {w, _} -> poke(w) end)
+      Process.sleep(5_000)
+
+      %{amount: poke_amount} = ForgeSdk.get_forge_state().poke_config
+      itx = ForgeAbi.TransferTx.new(to: addr, value: ForgeAbi.token_to_unit(poke_amount))
+
+      Enum.each(wallets, fn {w, _} -> ForgeSdk.transfer(itx, wallet: w) end)
+    end)
+
     {w, hash}
   end
 end

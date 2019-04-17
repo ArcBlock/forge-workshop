@@ -1,13 +1,18 @@
 defmodule Client.MixProject do
   use Mix.Project
 
+  @top "../../"
+  @version @top |> Path.join("version") |> File.read!() |> String.trim()
+  @elixir_version @top |> Path.join(".elixir_version") |> File.read!() |> String.trim()
+
   def project do
     [
       app: :client,
-      version: "0.1.0",
-      elixir: "~> 1.7",
-      build_path: "../../src/_build",
-      deps_path: "../../src/deps",
+      version: @version,
+      elixir: @elixir_version,
+      deps_path: Path.join(@top, "deps"),
+      build_path: Path.join(@top, "_build"),
+      lockfile: Path.join(@top, "src/mix.lock"),
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -27,7 +32,7 @@ defmodule Client.MixProject do
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
       {:httpoison, "~> 1.4"},
-      {:abt_did_elixir, git: "git@github.com:arcblock/abt-did-elixir.git", tag: "v0.1.17"},
+      {:abt_did_elixir, git: "git@github.com:arcblock/abt-did-elixir.git", tag: "v0.2.2"},
       {:forge_sdk, git: "git@github.com:arcblock/forge-elixir-sdk.git"},
       {:multibase, "~> 0.0.1"}
     ]

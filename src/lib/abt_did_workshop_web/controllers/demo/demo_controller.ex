@@ -1,12 +1,11 @@
 defmodule AbtDidWorkshopWeb.DemoController do
   use AbtDidWorkshopWeb, :controller
 
-  alias AbtDidWorkshop
-  alias AbtDidWorkshop.{Demo, Repo, Tables.DemoTable}
+  alias AbtDidWorkshop.{Demo, Repo, Util}
 
   def index(conn, _) do
     changeset = Demo.changeset(%Demo{}, %{})
-    demos = DemoTable.get_all()
+    demos = Demo.get_all()
     render(conn, "index.html", demos: demos, changeset: changeset)
   end
 
@@ -23,20 +22,20 @@ defmodule AbtDidWorkshopWeb.DemoController do
       |> Map.put("icon", get_icon(demo["icon"]))
       |> Map.put("path", get_path(demo["path"]))
 
-    case DemoTable.insert(demo) do
+    case Demo.insert(demo) do
       {:ok, record} ->
         conn
         |> put_flash(:info, "Successfully created demo case. Now please add transactions.")
         |> redirect(to: Routes.tx_path(conn, :index, demo_id: record.id))
 
       {:error, changeset} ->
-        demos = DemoTable.get_all()
+        demos = Demo.get_all()
         render(conn, "index.html", demos: demos, changeset: changeset)
     end
   end
 
   def delete(conn, %{"id" => demo_id}) do
-    case DemoTable.delete(demo_id) do
+    case Demo.delete(demo_id) do
       {:ok, _} ->
         conn
         |> put_flash(:info, "Successfully deleted demo.")
@@ -71,9 +70,9 @@ defmodule AbtDidWorkshopWeb.DemoController do
     end
   end
 
-  defp get_icon(""), do: Application.get_env(:abt_did_workshop, :app_info) |> Keyword.get(:icon)
+  defp get_icon(""), do: Util.config([:app_info, :icon])
   defp get_icon(url), do: url
 
-  defp get_path(""), do: Application.get_env(:abt_did_workshop, :deep_link_path)
+  defp get_path(""), do: Util.config(:deep_link_path)
   defp get_path(path), do: path
 end

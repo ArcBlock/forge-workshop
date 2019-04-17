@@ -1,7 +1,22 @@
 defmodule AbtDidWorkshop.Util do
   @moduledoc false
 
-  alias AbtDidWorkshop.{AppAuthState, Demo, Repo}
+  alias AbtDidWorkshop.{AppState, Demo, Repo, Util}
+  alias AbtDidWorkshopWeb.Router.Helpers, as: Routes
+
+  def expand_icon_path(conn, icon) do
+    icon =
+      if icon == nil or icon == "" do
+        config([:app_info, :icon])
+      else
+        icon
+      end
+
+    case URI.parse(icon) do
+      %{host: nil} -> Routes.static_url(conn, icon)
+      _ -> icon
+    end
+  end
 
   def str_to_bin(str) do
     case Base.decode16(str, case: :mixed) do
@@ -12,21 +27,30 @@ defmodule AbtDidWorkshop.Util do
 
   def get_ip do
     {:ok, ip_list} = :inet.getif()
+    list = Enum.filter(ip_list, fn {_ip, broadcast, _netmask} -> broadcast != :undefined end)
+    result = Enum.find(list, fn {ip, _, _} -> elem(ip, 0) == 192 or elem(ip, 0) == 10 end)
 
-    {ip, _broadcast, _netmask} =
-      Enum.find(ip_list, fn {ip, broadcast, _netmask} ->
-        ip != {127, 0, 0, 1} and broadcast != :undefined
-      end)
+    {ip, _, _} =
+      case result do
+        nil -> List.first(list)
+        _ -> result
+      end
 
     {i1, i2, i3, i4} = ip
     "#{i1}.#{i2}.#{i3}.#{i4}"
   end
 
+  def config([first | rest]),
+    do: :abt_did_workshop |> Application.get_env(first) |> get_in(rest)
+
+  def config(key),
+    do: :abt_did_workshop |> Application.get_env(key)
+
   def get_port do
-    :abt_did_workshop
-    |> Application.get_env(AbtDidWorkshopWeb.Endpoint)
-    |> Keyword.get(:http)
-    |> Keyword.get(:port)
+    case config([AbtDidWorkshopWeb.Endpoint, :http, :port]) do
+      {:system, "PORT"} -> System.get_env("PORT")
+      port -> port
+    end
   end
 
   def get_callback do
@@ -35,6 +59,24 @@ defmodule AbtDidWorkshop.Util do
 
   def get_agreement_uri(uri) do
     "http://#{get_ip()}:#{get_port()}" <> uri
+  end
+
+  def get_chainhost do
+    if Application.get_env(:abt_did_workshop, :forge_node) == nil do
+      host =
+        ["forge", "sock_grpc"]
+        |> Util.config()
+        |> String.split("//")
+        |> List.last()
+        |> String.split(":")
+        |> List.first()
+
+      web_port = Util.config(["forge", "web", "port"])
+      Application.put_env(:abt_did_workshop, :forge_node, %{host: host, web_port: web_port})
+    end
+
+    forge_node = Application.get_env(:abt_did_workshop, :forge_node)
+    "http://#{forge_node.host}:#{forge_node.web_port}/api/"
   end
 
   def get_body(jwt) do
@@ -46,13 +88,13 @@ defmodule AbtDidWorkshop.Util do
   end
 
   def gen_deeplink(app_id) do
-    app_state = Repo.get(AppAuthState, app_id)
+    app_state = Repo.get(AppState, app_id)
     gen_deeplink(app_state.path, app_state.pk, app_state.did, get_callback() <> "auth/")
   end
 
   def gen_deeplink(demo_id, tx_id) do
     demo = Repo.get(Demo, demo_id)
-    gen_deeplink(demo.path, demo.pk, demo.did, get_callback() <> "transaction/#{tx_id}")
+    gen_deeplink(demo.path, demo.pk, demo.did, get_callback() <> "workflow/#{tx_id}")
   end
 
   defp gen_deeplink(path, pk, did, url) do

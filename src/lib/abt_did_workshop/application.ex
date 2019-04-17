@@ -1,7 +1,7 @@
 defmodule AbtDidWorkshop.Application do
   @moduledoc false
 
-  alias AbtDidWorkshop.WalletUtil
+  alias AbtDidWorkshop.{Repo, SqliteRepo, UserDb, Util, WalletUtil, WorkshopAsset}
   alias AbtDidWorkshopWeb.Endpoint
 
   def start(_type, _args) do
@@ -9,17 +9,13 @@ defmodule AbtDidWorkshop.Application do
     register_type_urls()
     opts = [strategy: :one_for_one, name: AbtDidWorkshop.Supervisor]
     result = Supervisor.start_link(children, opts)
-    env = Application.get_env(:abt_did_workshop, :env)
 
-    if env == "prod" or env == "staging" do
-      WalletUtil.init_robert()
-    end
-
-    try do
-      ForgeAbi.one_token()
-    rescue
-      _ -> Application.put_env(:forge_abi, :decimal, 16)
-    end
+    spawn(fn ->
+      Process.sleep(5_000)
+      %{decimal: decimal} = ForgeSdk.get_forge_state().token
+      Application.put_env(:forge_abi, :decimal, decimal)
+      WalletUtil.get_robert()
+    end)
 
     result
   end
@@ -33,38 +29,60 @@ defmodule AbtDidWorkshop.Application do
 
   defp register_type_urls do
     ForgeAbi.register_type_urls([
-      {:certificate, "ws:x:certificate", AbtDidWorkshop.Certificate}
+      {:workshop_asset, "ws:x:workshop_asset", WorkshopAsset}
     ])
   end
 
-  def get_children do
-    env = Application.get_env(:abt_did_workshop, :env)
-
-    forge_env =
-      case env do
-        env when env in ["test", "dev"] -> "dev"
-        _ -> "staging"
-      end
-
-    app_servers = [
-      AbtDidWorkshopWeb.Endpoint,
-      AbtDidWorkshop.UserDb,
-      AbtDidWorkshop.Repo
-    ]
+  defp get_children do
+    filepath = read_config()
+    env = Util.config(:env)
+    repo = set_db()
+    app_servers = [Endpoint, UserDb, repo]
 
     case env do
       "test" ->
         app_servers
 
       _ ->
-        filename =
-          :abt_did_workshop
-          |> Application.app_dir()
-          |> Path.join("priv/forge_config")
-          |> Path.join("/forge_#{forge_env}.toml")
-
-        forge_servers = ForgeSdk.init(:abt_did_workshop, "", filename)
+        forge_servers = ForgeSdk.init(:abt_did_workshop, "", filepath)
         forge_servers ++ app_servers
+    end
+  end
+
+  def read_config() do
+    filepath =
+      case System.get_env("WORKSHOP_CONFIG") do
+        nil -> :abt_did_workshop |> Application.app_dir() |> Path.join("priv/config/default.toml")
+        path -> path
+      end
+
+    filepath
+    |> File.read!()
+    |> Toml.decode!()
+    |> Enum.each(fn {key, value} ->
+      Application.put_env(:abt_did_workshop, key, adjust_config(value))
+    end)
+
+    filepath
+  end
+
+  defp adjust_config(config) when is_map(config) do
+    config
+    |> Enum.map(fn {key, value} -> {key, adjust_config(key, value)} end)
+    |> Enum.into(%{})
+  end
+
+  defp adjust_config("path", value), do: Path.expand(value)
+  defp adjust_config(_, value), do: value
+
+  defp set_db() do
+    db_path = Util.config(["workshop", "db"])
+
+    case db_path do
+      "sqlite://" <> _ ->
+        Repo.set_mod(SqliteRepo)
+        SqliteRepo
+        # "postgres://" <>
     end
   end
 end

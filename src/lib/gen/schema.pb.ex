@@ -1,4 +1,4 @@
-defmodule AbtDidWorkshop.Certificate do
+defmodule AbtDidWorkshop.WorkshopAsset do
   @moduledoc false
   use Protobuf, syntax: :proto3
 

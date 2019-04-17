@@ -1,5 +1,5 @@
 #!/bin/sh
-MIX_ENV=test mix test_all
+MIX_ENV=test mix test
 RES=$?
 if [ $RES -ne 0  ]
 then
