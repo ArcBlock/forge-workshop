@@ -1,8 +1,15 @@
 <%= form_for @changeset, Routes.demo_path(@conn, :update, @demo), fn(f) -> %>
   <div class="form-group">
-    <%= text_input(f, :title, placeholder: "Demo case title", class: "form-control") %>
-    <%= error_tag(f, :title) %>
-    <%= text_input f, :description, placeholder: "Description (optional)" %>
+    <%= text_input(f, :name, placeholder: "Demo case name", class: "form-control") %>
+    <%= error_tag(f, :name) %>
+    <%= text_input(f, :subtitle, placeholder: "Demo case subtitle", class: "form-control") %>
+    <%= error_tag(f, :subtitle) %>
+    <%= text_input(f, :description, placeholder: "Description", class: "form-control") %>
+    <%= error_tag(f, :description) %>
+    <%= text_input(f, :icon, placeholder: "App icon url.", class: "form-control") %>
+    <%= error_tag(f, :icon) %>
+    <%= text_input(f, :path, placeholder: "Deeplink path.", class: "form-controle") %>
+    <%= error_tag(f, :path) %>
   </div>
 
   <%= submit "Save Demo", class: "btn btn-primary" %>
