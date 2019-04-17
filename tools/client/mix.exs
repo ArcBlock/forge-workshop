@@ -12,6 +12,7 @@ defmodule Client.MixProject do
       elixir: @elixir_version,
       deps_path: Path.join(@top, "deps"),
       build_path: Path.join(@top, "_build"),
+      lockfile: Path.join(@top, "src/mix.lock"),
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]

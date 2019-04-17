@@ -1,6 +1,0 @@
-[forge]
-pub_sub_key = "bztothemoon!"
-sock_grpc = "tcp://127.0.0.1:27210"
-
- [forge.web]
- port = 8210

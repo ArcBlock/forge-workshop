@@ -10,9 +10,9 @@ config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
 config :logger, level: :warn
 
 # Configure your database
-config :abt_did_workshop, AbtDidWorkshop.Repo,
-  username: "postgres",
-  password: "postgres",
-  database: "abt_did_workshop_test",
-  hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+# config :abt_did_workshop, AbtDidWorkshop.Repo,
+#   username: "postgres",
+#   password: "postgres",
+#   database: "abt_did_workshop_test",
+#   hostname: "localhost",
+#   pool: Ecto.Adapters.SQL.Sandbox

@@ -1,7 +1,7 @@
 defmodule AbtDidWorkshop.Util do
   @moduledoc false
 
-  alias AbtDidWorkshop.{AppState, Demo, Repo}
+  alias AbtDidWorkshop.{AppState, Demo, Repo, Util}
   alias AbtDidWorkshopWeb.Router.Helpers, as: Routes
 
   def expand_icon_path(conn, icon) do
@@ -63,20 +63,15 @@ defmodule AbtDidWorkshop.Util do
 
   def get_chainhost do
     if Application.get_env(:abt_did_workshop, :forge_node) == nil do
-      filename =
-        :abt_did_workshop |> Application.app_dir() |> Path.join("priv/forge_config/forge.toml")
-
-      config = filename |> File.read!() |> Toml.decode!()
-
       host =
-        config
-        |> get_in(["forge", "sock_grpc"])
+        ["forge", "sock_grpc"]
+        |> Util.config()
         |> String.split("//")
         |> List.last()
         |> String.split(":")
         |> List.first()
 
-      web_port = get_in(config, ["forge", "web", "port"])
+      web_port = Util.config(["forge", "web", "port"])
       Application.put_env(:abt_did_workshop, :forge_node, %{host: host, web_port: web_port})
     end
 

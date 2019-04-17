@@ -7,8 +7,10 @@
 # General application configuration
 use Mix.Config
 
+config :abt_did_workshop, AbtDidWorkshop.SqliteRepo, adapter: Sqlite.Ecto2, priv: "priv/repo"
+
 config :abt_did_workshop,
-  ecto_repos: [AbtDidWorkshop.Repo]
+  ecto_repos: [AbtDidWorkshop.SqliteRepo]
 
 # Configures the endpoint
 config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
@@ -67,7 +69,7 @@ config :abt_did_workshop,
     copyright: "https://example-application/copyright",
     publisher: "did:abt:zNKSHDK5KTZ5bdxfHoKp6F2iibbpLriYJDSi"
   },
-  deep_link_path: "https://abtwallet.io/i/",
+  deep_link_path: "https://arcwallet.io/i/",
   wallet: %{moniker_prefix: "stu", passphrase: "abcd1234"},
   robert: %{
     address: "z1YgP3zaVdQzB9gC3kHAyTiiMMPZhLzCLDP",

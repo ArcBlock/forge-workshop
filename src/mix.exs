@@ -43,17 +43,22 @@ defmodule AbtDidWorkshop.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      # Phoenix and Ecto
       {:phoenix, "~> 1.4.0"},
       {:phoenix_pubsub, "~> 1.1"},
-      {:phoenix_ecto, "~> 4.0"},
-      {:ecto_sql, "~> 3.0"},
-      {:postgrex, "~> 0.13"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:phoenix_ecto, "~> 3.0"},
+      {:ecto, "~> 2.2"},
+      {:postgrex, "~> 0.13"},
+      {:sqlite_ecto2, git: "https://github.com/tyrchen/sqlite_ecto2"},
+
+      # Common tools
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:httpoison, "~> 1.4"},
+      {:poison, "~> 3.1"},
       {:drab, "~> 0.10"},
 
       # ArcBlock
@@ -77,7 +82,6 @@ defmodule AbtDidWorkshop.MixProject do
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.19", only: [:dev, :test], runtime: false},
       {:excheck, "~> 0.6", only: :test, runtime: false},
-      {:pre_commit_hook, "~> 1.2", only: [:dev, :test], runtime: false},
       {:triq, "~> 1.3", only: :test, runtime: false},
 
       # test only

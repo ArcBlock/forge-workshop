@@ -96,7 +96,9 @@ defmodule AbtDidWorkshopWeb.DidController do
     AppState
     |> Repo.get!(app_id)
     |> AppState.changeset(%{claims: %{profile: profile, agreements: agreements}})
+    |> IO.inspect(label: "######")
     |> Repo.update!()
+    |> IO.inspect(label: "@@@@")
 
     redirect(conn, to: Routes.did_path(conn, :show))
   end

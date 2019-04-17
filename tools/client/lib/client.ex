@@ -49,7 +49,7 @@ defmodule Client do
   end
 
   defp handle_response(w, %{"authInfo" => auth_info}) do
-    info_body = get_body(auth_info)
+    info_body = get_body(auth_info) |> IO.inspect(label: "@@@")
     url = info_body["url"]
     claims = handle_claims(info_body["requestedClaims"], w)
     req = prepare_request(w, %{requestedClaims: claims})
