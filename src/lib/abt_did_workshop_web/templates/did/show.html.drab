@@ -23,6 +23,75 @@
         DID Secret Key (base58_btc encoding):
         <p class="info-text"><%= Multibase.encode!(@app_state.sk, :base58_btc) %></p>
       </div>
+      <%= if [] != @users do %>
+        Known users:
+        <ul class="collapsible popout">
+          <%= for user <- @users do %>
+          <li>
+            <div class="collapsible-header"><%= user.did %></div>
+            <div class="collapsible-body">
+              <span>
+                <table class="striped" style="font-size: smaller; table-layout: fixed;">
+                  <tr>
+                    <td style="width: 30%"> DID </td>
+                    <td style="word-wrap: break-word;"> <%= user.did %> </td>
+                  </tr>
+                  <tr>
+                    <td>Publick Key</td>
+                    <td style="word-wrap: break-word;"> <%= user.pk %> </td>
+                  </tr>
+                  <%= for claim_id <- AbtDidWorkshop.AppState.get().claims["profile"] do %>
+                    <tr>
+                      <td>
+                        <%= claim_id %>
+                      </td>
+                      <td text-align="right">
+                        <%= user.profile[claim_id] %>
+                      </td>
+                    </tr>
+                  <% end %>
+                  <%= for agr <- user.agreement do %>
+                  <tr>
+                    <td colspan="2">
+                      <table style="font-size: smaller; table-layout: fixed;">
+                        <tr>
+                          <td style="width: 30%">Hash</td>
+                          <td style="word-wrap: break-word;"><%= agr["hash"]["digest"] %></td>
+                        </tr>
+                        <tr>
+                          <td>URI</td>
+                          <td style="word-wrap: break-word;">
+                          <% uri = agr["uri"] %>
+                          <a href='<%= uri %>'><%= uri %></a>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Agreed?</td>
+                          <td style="word-wrap: break-word;">
+                            <%= if agr["agreed"] || agr["agree"] do %>
+                              true
+                            <% else %>
+                              false
+                            <% end %>
+                          </td>
+                        </tr>
+                        <%= if agr["agreed"] || agr["agree"] do %>
+                        <tr>
+                          <td> Signature </td>
+                          <td style="word-wrap: break-word;"> <%= agr["sig"] %> </td>
+                        </tr>
+                        <% end %>
+                      </table>
+                    </td>
+                  </tr>
+                  <% end %>
+                </table>
+              </span>
+            </div>
+          </li>
+          <% end %>
+        </ul>
+      <% end %>
     </div>
     <div class="col s12 m3">
       <div class="app-actions">
@@ -45,74 +114,3 @@
     </div>
   </div>
 </div>
-
-<a name="known_users"></a>
-<%= if [] != @users do %>
-  Known users:
-  <ul class="collapsible popout">
-    <%= for user <- @users do %>
-    <li>
-      <div class="collapsible-header"><%= user.did %></div>
-      <div class="collapsible-body">
-        <span>
-          <table class="striped" style="font-size: smaller; table-layout: fixed;">
-            <tr>
-              <td style="width: 30%"> DID </td>
-              <td style="word-wrap: break-word;"> <%= user.did %> </td>
-            </tr>
-            <tr>
-              <td> Publick Key </td>
-              <td style="word-wrap: break-word;"> <%= user.pk %> </td>
-            </tr>
-            <%= for claim_id <- AbtDidWorkshop.AppState.get().claims["profile"] do %>
-              <tr>
-                <td>
-                  <%= claim_id %>
-                </td>
-                <td text-align="right">
-                  <%= user.profile[claim_id] %>
-                </td>
-              </tr>
-            <% end %>
-            <%= for agr <- user.agreement do %>
-            <tr>
-              <td colspan="2">
-                <table style="font-size: smaller; table-layout: fixed;">
-                  <tr>
-                    <td style="width: 30%">Hash</td>
-                    <td style="word-wrap: break-word;"><%= agr["hash"]["digest"] %></td>
-                  </tr>
-                  <tr>
-                    <td>URI</td>
-                    <td style="word-wrap: break-word;">
-                    <% uri = agr["uri"] %>
-                    <a href='<%= uri %>'><%= uri %></a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Agreed?</td>
-                    <td style="word-wrap: break-word;">
-                      <%= if agr["agreed"] || agr["agree"] do %>
-                        true
-                      <% else %>
-                        false
-                      <% end %>
-                    </td>
-                  </tr>
-                  <%= if agr["agreed"] || agr["agree"] do %>
-                  <tr>
-                    <td> Signature </td>
-                    <td style="word-wrap: break-word;"> <%= agr["sig"] %> </td>
-                  </tr>
-                  <% end %>
-                </table>
-              </td>
-            </tr>
-            <% end %>
-          </table>
-        </span>
-      </div>
-    </li>
-    <% end %>
-  </ul>
-<% end %>
