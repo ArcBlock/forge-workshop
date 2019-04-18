@@ -3,52 +3,70 @@
     alert("<%= @conn.assigns[:alert] %>")
   </script>
 <% end %>
-<br>
-<section class="row">
-  <b>Configur the metadata for your application.</b>
-</section>
-<%= form_for @changeset, Routes.did_path(@conn, :upsert_app_state), fn f -> %>
-  <%= text_input(f, :sk, type: "hidden") %>
-  <%= text_input(f, :pk, type: "hidden") %>
-  <%= text_input(f, :did, type: "hidden") %>
-  <section class="column">
-    <div class="form-group">
-        <p>
-          <%= text_input(f, :name) %>
-          <%= error_tag(f, :name) %>
-          <label> <span>Application name</span></label>
-        </p>
-        <p>
-          <%= text_input(f, :subtitle) %>
-          <%= error_tag(f, :subtitle) %>
-          <label><span>Subtitle</span></label>
-        </p>
-        <p>
-          <%= text_input(f, :description) %>
-          <%= error_tag(f, :description) %>
-          <label><span>Description</span></label>
-        </p>
-        <p>
-          <%= text_input(f, :icon) %>
-          <%= error_tag(f, :icon) %>
-          <label><span>Icon</span></label>
-        </p>
-        <p>
-          <%= text_input(f, :copyright) %>
-          <%= error_tag(f, :copyright) %>
-          <label><span>Copyright</span></label>
-        </p>
-        <p>
-          <%= text_input(f, :publisher) %>
-          <%= error_tag(f, :publisher) %>
-          <label><span>Publisher</span></label>
-        </p>
-        <p>
-          <%= text_input(f, :path) %>
-          <%= error_tag(f, :path) %>
-          <label><span>Deeplink path</span></label>
-      </p>
+
+<div class="row">
+  <div class="col s8 pull-s4">
+    <div class="section">
+      <h5 class="page-header">Configur the metadata for your application</h5>
+      <%= form_for @changeset, Routes.did_path(@conn, :upsert_app_state), fn f -> %>
+        <%= text_input(f, :sk, type: "hidden") %>
+        <%= text_input(f, :pk, type: "hidden") %>
+        <%= text_input(f, :did, type: "hidden") %>
+        <div class="row">
+          <div class="input-field col s12">
+            <%= text_input(f, :name) %>
+            <%= error_tag(f, :name) %>
+            <label>Application name</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <%= text_input(f, :subtitle) %>
+            <%= error_tag(f, :subtitle) %>
+            <label>Subtitle</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <%= text_input(f, :description) %>
+            <%= error_tag(f, :description) %>
+            <label>Description</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <%= text_input(f, :icon) %>
+            <%= error_tag(f, :icon) %>
+            <label>Icon</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <%= text_input(f, :copyright) %>
+            <%= error_tag(f, :copyright) %>
+            <label>Copyright</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <%= text_input(f, :publisher) %>
+            <%= error_tag(f, :publisher) %>
+            <label>Publisher</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <%= text_input(f, :path) %>
+            <%= error_tag(f, :path) %>
+            <label>Deeplink path</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col s12 right-align">
+            <%= submit "Submit", class: "btn btn-outlined btn-squared blue-text text-accent-2" %>
+          </div>
+        </div>
+      <% end %>
     </div>
-  </section>
-  <%= submit "SUBMIT", class: "btn btn-primary" %>
-<% end %>
+  </div>
+</div>

@@ -1,3 +1,33 @@
 /* This file is for your main application css. */
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+}
 
-@import "./phoenix.css";
+@import './phoenix.css';
+@import './materialize.css';
+
+.page-header {
+  font-size: 1rem;
+  line-height: 1.71;
+  letter-spacing: 2px;
+  color: #222222;
+  margin-bottom: 24px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.section-header {
+  height: 16px;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  color: #4a4a4a;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 2rem;
+}
