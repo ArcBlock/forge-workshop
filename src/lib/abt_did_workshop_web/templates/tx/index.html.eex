@@ -1,61 +1,102 @@
-<div class="section">
-  <h4> <%= @demo.name %> </h4>
-  <p style="font-size: smaller"> <%= @demo.description %> </p>
-</div>
-
-Transaction list:
-<ul class="collection">
-  <%= for tx <- @txs do %>
-    <li class="collection-item">
+<div class="row">
+  <div class="col s12 m3">
+    <div class="section">
+      <h5 class="page-header"><%= @demo.name %></h5>
       <div class="row">
-        <div class="col s12 m4 l6">
-          <!-- Tx name, description and tx type. -->
-          <h5> <%= tx.name %> </h5>
-          <p style="font-size: smaller"> <%= tx.description %> </p>
-          <%= String.upcase(tx.tx_type) %> <%= tx.id %>
-          <!-- Tx behaviors -->
-          <ul class="collection">
-            <%= for beh <- tx.tx_behaviors do %>
-              <li class="collection-item" style="font-size: smaller"> 
-                <div class="row">
-                  <div class="col s12 m12">
-                    <%= beh.behavior %>
-                  </div>
-                  <%= if beh.token != nil do %>
-                    <div class="col s12 m12 l4"> <%= beh.token %> TBA </div>
-                  <% end %>
-                  <%= if beh.asset != nil and beh.asset != "" do %>
-                    <div class="col s12 m12 l4"> <%= beh.asset %></div>
-                  <% end %>
-                  <%= if beh.function != nil and beh.function != "" do %>
-                    <div class="col s12 m12 l4"> <%= beh.function %></div>
-                  <% end %>
-                </div>
-              </li>
-            <% end %>
-          </ul>
-        </div>
-        <!-- QR Code -->
-        <div class="col s12 m8 l6">
-          <input id='<%= "qrValue_#{tx.id}" %>' type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink(@demo.id, tx.id) %>"></input>
-          <div align="center">
-            <canvas id='<%= "canvas_#{tx.id}" %>'></canvas>
-          </div>
+        <div class="input-field col s12">
+          <p><%= @demo.name %></p>
+          <label>Name</label>
         </div>
       </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <p><%= @demo.subtitle %></p>
+          <label>Subtitle</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <p><%= @demo.description %></p>
+          <label>Description</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <p><%= @demo.icon %></p>
+          <label>Icon URL</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <p><%= @demo.path %></p>
+          <label>Deep Link Path</label>
+        </div>
+      </div>
+    <div class="row">
+      <div class="col s12">
+        <a class="btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" href="/demo/1/edit">Edit</a>
+      </div>
+    </div>
+    </div>
+  </div>
+  <div class="col s12 m8 offset-m1">
+    <div class="section">
+      <h5 class="page-header">Transaction List</h5>
+      <ul class="collection">
+        <%= for tx <- @txs do %>
+          <li class="collection-item">
+            <div class="row">
+              <div class="col s12 m4 l6">
+                <!-- Tx name, description and tx type. -->
+                <h5> <%= tx.name %> </h5>
+                <p style="font-size: smaller"> <%= tx.description %> </p>
+                <%= String.upcase(tx.tx_type) %> <%= tx.id %>
+                <!-- Tx behaviors -->
+                <ul class="collection">
+                  <%= for beh <- tx.tx_behaviors do %>
+                    <li class="collection-item" style="font-size: smaller">
+                      <div class="row">
+                        <div class="col s12 m12">
+                          <%= beh.behavior %>
+                        </div>
+                        <%= if beh.token != nil do %>
+                          <div class="col s12 m12 l4"> <%= beh.token %> TBA </div>
+                        <% end %>
+                        <%= if beh.asset != nil and beh.asset != "" do %>
+                          <div class="col s12 m12 l4"> <%= beh.asset %></div>
+                        <% end %>
+                        <%= if beh.function != nil and beh.function != "" do %>
+                          <div class="col s12 m12 l4"> <%= beh.function %></div>
+                        <% end %>
+                      </div>
+                    </li>
+                  <% end %>
+                </ul>
+              </div>
+              <!-- QR Code -->
+              <div class="col s12 m8 l6">
+                <input id='<%= "qrValue_#{tx.id}" %>' type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink(@demo.id, tx.id) %>"></input>
+                <div align="center">
+                  <canvas id='<%= "canvas_#{tx.id}" %>'></canvas>
+                </div>
+              </div>
+            </div>
 
-      <div class="row" style: "font-size: smaller">
-        <div class="col s8"></div>
-        <div class="col s2">
-          <%= link("Edit", to: Routes.tx_path(@conn, :edit, tx, demo_id: @demo.id)) %>
-        </div>
-        <div class="col s2">
-          <%= link("Delete", to: Routes.tx_path(@conn, :delete, tx, demo_id: @demo.id), method: :delete) %>
-        </div>
-      </div>    
-    </li>
-  <% end %>
-</ul>
+            <div class="row" style: "font-size: smaller">
+              <div class="col s8"></div>
+              <div class="col s2">
+                <%= link("Edit", to: Routes.tx_path(@conn, :edit, tx, demo_id: @demo.id)) %>
+              </div>
+              <div class="col s2">
+                <%= link("Delete", to: Routes.tx_path(@conn, :delete, tx, demo_id: @demo.id), method: :delete) %>
+              </div>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>
 
 <div class="fixed-action-btn">
   <%= link(to: Routes.tx_path(@conn, :new, demo_id: @demo.id), class: "btn-floating btn-large waves-effect waves-light red") do %>
