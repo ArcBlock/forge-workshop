@@ -8,8 +8,8 @@ use Mix.Config
 # with webpack to recompile .js and .css sources.
 config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
   server: true,
-  url: [host: "did-workshop.arcblock.co", port: 80],
-  http: [port: 80],
+  url: [host: "did-workshop.arcblock.co", port: 4000],
+  http: [port: 4000],
   debug_errors: true,
   check_origin: false
 
