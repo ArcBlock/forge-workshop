@@ -1,5 +1,5 @@
 <div class="info-panel">
-  <h5 class="page-header">Authentication</h5>
+  <h5 class="page-header"><i class="material-icons">person_outline</i>Login Application With ABT Wallet</h5>
   <div class="row">
     <div class="col s12 m9">
       <h6 class="app-name"><%= @app_state.name %></h6>
@@ -12,25 +12,25 @@
         </p>
       </div>
       <div class="app-key">
-        DID (Base58BTC Encoding):
+        DID (base58_btc encoding):
         <p class="info-text"><%= Multibase.encode!(@app_state.did, :base58_btc) %></p>
       </div>
       <div class="app-key">
-        DID Public Key (Base58BTC Encoding):
+        DID Public Key (base58_btc encoding):
         <p class="info-text"><%= Multibase.encode!(@app_state.pk, :base58_btc) %></p>
       </div>
       <div class="app-key">
-        DID Secret Key (Base58BTC Encoding):
+        DID Secret Key (base58_btc encoding):
         <p class="info-text"><%= Multibase.encode!(@app_state.sk, :base58_btc) %></p>
       </div>
     </div>
     <div class="col s12 m3">
       <div class="app-actions">
         <%= form_for @conn, Routes.did_path(@conn, :show), [method: "get"], fn _ -> %>
-          <button type="submit" class="btn-floating btn-flat blue waves-effect"><i class="material-icons">edit</i></button>
+          <button type="submit" class="btn-floating btn-flat blue waves-effect tooltipped" data-position="top" data-tooltip="Update application claims"><i class="material-icons">edit</i></button>
         <% end %>
         <%= form_for @conn, Routes.did_path(@conn, :start_over), fn _ -> %>
-          <button type="submit" class="btn-floating btn-flat red waves-effect"><i class="material-icons">delete</i></button>
+          <button type="submit" class="btn-floating btn-flat red waves-effect tooltipped" data-position="top" data-tooltip="Delete this application"><i class="material-icons">delete</i></button>
         <% end %>
       </div>
       <div class="auth-qrcode">

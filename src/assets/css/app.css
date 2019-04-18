@@ -25,6 +25,12 @@ a {
   margin-bottom: 3rem;
   font-weight: 500;
   text-transform: uppercase;
+  display: flex;
+  align-items: center;
+}
+
+.page-header i {
+  margin-right: 1rem;
 }
 
 .step-badge {

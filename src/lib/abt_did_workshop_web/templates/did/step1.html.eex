@@ -6,24 +6,24 @@
         <div class="row">
           <div class="input-field col s12">
             <%= select f, :role_type, ["account", "node", "device", "application", "smart_contract", "bot", "asset", "stake", "validator", "group"], selected: "application" %>
-            <label>DID type</label>
+            <label>DID Type</label>
           </div>
         </div>
         <div class="row">
           <div class="input-field col s12">
             <%= select f, :key_type, ["ed25519", "secp256k1"] %>
-            <label>DSA algorithm</label>
+            <label>DSA Algorithm</label>
           </div>
         </div>
         <div class="row">
           <div class="input-field col s12">
             <%= select f, :hash_type, ["keccak", "sha3", "keccak_384", "sha3_384", "keccak_512", "sha3_512"], selected: "sha3" %>
-            <label>Hash function</label>
+            <label>Hash Function</label>
           </div>
         </div>
         <div class="row">
           <div class="col s12 right-align">
-            <%= submit "Generate", class: "btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" %>
+            <%= submit "Generate Application DID", class: "btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" %>
           </div>
         </div>
     <% end %>

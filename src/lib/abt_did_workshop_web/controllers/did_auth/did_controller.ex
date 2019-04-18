@@ -10,7 +10,7 @@ defmodule AbtDidWorkshopWeb.DidController do
   def index(conn, _params) do
     case AppState.get() do
       nil -> render(conn, "step1.html")
-      state -> render(conn, "show.html", app_state: state, users: UserDb.get_all(), info: "Application DID Already Generated!")
+      state -> render(conn, "show.html", app_state: state, users: UserDb.get_all(), info: "Application already generated!")
     end
   end
 
@@ -25,7 +25,7 @@ defmodule AbtDidWorkshopWeb.DidController do
         render(conn, "step2.html", error: "Please configure meta data for application.")
 
       true ->
-        render(conn, "show.html", app_state: app_state, users: UserDb.get_all())
+        render(conn, "show.html", app_state: app_state, users: UserDb.get_all(), info: "Application succesfully created!")
     end
   end
 
