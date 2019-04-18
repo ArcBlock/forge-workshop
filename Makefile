@@ -36,7 +36,8 @@ dep:
 
 pre-build: install dep
 	@echo "Running scripts before the build..."
-	@cd src/assets; npm install; ./node_modules/.bin/webpack;
+	@cd src/assets; npm install; npm run deploy;
+	@cd src; mix phx.digest
 
 post-build:
 	@echo "Running scripts after the build is done..."

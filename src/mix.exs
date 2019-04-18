@@ -52,6 +52,7 @@ defmodule AbtDidWorkshop.MixProject do
       {:ecto, "~> 2.2"},
       {:postgrex, "~> 0.13"},
       {:sqlite_ecto2, git: "https://github.com/tyrchen/sqlite_ecto2"},
+      {:esqlite, git: "https://github.com/dingpl716/esqlite", override: true},
 
       # Common tools
       {:gettext, "~> 0.11"},

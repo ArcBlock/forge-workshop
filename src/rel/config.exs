@@ -1,3 +1,4 @@
+version = AbtDidWorkshop.MixProject.get_version()
 otp_version = AbtDidWorkshop.MixProject.get_otp_version()
 
 # Import all plugins from `rel/plugins`
@@ -36,14 +37,14 @@ environment :dev do
 end
 
 environment :staging do
-  set(include_erts: "/tmp/esl_otp_#{otp_version}/usr/lib/erlang")
+  set(include_erts: true)
   set(include_src: false)
   set(cookie: :"$S9]!!WH@hvS`z[y>wGnY3gXY3t%8HAn::7]W(23C7J]C1qDyh*^M6_nn^J[nw~{")
   set(vm_args: "rel/vm.args")
 end
 
 environment :prod do
-  set(include_erts: "/tmp/esl_otp_#{otp_version}/usr/lib/erlang")
+  set(include_erts: true)
   set(include_src: false)
   set(cookie: :"$S9]!!WH@hvS`z[y>wGnY3gXY3t%8HAn::7]W(23C7J]C1qDyh*^M6_nn^J[nw~{")
   set(vm_args: "rel/vm.args")
@@ -55,7 +56,7 @@ end
 # will be used by default
 
 release :abt_did_workshop do
-  set(version: current_version(:abt_did_workshop))
+  set(version: version)
 
   set(
     applications: [
