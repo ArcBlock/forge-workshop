@@ -1,20 +1,28 @@
-<br>
-<%= form_for @changeset, Routes.tx_path(@conn, :create), fn f -> %>
-  <% init_tx_type = @changeset.data.tx_type || ""%>
-  <%= text_input f, :init_tx_type, value: init_tx_type, type: "hidden" %>
-  <%= text_input f, :demo_id, value: @demo_id, type: "hidden" %>
-  <%= text_input f, :tx_id, value: @tx_id, type: "hidden" %>
-  <div class="form-group">
-    <p>
-      <%= text_input f, :name, placeholder: "Transaction Name", class: "form-control" %>
-    </p>
-    <p>
-      <%= text_input f, :description, placeholder: "Description (will be displayed to wallet user.)" %>
-    </p>
-    <p>
-      <%= select f, :tx_type, ["PokeTx", "TransferTx", "ExchangeTx", "ConsumeAssetTx", "UpdateAssetTx", [key: "Proof of Holding", value: "ProofOfHolding"]], prompt: "Choose your transaction type", id: :tx_type, value: init_tx_type %>
-    </p>
-  </div>
+<div class="section">
+  <h5 class="page-header"><i class="material-icons">control_point</i>Add transaction to Demo Case</h5>
+  <%= form_for @changeset, Routes.tx_path(@conn, :create), fn f -> %>
+    <% init_tx_type = @changeset.data.tx_type || ""%>
+    <%= text_input f, :init_tx_type, value: init_tx_type, type: "hidden" %>
+    <%= text_input f, :demo_id, value: @demo_id, type: "hidden" %>
+    <%= text_input f, :tx_id, value: @tx_id, type: "hidden" %>
+    <div class="row">
+      <div class="input-field col s12">
+        <%= text_input f, :name, placeholder: "Transaction Name", class: "form-control" %>
+        <label>Name</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <%= text_input f, :description, placeholder: "Description (will be displayed to wallet user.)" %>
+        <label>Description</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <%= select f, :tx_type, ["PokeTx", "TransferTx", "ExchangeTx", "ConsumeAssetTx", "UpdateAssetTx", [key: "Proof of Holding", value: "ProofOfHolding"]], prompt: "Choose your transaction type", id: :tx_type, value: init_tx_type %>
+        <label>Transaction Type</label>
+      </div>
+    </div>
 
   <div class="form-group" id="PokeTx">
       <div class="section">
@@ -111,7 +119,7 @@
       </div>
     </div>
   </div>
-  
+
   <div class="form-group" id="UpdateAssetTx">
     <div class="section">
       <h7> UpdateAssetTx </h7>
@@ -163,9 +171,11 @@
       </div>
     </div>
   </div>
-  <p>
-    <%= submit "Save Demo", class: "btn btn-primary" %>
-  </p>
+  <div class="row">
+    <div class="col s12 right-align">
+      <%= submit "Create Transaction", class: "btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" %>
+    </div>
+  </div>
 <% end %>
 
 <script>
