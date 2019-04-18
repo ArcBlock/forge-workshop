@@ -157,6 +157,16 @@ defmodule AbtDidWorkshop.TxUtil do
     )
   end
 
+  def robert_offer(robert, user, token, title) do
+    offer_asset = gen_asset(robert, user.address, title)
+    sender = Map.merge(robert, %{token: token, asset: offer_asset})
+
+    "TransferTx"
+    |> get_transaction_to_sign(sender, user)
+    |> sign_tx(robert)
+    |> send_tx()
+  end
+
   defp do_require_signature(tx, description) do
     tx_data = Transaction.encode(tx)
     did_type = AbtDid.get_did_type(tx.from)
