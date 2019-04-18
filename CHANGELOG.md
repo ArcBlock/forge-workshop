@@ -1,3 +1,6 @@
+## 0.3.4 (April 17, 2019)
+  - Use port 80 for staging.
+
 ## 0.3.2 (April 17, 2019)
   - Use local erts.
   - Use forked esqlite.
