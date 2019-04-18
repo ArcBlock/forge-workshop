@@ -7,7 +7,6 @@ body {
   font-size: 16px;
 }
 
-@import './phoenix.css';
 @import './materialize.css';
 
 .page-header {
@@ -43,4 +42,50 @@ body {
 
 .form-group {
   margin-bottom: 2rem;
+}
+
+.info-panel {
+  border-left: solid 2px #222222;
+  padding-left: 1rem;
+}
+.info-panel .page-header {
+  margin-bottom: 2rem;
+}
+
+/* page-did-show */
+.app-actions,
+.auth-qrcode,
+.auth-open {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.app-subtitle,
+.app-description,
+.app-link,
+.app-sk {
+  font-size: 1rem;
+}
+
+.app-link,
+.app-sk {
+  margin-top: 3rem;
+}
+
+.app-actions form {
+  display: inline-block;
+  margin: 0 1rem 0 0;
+}
+
+.info-text {
+  word-wrap: break-word;
+  color: #4a4a4a;
+}
+
+.auth-qrcode {
+  margin: 2rem 0;
+}
+.auth-qrcode canvas {
+  width: 200px !important;
+  height: 200px !important;
 }

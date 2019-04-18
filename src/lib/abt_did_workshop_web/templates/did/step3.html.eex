@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col s8 pull-s4">
+  <div class="col s12 m8">
     <div class="section">
       <h5 class="page-header"><span class="step-badge">3</span>Choose Application Claims</h5>
       <%= form_for @conn, Routes.did_path(@conn, :upsert_claims), fn f -> %>
