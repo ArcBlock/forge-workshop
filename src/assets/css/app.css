@@ -7,7 +7,15 @@ body {
   font-size: 16px;
 }
 
+a {
+  color: #71b5b2;
+}
+
 @import './materialize.css';
+
+#main {
+  margin-top: 2rem;
+}
 
 .page-header {
   font-size: 1rem;
@@ -52,6 +60,60 @@ body {
   margin-bottom: 2rem;
 }
 
+/* alerts */
+.alert {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 2rem;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.alert .material-icons {
+  margin-right: 1rem;
+  color: inherit;
+}
+
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.alert-success .alert-link {
+  color: #0b2e13;
+}
+
+.alert-info {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+}
+
+.alert-info .alert-link {
+  color: #062c33;
+}
+
+.alert-warning {
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+}
+
+.alert-warning .alert-link {
+  color: #533f03;
+}
+
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.alert-danger .alert-link {
+  color: #491217;
+}
+
 /* page-did-show */
 .app-actions,
 .auth-qrcode,
@@ -63,12 +125,12 @@ body {
 .app-subtitle,
 .app-description,
 .app-link,
-.app-sk {
+.app-key {
   font-size: 1rem;
 }
 
 .app-link,
-.app-sk {
+.app-key {
   margin-top: 3rem;
 }
 

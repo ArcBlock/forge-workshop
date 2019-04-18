@@ -1,9 +1,3 @@
-<%= if @conn.assigns[:alert] != nil do %>
-  <script>
-    alert("<%= @conn.assigns[:alert] %>")
-  </script>
-<% end %>
-
 <div class="row">
   <div class="col s12 m8">
     <div class="section">

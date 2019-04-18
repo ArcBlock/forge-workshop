@@ -10,7 +10,7 @@ defmodule AbtDidWorkshopWeb.DidController do
   def index(conn, _params) do
     case AppState.get() do
       nil -> render(conn, "step1.html")
-      state -> render(conn, "index.html", did: state.did)
+      state -> render(conn, "show.html", app_state: state, users: UserDb.get_all(), info: "Application DID Already Generated!")
     end
   end
 
@@ -19,10 +19,10 @@ defmodule AbtDidWorkshopWeb.DidController do
 
     cond do
       app_state == nil ->
-        render(conn, "step1.html", alert: "You must create an application DID first.")
+        render(conn, "step1.html", error: "You must create an application DID first.")
 
       Map.get(app_state, :name) == nil ->
-        render(conn, "step2.html", alert: "Please configure meta data for application.")
+        render(conn, "step2.html", error: "Please configure meta data for application.")
 
       true ->
         render(conn, "show.html", app_state: app_state, users: UserDb.get_all())
@@ -33,7 +33,7 @@ defmodule AbtDidWorkshopWeb.DidController do
     app_state = AppState.get()
 
     case app_state do
-      nil -> render(conn, "step1.html", alert: "You must create an application DID first.")
+      nil -> render(conn, "step1.html", error: "You must create an application DID first.")
       _ -> render(conn, "step3.html", id: app_state.id)
     end
   end

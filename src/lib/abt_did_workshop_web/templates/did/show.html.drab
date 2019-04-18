@@ -11,11 +11,15 @@
           <a href="<%= AbtDidWorkshop.Util.gen_deeplink(@app_state.id) %>"><%= AbtDidWorkshop.Util.gen_deeplink(@app_state.id) %></a>
         </p>
       </div>
-      <div class="app-sk">
+      <div class="app-key">
+        DID (Base58BTC Encoding):
+        <p class="info-text"><%= Multibase.encode!(@app_state.did, :base58_btc) %></p>
+      </div>
+      <div class="app-key">
         DID Public Key (Base58BTC Encoding):
         <p class="info-text"><%= Multibase.encode!(@app_state.pk, :base58_btc) %></p>
       </div>
-      <div class="app-sk">
+      <div class="app-key">
         DID Secret Key (Base58BTC Encoding):
         <p class="info-text"><%= Multibase.encode!(@app_state.sk, :base58_btc) %></p>
       </div>
