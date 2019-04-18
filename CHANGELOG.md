@@ -1,4 +1,8 @@
 ## 0.3.2 (April 17, 2019)
+  - Use local erts.
+  - Use forked esqlite.
+
+## 0.3.2 (April 17, 2019)
   - Include erts of CentOs when building.
   
 ## 0.3.1 (April 17, 2019)

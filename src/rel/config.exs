@@ -1,3 +1,4 @@
+version = AbtDidWorkshop.MixProject.get_version()
 otp_version = AbtDidWorkshop.MixProject.get_otp_version()
 
 # Import all plugins from `rel/plugins`
@@ -55,7 +56,7 @@ end
 # will be used by default
 
 release :abt_did_workshop do
-  set(version: current_version(:abt_did_workshop))
+  set(version: version)
 
   set(
     applications: [
