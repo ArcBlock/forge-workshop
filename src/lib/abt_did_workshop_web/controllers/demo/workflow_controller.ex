@@ -136,7 +136,15 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
   end
 
   defp reply({:error, :consensus_rpc_error}, conn) do
-    json(conn, %{error: "Consensus error, please try again."})
+    tx = conn.assigns.tx
+
+    error =
+      case tx.tx_type do
+        "PokeTx" -> "Consensus error, you can only poke once a day."
+        _ -> "Consensus error, please try again."
+      end
+
+    json(conn, %{error: error})
   end
 
   defp reply({:error, error}, conn) do
