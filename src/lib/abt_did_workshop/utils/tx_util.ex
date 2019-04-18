@@ -32,7 +32,7 @@ defmodule AbtDidWorkshop.TxUtil do
     %{tx | signatures: [msig | rest]}
   end
 
-  # for TransferTx, UpdateTx, PokeTx
+  # for TransferTx, UpdateAssetTx, PokeTx
   def require_signature(conn, desc) do
     tx = conn.assigns.tx
     robert = conn.assigns.robert
@@ -44,7 +44,7 @@ defmodule AbtDidWorkshop.TxUtil do
     |> do_require_signature(desc)
   end
 
-  # For ExchangeTx, ConsumeTx
+  # For ExchangeTx, ConsumeAssetTx
   def require_multi_sig(conn, desc) do
     tx = conn.assigns.tx
     robert = conn.assigns.robert
@@ -244,7 +244,7 @@ defmodule AbtDidWorkshop.TxUtil do
   end
 
   # User is always the sender.
-  defp prepare_transaction(%{tx_type: "UpdateTx"} = tx, robert, user, asset) do
+  defp prepare_transaction(%{tx_type: "UpdateAssetTx"} = tx, robert, user, asset) do
     update = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "update" end)
     sender = %{address: user.address, pk: user.pk, asset: asset}
     receiver = %{address: robert.address, sk: robert.sk, function: update.function}

@@ -1,3 +1,6 @@
+## 0.3.6 (April 17, 2019)
+  - Fix tx names.
+  
 ## 0.3.5 (April 17, 2019)
   - Use host in QR code.
   
