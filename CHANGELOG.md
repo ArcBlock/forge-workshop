@@ -1,4 +1,5 @@
-## 0.3.8 (April 18, 2019)
+## 0.3.8 (April 19, 2019)
+  - Use abtwallet
   - Add logic to do async offer after update and consume.
 
 ## 0.3.7 (April 18, 2019)
