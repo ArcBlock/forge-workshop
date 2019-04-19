@@ -1,5 +1,5 @@
 <div class="info-panel">
-  <h5 class="page-header"><i class="material-icons">person_outline</i>Login Application With ABT Wallet</h5>
+  <h5 class="page-header"><i class="material-icons">person_outline</i>Application</h5>
   <div class="row">
     <div class="col s12 m9">
       <h6 class="app-name"><%= @app_state.name %></h6>
@@ -12,20 +12,20 @@
         </p>
       </div>
       <div class="app-key">
-        DID (base58_btc encoding):
+        Application DID (base58_btc encoding):
         <p class="info-text"><%= Multibase.encode!(@app_state.did, :base58_btc) %></p>
       </div>
       <div class="app-key">
-        DID Public Key (base58_btc encoding):
+        Application Public Key (base58_btc encoding):
         <p class="info-text"><%= Multibase.encode!(@app_state.pk, :base58_btc) %></p>
       </div>
       <div class="app-key">
-        DID Secret Key (base58_btc encoding):
+        Application Secret Key (base58_btc encoding):
         <p class="info-text"><%= Multibase.encode!(@app_state.sk, :base58_btc) %></p>
       </div>
       <%= if [] != @users do %>
       <div class="app-key">
-        Known users:
+        Known Users:
         <ul class="collapsible expandable">
           <%= for user <- @users do %>
           <li>

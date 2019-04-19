@@ -32,11 +32,6 @@
           <label>Deep Link Path</label>
         </div>
       </div>
-      <div class="row">
-        <div class="col s12">
-          <a class="btn btn-outlined blue-text text-accent-2 waves-effect" href="/demo/1/edit">Edit</a>
-        </div>
-      </div>
     </div>
   </div>
   <div class="col s12 m8 offset-m1">
