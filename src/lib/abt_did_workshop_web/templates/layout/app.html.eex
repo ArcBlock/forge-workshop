@@ -10,12 +10,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   </head>
   <body>
-    <nav>
+    <nav class="nav">
       <div class="nav-wrapper container">
         <a href="/" class="brand-logo">ABT DID Workshop</a>
         <ul class="right hide-on-med-and-down">
-          <li class="active"><a href="/">Application</a></li>
-          <li><a href="/demo">Demo Case</a></li>
+          <li class="menu menu-app"><a href="/">Application</a></li>
+          <li class="menu menu-demo"><a href="/demo">Demo Case</a></li>
         </ul>
       </div>
     </nav>
@@ -42,6 +42,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
       $(document).ready(function () {
+        var pathname = window.location.pathname;
+        if (pathname.indexOf('/demo') === 0 || pathname.indexOf('/tx') === 0) {
+          $('.nav .menu-demo').addClass('active');
+        } else {
+          $('.nav .menu-app').addClass('active');
+        }
         $('select').formSelect();
         $('.collapsible').collapsible();
         $('.tooltipped').tooltip();
