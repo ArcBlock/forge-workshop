@@ -60,7 +60,9 @@ defmodule Client do
         recv_timeout: 80000
       )
 
-    response = Jason.decode!(body)
+    response =
+      body
+      |> Jason.decode!()
 
     handle_response(w, response)
   end

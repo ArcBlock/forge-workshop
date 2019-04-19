@@ -1,3 +1,12 @@
+## 0.3.7 (April 18, 2019)
+  - Return more friendly error message.
+
+## 0.3.6 (April 17, 2019)
+  - Fix tx names.
+  
+## 0.3.5 (April 17, 2019)
+  - Use host in QR code.
+  
 ## 0.3.4 (April 17, 2019)
   - Use port 80 for staging.
 

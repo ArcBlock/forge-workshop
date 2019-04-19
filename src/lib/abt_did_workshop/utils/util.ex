@@ -2,6 +2,7 @@ defmodule AbtDidWorkshop.Util do
   @moduledoc false
 
   alias AbtDidWorkshop.{AppState, Demo, Repo, Util}
+  alias AbtDidWorkshopWeb.Endpoint
   alias AbtDidWorkshopWeb.Router.Helpers, as: Routes
 
   def expand_icon_path(conn, icon) do
@@ -26,25 +27,30 @@ defmodule AbtDidWorkshop.Util do
   end
 
   def get_ip do
-    {:ok, ip_list} = :inet.getif()
-    list = Enum.filter(ip_list, fn {_ip, broadcast, _netmask} -> broadcast != :undefined end)
-    result = Enum.find(list, fn {ip, _, _} -> elem(ip, 0) == 192 or elem(ip, 0) == 10 end)
+    host = config([Endpoint, :url, :host])
 
-    {ip, _, _} =
-      case result do
-        nil -> List.first(list)
-        _ -> result
-      end
+    case host do
+      h when h in [nil, "localhost", "127.0.0.1"] ->
+        {:ok, ip_list} = :inet.getif()
+        list = Enum.filter(ip_list, fn {_ip, broadcast, _netmask} -> broadcast != :undefined end)
+        result = Enum.find(list, fn {ip, _, _} -> elem(ip, 0) == 192 or elem(ip, 0) == 10 end)
 
-    {i1, i2, i3, i4} = ip
-    "#{i1}.#{i2}.#{i3}.#{i4}"
+        {ip, _, _} =
+          case result do
+            nil -> List.first(list)
+            _ -> result
+          end
+
+        {i1, i2, i3, i4} = ip
+        "#{i1}.#{i2}.#{i3}.#{i4}"
+
+      _ ->
+        host
+    end
   end
 
-  def config([first | rest]),
-    do: :abt_did_workshop |> Application.get_env(first) |> get_in(rest)
-
-  def config(key),
-    do: :abt_did_workshop |> Application.get_env(key)
+  def config([first | rest]), do: :abt_did_workshop |> Application.get_env(first) |> get_in(rest)
+  def config(key), do: :abt_did_workshop |> Application.get_env(key)
 
   def get_port do
     case config([AbtDidWorkshopWeb.Endpoint, :http, :port]) do
