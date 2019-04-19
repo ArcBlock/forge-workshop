@@ -46,7 +46,7 @@ a {
 }
 
 .page-header i {
-  margin-right: 1rem;
+  margin-right: 0.5rem;
 }
 
 .step-badge {
@@ -71,7 +71,7 @@ a {
 }
 
 .info-panel {
-  border-left: solid 2px #222222;
+  border-left: solid 1px #222222;
   padding-left: 1rem;
 }
 .info-panel .page-header {
@@ -171,4 +171,29 @@ a {
 .auth-qrcode canvas {
   width: 200px !important;
   height: 200px !important;
+}
+
+/* demo list */
+.demo-case {
+  margin-bottom: 3rem;
+}
+.demo-case .demo-name {
+  margin-bottom: 1rem;
+}
+
+.demo-case .demo-txs .demo-tx {
+  padding-left: 1rem;
+  list-style: inside disc;
+  font-size: 0.9rem;
+  color: #4a4a4a;
+}
+
+.demo-actions {
+  display: flex;
+  align-items: center;
+}
+
+.demo-actions form {
+  display: inline-block;
+  margin: 0 1rem 0 0;
 }

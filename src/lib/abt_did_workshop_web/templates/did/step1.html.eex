@@ -26,7 +26,7 @@
             <%= submit "Generate Application DID", class: "btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" %>
           </div>
         </div>
-    <% end %>
+      <% end %>
     </div>
   </div>
 </div>

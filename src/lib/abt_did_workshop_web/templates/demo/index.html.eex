@@ -1,47 +1,38 @@
 <div class="row">
   <div class="col s12 m7">
     <div class="section">
-      <h5 class="page-header">Demo Cases</h5>
-      <ul class="collection">
+      <h5 class="page-header"><i class="material-icons">videocam</i>Demo Cases</h5>
+      <div class="demo-cases">
         <%= for demo <- @demos do %>
-          <li class="collection-item">
+          <div class="demo-case info-panel">
             <div class="row">
-              <div class="col s5">
-                <div>
-                  <%= link(demo.name, to: Routes.tx_path(@conn, :index, demo_id: demo.id)) %>
-                </div>
-                <br>
-                <div style="font-size: small">
-                  <%= demo.description %>
-                </div>
-              </div>
-
-              <div class="col s6">
+              <div class="col s9">
+                <h6 class="demo-name page-header"><%= link(demo.name, to: Routes.tx_path(@conn, :index, demo_id: demo.id)) %></h6>
+                <p style="demo-description"><%= demo.description %></p>
                 <%= if demo.txs != [] do %>
-                  <ul class="collection">
+                  <ul class="demo-txs">
                     <%= for tx <- demo.txs do %>
-                      <li class="collection-item" style="font-size: smaller">
+                      <li class="demo-tx">
                         <%= tx.name %>
                       </li>
                     <% end %>
                   </ul>
                 <% end %>
               </div>
-              <div class="col s1"></div>
-            </div>
-
-            <div class="row" style="font-size: smaller">
-              <div class="col s8"></div>
-              <div class="col s2">
-                <%= link("Edit", to: Routes.demo_path(@conn, :edit, demo)) %>
+              <div class="col s3">
+                <div class="demo-actions">
+                  <%= form_for @conn, Routes.demo_path(@conn, :edit, demo), [method: "get"], fn _ -> %>
+                    <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Update demo case"><i class="material-icons">edit</i></button>
+                  <% end %>
+                  <%= form_for @conn, Routes.demo_path(@conn, :delete, demo, [method: :delete]), fn _ -> %>
+                    <button type="submit" class="btn-floating btn-flat btn-small red waves-effect tooltipped" data-position="top" data-tooltip="Delete demo case"><i class="material-icons">delete</i></button>
+                  <% end %>
+                </div>
               </div>
-              <div class="col s2">
-                <%= link("Delete", to: Routes.demo_path(@conn, :delete, demo), method: :delete) %>
-              </div>
             </div>
-          </li>
+          </div>
         <% end %>
-      </ul>
+      </div>
     </div>
   </div>
   <div class="col s12 m4 offset-m1">
@@ -69,19 +60,19 @@
       </div>
       <div class="row">
         <div class="input-field col s12">
-          <%= text_input f, :icon, placeholder: "Icon url, default value: #{AbtDidWorkshop.Util.config([:app_info, :icon])}" %>
+          <%= text_input f, :icon, placeholder: "#{AbtDidWorkshop.Util.config([:app_info, :icon])}" %>
           <label>Icon URL</label>
         </div>
       </div>
       <div class="row">
         <div class="input-field col s12">
-          <%= text_input f, :path, placeholder: "Deep link path, default value: #{AbtDidWorkshop.Util.config(:deep_link_path)}" %>
+          <%= text_input f, :path, placeholder: "#{AbtDidWorkshop.Util.config(:deep_link_path)}" %>
           <label>Deep Link Path</label>
         </div>
       </div>
       <div class="row">
         <div class="col s12 right-align">
-          <%= submit "Create New Demo Case", class: "btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" %>
+          <%= submit "Create", class: "btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" %>
         </div>
       </div>
       <% end %>
