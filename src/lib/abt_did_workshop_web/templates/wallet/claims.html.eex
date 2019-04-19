@@ -41,17 +41,15 @@
     </div>
   </div>
   <div class="col s12 m7 offset-m1">
-    <div class="section">
-      <h5 class="page-header"><i class="material-icons">folder_shared</i>Requested Claims</h5>
       <%= form_for @conn, Routes.wallet_path(@conn, :response_auth), fn f -> %>
-        <div class="form-group">
-          <%= text_input(f, :sk, value: @sk, type: "hidden") %>
-          <%= text_input(f, :pk, value: @pk, type: "hidden") %>
-          <%= text_input(f, :did, value: @did, type: "hidden") %>
-          <%= text_input(f, :url, value: @url, type: "hidden") %>
-        </div>
+        <%= text_input(f, :sk, value: @sk, type: "hidden") %>
+        <%= text_input(f, :pk, value: @pk, type: "hidden") %>
+        <%= text_input(f, :did, value: @did, type: "hidden") %>
+        <%= text_input(f, :url, value: @url, type: "hidden") %>
+
         <%= if @profile != nil do %>
-          <h6 class="section-header"><%= @profile["meta"]["description"] %></h6>
+        <div class="section">
+          <h5 class="page-header"><span class="step-badge">1</span>Profile Information</h5>
           <%= for item <- @profile["items"] do %>
             <div class="row">
               <div class="input-field col s12">
@@ -60,9 +58,12 @@
               </div>
             </div>
           <% end %>
+        </div>
         <% end %>
+
         <%= if @agreements != [] do %>
-          <h6 class="section-header">Agreements required to login:</h6>
+        <div class="section">
+          <h5 class="page-header"><span class="step-badge">2</span>Agreements</h5>
           <%= for agr <- @agreements do %>
             <div class="row">
               <div class="col s12">
@@ -76,7 +77,9 @@
               </div>
             </div>
           <% end %>
+        </div>
         <% end %>
+
         <div class="row">
           <div class="col s12 right-align">
             <%= submit "Authorize & Login", class: "btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" %>
