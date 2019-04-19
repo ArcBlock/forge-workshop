@@ -108,7 +108,7 @@
       </div>
       <div class="auth-open">
         <%= form_for @conn, Routes.wallet_path(@conn, :index), [method: "get", target: "_blank"], fn _ -> %>
-          <%= submit "Try in wallet", class: "btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" %>
+          <%= submit "Login with Web Wallet", class: "btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" %>
         <% end %>
       </div>
     </div>

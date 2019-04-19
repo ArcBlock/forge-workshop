@@ -65,10 +65,14 @@
           <h6 class="section-header">Agreements required to login:</h6>
           <%= for agr <- @agreements do %>
             <div class="row">
-              <div class="input-field col s12">
-                <%= checkbox f, "agreement_" <> agr["meta"]["id"] %>
-                <label>Agree</label>
-                <a href='<%= agr["uri"] %>'> <%= agr["meta"]["description"] %></a>
+              <div class="col s12">
+                <label>
+                  <%= checkbox f, "agreement_" <> agr["meta"]["id"] %>
+                  <span>
+                    Agree
+                    <a href='<%= agr["uri"] %>'> <%= agr["meta"]["description"] %></a>
+                  </span>
+                </label>
               </div>
             </div>
           <% end %>

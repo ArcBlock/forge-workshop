@@ -10,7 +10,7 @@ defmodule AbtDidWorkshopWeb.DidController do
   def index(conn, _params) do
     case AppState.get() do
       nil -> render(conn, "step1.html")
-      state -> render(conn, "show.html", app_state: state, users: UserDb.get_all(), info: "Application already generated!")
+      state -> render(conn, "show.html", app_state: state, users: UserDb.get_all())
     end
   end
 
@@ -19,13 +19,19 @@ defmodule AbtDidWorkshopWeb.DidController do
 
     cond do
       app_state == nil ->
-        render(conn, "step1.html", error: "You must create an application DID first.")
+        conn
+          |> put_flash(:error, "You must create an application DID first.")
+          |> render("step1.html")
 
       Map.get(app_state, :name) == nil ->
-        render(conn, "step2.html", error: "Please configure meta data for application.")
+        conn
+          |> put_flash(:error, "Please configure meta data for application.")
+          |> render("step2.html")
 
       true ->
-        render(conn, "show.html", app_state: app_state, users: UserDb.get_all(), info: "Application succesfully created!")
+        conn
+          |> put_flash(:info, "Application succesfully created!")
+          |> render("show.html", app_state: app_state, users: UserDb.get_all())
     end
   end
 
@@ -33,7 +39,9 @@ defmodule AbtDidWorkshopWeb.DidController do
     app_state = AppState.get()
 
     case app_state do
-      nil -> render(conn, "step1.html", error: "You must create an application DID first.")
+      nil ->
+        put_flash(conn, :error, "You must create an application DID first.")
+        render(conn, "step1.html")
       _ -> render(conn, "step3.html", id: app_state.id)
     end
   end
@@ -41,7 +49,10 @@ defmodule AbtDidWorkshopWeb.DidController do
   def start_over(conn, _) do
     AppState.delete()
     UserDb.clear()
-    redirect(conn, to: "/")
+
+    conn
+    |> put_flash(:info, "Application state was reset!")
+    |> redirect(to: "/")
   end
 
   def create_did(conn, params) do
