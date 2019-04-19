@@ -13,6 +13,16 @@ a {
 
 @import './materialize.css';
 
+/* Rewrite */
+.collapsible {
+  box-shadow: 0 0 0 0 transparent;
+}
+
+.collapsible-header {
+  background: transparent;
+}
+
+/* Application */
 #main {
   margin-top: 2rem;
 }
