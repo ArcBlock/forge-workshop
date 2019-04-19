@@ -4,7 +4,6 @@ defmodule AbtDidWorkshop.TxUtil do
   alias AbtDidWorkshop.AssetUtil
 
   alias ForgeAbi.{
-    ConsumeAssetTx,
     ExchangeInfo,
     ExchangeTx,
     Multisig,
@@ -190,8 +189,8 @@ defmodule AbtDidWorkshop.TxUtil do
   defp do_require_multi_sig(tx, user, description, asset)
        when is_binary(asset) or is_nil(asset) do
     msig =
-      case tx.itx.__struct__ do
-        ConsumeAssetTx ->
+      case tx.itx.type_url do
+        "fg:t:consume_asset" ->
           Multisig.new(
             signer: user.address,
             pk: user.pk,
