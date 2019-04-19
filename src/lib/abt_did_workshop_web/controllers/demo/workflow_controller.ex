@@ -83,6 +83,7 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
         claim["origin"]
         |> TxUtil.assemble_sig(claim["sig"])
         |> TxUtil.send_tx()
+        |> async_offer(conn, RequireSig)
         |> reply(conn)
     end
   end
@@ -103,20 +104,47 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
         claim["origin"]
         |> TxUtil.assemble_multi_sig(claim["sig"])
         |> TxUtil.send_tx()
+        |> async_offer(conn, RequireMultiSig)
         |> reply(conn)
     end
   end
 
+  defp async_offer(result, conn, currentStep) do
+    tx = conn.assigns.tx
+    workflow = gen_workflow(tx)
+    {_, rest} = get_step(workflow, currentStep)
+
+    case rest do
+      [%GenOffer{token: token, title: title} | _] -> do_async_offer(result, conn, token, title)
+      _ -> result
+    end
+  end
+
+  defp do_async_offer({:ok, %{hash: hash}} = result, conn, token, title) do
+    Task.async(fn ->
+      Process.sleep(10_000)
+      tx = ForgeSdk.get_tx(hash: hash)
+
+      if tx != nil && tx.code == 0 do
+        robert = conn.assigns.robert
+        user = conn.assigns.user
+
+        robert
+        |> TxUtil.robert_offer(user, token, title)
+      end
+    end)
+
+    result
+  end
+
+  defp do_async_offer(result, _, _, _), do: result
+
   defp reply_step(conn, [%GenOffer{token: token, title: title} | _]) do
     robert = conn.assigns.robert
     user = conn.assigns.user
-    offer_asset = TxUtil.gen_asset(robert, user.address, title)
-    sender = Map.merge(robert, %{token: token, asset: offer_asset})
 
-    "TransferTx"
-    |> TxUtil.get_transaction_to_sign(sender, user)
-    |> TxUtil.sign_tx(robert)
-    |> TxUtil.send_tx()
+    robert
+    |> TxUtil.robert_offer(user, token, title)
     |> reply(conn)
   end
 
