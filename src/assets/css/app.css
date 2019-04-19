@@ -60,16 +60,21 @@ a {
   margin-bottom: 1rem;
 }
 
-.form-group {
-  margin-bottom: 2rem;
-}
-
 .info-panel {
   border-left: solid 2px #222222;
   padding-left: 1rem;
 }
 .info-panel .page-header {
   margin-bottom: 2rem;
+}
+
+.info-text {
+  word-wrap: break-word;
+  color: #4a4a4a;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
 }
 
 /* alerts */
@@ -148,11 +153,6 @@ a {
 .app-actions form {
   display: inline-block;
   margin: 0 1rem 0 0;
-}
-
-.info-text {
-  word-wrap: break-word;
-  color: #4a4a4a;
 }
 
 .auth-qrcode {
