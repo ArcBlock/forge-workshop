@@ -8,7 +8,7 @@
       <div class="app-link">
         Deep Link:
         <p class="info-text">
-          <a href="<%= AbtDidWorkshop.Util.gen_deeplink(@app_state.id) %>"><%= AbtDidWorkshop.Util.gen_deeplink(@app_state.id) %></a>
+          <a href="<%= AbtDidWorkshop.Util.gen_deeplink(@app_state.id) %>" target="_blank"><%= AbtDidWorkshop.Util.gen_deeplink(@app_state.id) %></a>
         </p>
       </div>
       <div class="app-key">
@@ -95,7 +95,7 @@
     </div>
     <div class="col s12 m3">
       <div class="app-actions">
-        <%= form_for @conn, Routes.did_path(@conn, :show), [method: "get"], fn _ -> %>
+        <%= form_for @conn, Routes.did_path(@conn, :reselect_claims), [method: "get"], fn _ -> %>
           <button type="submit" class="btn-floating btn-flat blue waves-effect tooltipped" data-position="top" data-tooltip="Update application claims"><i class="material-icons">edit</i></button>
         <% end %>
         <%= form_for @conn, Routes.did_path(@conn, :start_over), fn _ -> %>
@@ -108,7 +108,7 @@
       </div>
       <div class="auth-open">
         <%= form_for @conn, Routes.wallet_path(@conn, :index), [method: "get", target: "_blank"], fn _ -> %>
-          <%= submit "Try in wallet", class: "btn btn-outlined blue-text text-accent-2 waves-effect" %>
+          <%= submit "Try in wallet", class: "btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" %>
         <% end %>
       </div>
     </div>
