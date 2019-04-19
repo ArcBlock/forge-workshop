@@ -180,6 +180,9 @@ a {
 .demo-case .demo-name {
   margin-bottom: 1rem;
 }
+.demo-case .demo-name a {
+  font-weight: 700;
+}
 
 .demo-case .demo-txs .demo-tx {
   padding-left: 1rem;
