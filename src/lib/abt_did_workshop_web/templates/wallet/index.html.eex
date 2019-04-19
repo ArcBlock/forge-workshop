@@ -31,7 +31,7 @@
         </div>
         <div class="row">
           <div class="col s12 right-align">
-            <%= submit "Try Login", class: "btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" %>
+            <%= submit "Try Login", class: "btn btn-outlined lue-text text-accent-2 waves-effect" %>
           </div>
         </div>
       <% end %>

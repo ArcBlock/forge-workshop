@@ -20,7 +20,7 @@
                 <% end %>
               </div>
               <div class="col s3">
-                <div class="demo-actions">
+                <div class="action-buttons">
                   <%= form_for @conn, Routes.demo_path(@conn, :edit, demo), [method: "get"], fn _ -> %>
                     <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Update demo case"><i class="material-icons">edit</i></button>
                   <% end %>
@@ -72,7 +72,7 @@
       </div>
       <div class="row">
         <div class="col s12 right-align">
-          <%= submit "Create", class: "btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" %>
+          <%= submit "Create", class: "btn btn-outlined blue-text text-accent-2 waves-effect" %>
         </div>
       </div>
       <% end %>

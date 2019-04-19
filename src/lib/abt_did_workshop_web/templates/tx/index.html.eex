@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col s12 m3">
     <div class="section">
-      <h5 class="page-header"><%= @demo.name %></h5>
+      <h5 class="page-header"><i class="material-icons">info</i>Demo Detail</h5>
       <div class="row">
         <div class="input-field col s12">
           <p><%= @demo.name %></p>
@@ -32,87 +32,72 @@
           <label>Deep Link Path</label>
         </div>
       </div>
-    <div class="row">
-      <div class="col s12">
-        <a class="btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" href="/demo/1/edit">Edit</a>
+      <div class="row">
+        <div class="col s12">
+          <a class="btn btn-outlined blue-text text-accent-2 waves-effect" href="/demo/1/edit">Edit</a>
+        </div>
       </div>
-    </div>
     </div>
   </div>
   <div class="col s12 m8 offset-m1">
     <div class="section">
-      <h5 class="page-header">Transaction List</h5>
-      <ul class="collection">
+      <h5 class="page-header"><i class="material-icons">view_list</i>Transaction List</h5>
+      <div class="txs">
         <%= for tx <- @txs do %>
-          <li class="collection-item">
+          <div class="tx info-panel">
             <div class="row">
-              <div class="col s12 m4 l6">
-                <!-- Tx name, description and tx type. -->
-                <h5> <%= tx.name %> </h5>
-                <p style="font-size: smaller"> <%= tx.description %> </p>
-                <%= String.upcase(tx.tx_type) %> <%= tx.id %>
-                <!-- Tx behaviors -->
-                <ul class="collection">
-                  <%= for beh <- tx.tx_behaviors do %>
-                    <li class="collection-item" style="font-size: smaller">
+              <div class="col s9">
+                <h6 class="tx-name page-header">TX#<%= tx.id %>: <%= String.upcase(tx.tx_type) %></h6>
+                <p class="tx-name"><%= tx.name %></p>
+                <p class="tx-description"><%= tx.description %></p>
+                <div class="tx-behaviors">
+                  <%= for x <- tx.tx_behaviors do %>
+                    <div class="tx-behavior" style="font-size: smaller">
                       <div class="row">
-                        <div class="col s12 m12">
-                          <%= beh.behavior %>
+                        <div class="col s12 m12 behavior-name">
+                          <%= x.behavior %>
                         </div>
-                        <%= if beh.token != nil do %>
-                          <div class="col s12 m12 l4"> <%= beh.token %> TBA </div>
+                        <%= if x.token != nil do %>
+                          <div class="col s12 m12 l4 behavior-value"> <%= x.token %> TBA </div>
                         <% end %>
-                        <%= if beh.asset != nil and beh.asset != "" do %>
-                          <div class="col s12 m12 l4"> <%= beh.asset %></div>
+                        <%= if x.asset != nil and x.asset != "" do %>
+                          <div class="col s12 m12 l4 behavior-value"> <%= x.asset %></div>
                         <% end %>
-                        <%= if beh.function != nil and beh.function != "" do %>
-                          <div class="col s12 m12 l4"> <%= beh.function %></div>
+                        <%= if x.function != nil and x.function != "" do %>
+                          <div class="col s12 m12 l4 behavior-value"> <%= x.function %></div>
                         <% end %>
                       </div>
-                    </li>
+                    </div>
                   <% end %>
-                </ul>
+                </div>
               </div>
-              <!-- QR Code -->
-              <div class="col s12 m8 l6">
-                <input id='<%= "qrValue_#{tx.id}" %>' type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink(@demo.id, tx.id) %>"></input>
-                <div align="center">
-                  <canvas id='<%= "canvas_#{tx.id}" %>'></canvas>
+              <div class="col s3">
+                <div class="action-buttons">
+                  <%= form_for @conn, Routes.tx_path(@conn, :edit, tx, demo_id: @demo.id), [method: "get"], fn _ -> %>
+                    <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Update transaction"><i class="material-icons">edit</i></button>
+                  <% end %>
+                  <%= form_for @conn, Routes.tx_path(@conn, :delete, tx, demo_id: @demo.id), [method: :delete], fn _ -> %>
+                    <button type="submit" class="btn-floating btn-flat btn-small red waves-effect tooltipped" data-position="top" data-tooltip="Delete transaction"><i class="material-icons">delete</i></button>
+                  <% end %>
+                </div>
+                <div class="qrcode-wrapper">
+                  <input id='<%= "qrValue_#{tx.id}" %>' type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink(@demo.id, tx.id) %>"></input>
+                  <div align="center">
+                    <canvas class="qrcode qrcode-small" id='<%= "canvas_#{tx.id}" %>'></canvas>
+                  </div>
                 </div>
               </div>
             </div>
-
-            <div class="row" style: "font-size: smaller">
-              <div class="col s8"></div>
-              <div class="col s2">
-                <%= link("Edit", to: Routes.tx_path(@conn, :edit, tx, demo_id: @demo.id)) %>
-              </div>
-              <div class="col s2">
-                <%= link("Delete", to: Routes.tx_path(@conn, :delete, tx, demo_id: @demo.id), method: :delete) %>
-              </div>
-            </div>
-          </li>
+          </div>
         <% end %>
-      </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col s12">
+        <%= link(to: Routes.tx_path(@conn, :new, demo_id: @demo.id), class: "btn btn-outlined blue-text text-accent-2 waves-effect") do %>
+          Create New Transaction
+        <% end %>
+      </div>
     </div>
   </div>
 </div>
-
-<div class="fixed-action-btn">
-  <%= link(to: Routes.tx_path(@conn, :new, demo_id: @demo.id), class: "btn-floating btn-large waves-effect waves-light red") do %>
-    <i class="material-icons">add</i>
-  <% end %>
-</div>
-
-<script>
-var QRCode = require('qrcode')
-var canvas = document.getElementById('canvas')
-var qrValue = document.getElementById('qrValue')
-
-if (canvas != null) {
-  QRCode.toCanvas(canvas, qrValue.value, function (error) {
-    if (error) console.error(error)
-    console.log('success!');
-  });
-}
-</script>

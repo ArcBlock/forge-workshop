@@ -96,21 +96,21 @@
       <% end %>
     </div>
     <div class="col s12 m3">
-      <div class="app-actions">
+      <div class="action-buttons">
         <%= form_for @conn, Routes.did_path(@conn, :reselect_claims), [method: "get"], fn _ -> %>
-          <button type="submit" class="btn-floating btn-flat blue waves-effect tooltipped" data-position="top" data-tooltip="Update application claims"><i class="material-icons">edit</i></button>
+          <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Update application claims"><i class="material-icons">edit</i></button>
         <% end %>
         <%= form_for @conn, Routes.did_path(@conn, :start_over), fn _ -> %>
-          <button type="submit" class="btn-floating btn-flat red waves-effect tooltipped" data-position="top" data-tooltip="Delete this application"><i class="material-icons">delete</i></button>
+          <button type="submit" class="btn-floating btn-flat btn-small red waves-effect tooltipped" data-position="top" data-tooltip="Delete this application"><i class="material-icons">delete</i></button>
         <% end %>
       </div>
-      <div class="auth-qrcode">
+      <div class="qrcode-wrapper">
         <input id="qrValue_1" type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink(@app_state.id) %>"></input>
-        <canvas id="canvas_1"></canvas>
+        <canvas id="canvas_1" class="qrcode"></canvas>
       </div>
       <div class="auth-open">
         <%= form_for @conn, Routes.wallet_path(@conn, :index), [method: "get", target: "_blank"], fn _ -> %>
-          <%= submit "Login with Web Wallet", class: "btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" %>
+          <%= submit "Login with Web Wallet", class: "btn btn-outlined blue-text text-accent-2 waves-effect" %>
         <% end %>
       </div>
     </div>

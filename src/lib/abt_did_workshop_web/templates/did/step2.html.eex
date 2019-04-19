@@ -57,7 +57,7 @@
         </div>
         <div class="row">
           <div class="col s12 right-align">
-            <%= submit "Save & Continue", class: "btn btn-outlined btn-squared blue-text text-accent-2 waves-effect" %>
+            <%= submit "Save & Continue", class: "btn btn-outlined blue-text text-accent-2 waves-effect" %>
           </div>
         </div>
       <% end %>
