@@ -24,7 +24,7 @@
                   <%= form_for @conn, Routes.demo_path(@conn, :edit, demo), [method: "get"], fn _ -> %>
                     <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Update demo case"><i class="material-icons">edit</i></button>
                   <% end %>
-                  <%= form_for @conn, Routes.demo_path(@conn, :delete, demo, [method: :delete]), fn _ -> %>
+                  <%= form_for @conn, Routes.demo_path(@conn, :delete, demo), [method: :delete], fn _ -> %>
                     <button type="submit" class="btn-floating btn-flat btn-small red waves-effect tooltipped" data-position="top" data-tooltip="Delete demo case"><i class="material-icons">delete</i></button>
                   <% end %>
                 </div>
