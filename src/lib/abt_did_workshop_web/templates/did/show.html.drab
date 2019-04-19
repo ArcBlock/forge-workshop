@@ -24,8 +24,9 @@
         <p class="info-text"><%= Multibase.encode!(@app_state.sk, :base58_btc) %></p>
       </div>
       <%= if [] != @users do %>
+      <div class="app-key">
         Known users:
-        <ul class="collapsible popout">
+        <ul class="collapsible expandable">
           <%= for user <- @users do %>
           <li>
             <div class="collapsible-header"><%= user.did %></div>
@@ -91,6 +92,7 @@
           </li>
           <% end %>
         </ul>
+      </div>
       <% end %>
     </div>
     <div class="col s12 m3">
