@@ -104,7 +104,7 @@
       </div>
       <div class="auth-qrcode">
         <input id="qrValue_1" type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink(@app_state.id) %>"></input>
-          <canvas id="canvas_1"></canvas>
+        <canvas id="canvas_1"></canvas>
       </div>
       <div class="auth-open">
         <%= form_for @conn, Routes.wallet_path(@conn, :index), [method: "get", target: "_blank"], fn _ -> %>

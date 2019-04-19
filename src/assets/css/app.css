@@ -23,11 +23,16 @@ a {
   letter-spacing: 2px;
   color: #222222;
   margin-top: 0;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   font-weight: 500;
   text-transform: uppercase;
   display: flex;
   align-items: center;
+}
+
+.page-subheader {
+  margin-top: -1rem;
+  margin-bottom: 3rem;
 }
 
 .page-header i {
