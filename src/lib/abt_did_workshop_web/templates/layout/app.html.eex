@@ -13,6 +13,7 @@
     <main id="main" role="main" class="container">
       <div class="row">
         <div class="col s12">
+          <!-- TODO: remove this section, use flash instead-->
           <%= if @conn.assigns[:error] != nil do %>
             <div class="alert alert-danger"><i class="material-icons">error</i><%= @conn.assigns[:error] %></div>
           <% end %>
@@ -24,10 +25,13 @@
           <% end %>
 
           <%= if get_flash(@conn, :info) != nil do %>
-            <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+            <p class="alert alert-info" role="alert"><i class="material-icons">error</i><%= get_flash(@conn, :info) %></p>
+          <% end %>
+          <%= if get_flash(@conn, :warning) != nil do %>
+            <p class="alert alert-warning" role="alert"><i class="material-icons">warning</i><%= get_flash(@conn, :warning) %></p>
           <% end %>
           <%= if get_flash(@conn, :error) != nil do %>
-            <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+            <p class="alert alert-danger" role="alert"><i class="material-icons">info</i><%= get_flash(@conn, :error) %></p>
           <% end %>
 
           <%= render @view_module, @view_template, assigns %>
