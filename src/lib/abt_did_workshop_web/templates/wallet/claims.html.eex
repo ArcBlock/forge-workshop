@@ -1,68 +1,91 @@
-<section class="column">
-<b>Applciation's metadata</b>
-<table style="font-size: smaller; table-layout: fixed;">
-  <tr>
-    <td style="width: 30%"> Name </td>
-    <td> <%= @app_info["name"] %> </td>
-  </tr>
-  <tr>
-    <td> Subtitle </td>
-    <td> <%= @app_info["subtitle"] %> </td>
-  </tr>
-  <tr>
-    <td> Description </td>
-    <td> <%= @app_info["description"] %> </td>
-  </tr>
-  <tr>
-    <td> Icon </td>
-    <td> <img src='<%= Routes.static_path(@conn, @app_info["icon"]) %>'/> </td>
-  </tr>
-  <tr>
-    <td> Publisher </td>
-    <td> <%= @app_info["publisher"] %> </td>
-  </tr>
-  <tr>
-    <td> Copyright </td>
-    <td> <a href='<%= @app_info["copyright"] %>'> <%= @app_info["copyright"] %> </a> </td>
-  </tr>
-</table>
-
-</section>
-<section class="row">
-  <%= form_for @conn, Routes.wallet_path(@conn, :response_auth), fn f -> %>
-    <div class="form-group">
-      <%= text_input(f, :sk, value: @sk, type: "hidden") %>
-      <%= text_input(f, :pk, value: @pk, type: "hidden") %>
-      <%= text_input(f, :did, value: @did, type: "hidden") %>
-      <%= text_input(f, :url, value: @url, type: "hidden") %>
+<div class="row">
+  <div class="col s12 m4">
+    <div class="section">
+      <h5 class="page-header"><i class="material-icons">info</i>Application Meta Data</h5>
+      <div class="row">
+        <div class="input-field col s12">
+          <p><%= @app_info["name"] %></p>
+          <label>Name</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <p><%= @app_info["subtitle"] %></p>
+          <label>Subtitle</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <p><%= @app_info["description"] %></p>
+          <label>Description</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <p><%= @app_info["publisher"] %></p>
+          <label>DID</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <p><a href='<%= @app_info["copyright"] %>'><%= @app_info["copyright"] %></a></p>
+          <label>Copyright</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <p><img src='<%= Routes.static_path(@conn, @app_info["icon"]) %>' alt="" style="width: 100%" /></p>
+          <label>Application Icon</label>
+        </div>
+      </div>
     </div>
-    <%= if @profile != nil do %>
-      <div class="form-group">
-        <%= @profile["meta"]["description"] %>
-        <p>
+  </div>
+  <div class="col s12 m7 offset-m1">
+      <%= form_for @conn, Routes.wallet_path(@conn, :response_auth), fn f -> %>
+        <%= text_input(f, :sk, value: @sk, type: "hidden") %>
+        <%= text_input(f, :pk, value: @pk, type: "hidden") %>
+        <%= text_input(f, :did, value: @did, type: "hidden") %>
+        <%= text_input(f, :url, value: @url, type: "hidden") %>
+
+        <%= if @profile != nil do %>
+        <div class="section">
+          <h5 class="page-header"><span class="step-badge">1</span>Profile Information</h5>
           <%= for item <- @profile["items"] do %>
-            <label>
-              <%= text_input(f, "profile_" <> item) %>
-              <span><%= item %></span>
-            </label>
+            <div class="row">
+              <div class="input-field col s12">
+                <%= text_input(f, "profile_" <> item) %>
+                <label class="text-capitalize"><%= item %></label>
+              </div>
+            </div>
           <% end %>
-        </p>
-      </div>
-    <% end %>
-    <%= if @agreements != [] do %>
-      <p>Application is asking for your agreement:</p>
-      <div class="form-group">
-        <%= for agr <- @agreements do %>
-          <p>
-            <a href='<%= agr["uri"] %>'> <%= agr["meta"]["description"] %></a>
-            <label>
-              <%= checkbox f, "agreement_" <> agr["meta"]["id"] %>
-              <span> Agree </span>
-            </label>
-          </p>
+        </div>
         <% end %>
-      </div>
-    <% end %>
-    <%= submit "submit", class: "btn btn-primary" %>
-  <% end %>
-</section>
+
+        <%= if @agreements != [] do %>
+        <div class="section">
+          <h5 class="page-header"><span class="step-badge">2</span>Agreements</h5>
+          <%= for agr <- @agreements do %>
+            <div class="row">
+              <div class="col s12">
+                <label>
+                  <%= checkbox f, "agreement_" <> agr["meta"]["id"] %>
+                  <span>
+                    Agree
+                    <a href='<%= agr["uri"] %>'> <%= agr["meta"]["description"] %></a>
+                  </span>
+                </label>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <% end %>
+
+        <div class="row">
+          <div class="col s12">
+            <%= submit "Authorize & Login", class: "btn btn-outlined blue-text text-accent-2 waves-effect" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
