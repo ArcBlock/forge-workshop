@@ -3778,7 +3778,7 @@ small {
   background-color: transparent;
   border: 1px solid #4e6af6;
   box-shadow: 0 0 0 0 transparent; }
-  .btn-outlined:hover {
+  .btn-outlined:hover, .btn-outlined:focus {
     background-color: rgba(0, 0, 0, 0.03);
     border: 1px solid #2962FF;
     box-shadow: 0 0 0 0 transparent; }
