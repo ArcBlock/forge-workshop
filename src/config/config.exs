@@ -69,7 +69,7 @@ config :abt_did_workshop,
     copyright: "https://example-application/copyright",
     publisher: "did:abt:zNKSHDK5KTZ5bdxfHoKp6F2iibbpLriYJDSi"
   },
-  deep_link_path: "https://arcwallet.io/i/",
+  deep_link_path: "https://abtwallet.io/i/",
   wallet: %{moniker_prefix: "stu", passphrase: "abcd1234"},
   robert: %{
     address: "z1YgP3zaVdQzB9gC3kHAyTiiMMPZhLzCLDP",
