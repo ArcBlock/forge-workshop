@@ -10,25 +10,25 @@
       </div>
       <div class="row">
         <div class="input-field col s12">
-          <p><%= @demo.subtitle %></p>
+          <p class="info-text"><%= @demo.subtitle %></p>
           <label>Subtitle</label>
         </div>
       </div>
       <div class="row">
         <div class="input-field col s12">
-          <p><%= @demo.description %></p>
+          <p class="info-text"><%= @demo.description %></p>
           <label>Description</label>
         </div>
       </div>
       <div class="row">
         <div class="input-field col s12">
-          <p><%= @demo.icon %></p>
+          <p class="info-text"><%= @demo.icon %></p>
           <label>Icon URL</label>
         </div>
       </div>
       <div class="row">
         <div class="input-field col s12">
-          <p><%= @demo.path %></p>
+          <p class="info-text"><%= @demo.path %></p>
           <label>Deep Link Path</label>
         </div>
       </div>
