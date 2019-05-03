@@ -194,7 +194,7 @@ defmodule AbtDidWorkshop.TxUtil do
           Multisig.new(
             signer: user.address,
             pk: user.pk,
-            data: ForgeAbi.encode_any!(:address, asset)
+            data: ForgeAbi.encode_any!(asset, "fg:x:address")
           )
 
         _ ->
@@ -274,7 +274,7 @@ defmodule AbtDidWorkshop.TxUtil do
         date: DateTime.utc_now() |> DateTime.to_date() |> Date.to_string()
       )
 
-    ForgeAbi.encode_any!(:poke, itx)
+    ForgeAbi.encode_any!(itx, "fg:t:poke")
   end
 
   defp get_itx_to_sign("TransferTx", sender, receiver) do
@@ -285,14 +285,14 @@ defmodule AbtDidWorkshop.TxUtil do
         value: to_tba(sender.token)
       )
 
-    ForgeAbi.encode_any!(:transfer, itx)
+    ForgeAbi.encode_any!(itx, "fg:t:transfer")
   end
 
   defp get_itx_to_sign("ExchangeTx", sender, receiver) do
     s = ExchangeInfo.new(assets: to_assets(sender.asset), value: to_tba(sender.token))
     r = ExchangeInfo.new(assets: to_assets(receiver.asset), value: to_tba(receiver.token))
     itx = ExchangeTx.new(receiver: r, sender: s, to: receiver.address)
-    ForgeAbi.encode_any!(:exchange, itx)
+    ForgeAbi.encode_any!(itx, "fg:t:exchange")
   end
 
   defp get_itx_to_sign("UpdateAssetTx", sender, receiver) do
@@ -309,15 +309,15 @@ defmodule AbtDidWorkshop.TxUtil do
     itx =
       UpdateAssetTx.new(
         address: sender.asset,
-        data: ForgeAbi.encode_any!(:workshop_asset, new_cert)
+        data: ForgeAbi.encode_any!(new_cert, "ws:x:workshop_asset")
       )
 
-    ForgeAbi.encode_any!(:update_asset, itx)
+    ForgeAbi.encode_any!(itx, "fg:t:update_asset")
   end
 
   defp get_itx_to_sign("ConsumeAssetTx", sender, _receiver) do
     itx = ForgeAbi.ConsumeAssetTx.new(issuer: sender.address)
-    ForgeAbi.encode_any!(:consume_asset, itx)
+    ForgeAbi.encode_any!(itx, "fg:t:consume_asset")
   end
 
   defp to_tba(nil), do: nil

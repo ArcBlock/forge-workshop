@@ -63,7 +63,7 @@ defmodule AbtDidWorkshop.MixProject do
       {:drab, "~> 0.10"},
 
       # ArcBlock
-      {:abt_did_elixir, git: "git@github.com:arcblock/abt-did-elixir.git", tag: "v0.2.2"},
+      {:abt_did_elixir, git: "git@github.com:arcblock/abt-did-elixir.git"},
       # {:forge_sdk, path: "~/Documents/GitHub/ArcBlock/forge-elixir-sdk"},
       {:forge_sdk, git: "git@github.com:arcblock/forge-elixir-sdk.git"},
 

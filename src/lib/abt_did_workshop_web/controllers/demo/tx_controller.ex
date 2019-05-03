@@ -12,7 +12,13 @@ defmodule AbtDidWorkshopWeb.TxController do
   def new(conn, %{"demo_id" => demo_id}) do
     # offers = demo_id |> String.to_integer() |> Tx.get_offer_txs()
     demo = Demo.get(demo_id)
-    render(conn, "new.html", changeset: Tx.changeset(%Tx{}, %{}), demo_id: demo_id, tx_id: "", demo: demo)
+
+    render(conn, "new.html",
+      changeset: Tx.changeset(%Tx{}, %{}),
+      demo_id: demo_id,
+      tx_id: "",
+      demo: demo
+    )
   end
 
   def edit(conn, %{"id" => tx_id, "demo_id" => demo_id}) do

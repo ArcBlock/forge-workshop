@@ -2,7 +2,7 @@ defmodule AbtDidWorkshop.AssetUtil do
   @moduledoc false
 
   alias AbtDidWorkshop.WorkshopAsset
-  alias ForgeAbi.{CreateAssetTx, RequestSendTx}
+  alias ForgeAbi.CreateAssetTx
 
   require Logger
 
@@ -37,7 +37,7 @@ defmodule AbtDidWorkshop.AssetUtil do
           {:error, "The asset does not belong to the account."}
         else
           case ForgeAbi.decode_any(state.data) do
-            {:workshop_asset, cert} ->
+            {:ok, cert} ->
               case cert.title do
                 ^title ->
                   :ok
@@ -82,28 +82,13 @@ defmodule AbtDidWorkshop.AssetUtil do
   end
 
   defp create_cert(wallet, cert) do
-    itx = CreateAssetTx.new(data: ForgeAbi.encode_any!(:workshop_asset, cert))
+    itx = CreateAssetTx.new(data: ForgeAbi.encode_any!(cert, "ws:x:workshop_asset"))
+    address = ForgeSdk.Util.to_asset_address(wallet.address, itx)
+    itx = %{itx | address: address}
 
-    asset =
-      ForgeSdk.get_asset_address(
-        itx: itx,
-        sender_address: wallet.address,
-        wallet_type: wallet.type
-      )
-
-    tx =
-      ForgeSdk.create_tx(
-        from: wallet.address,
-        itx: ForgeAbi.encode_any!(:create_asset, itx),
-        nonce: :crypto.strong_rand_bytes(8) |> Base.encode16() |> String.to_integer(16),
-        wallet: wallet
-      )
-
-    req = RequestSendTx.new(tx: tx, wallet: wallet, commit: true)
-
-    case ForgeSdk.send_tx(req) do
+    case ForgeSdk.create_asset(itx, wallet: wallet, commit: true) do
       {:error, reason} -> {:error, reason}
-      hash -> {hash, asset}
+      hash -> {hash, address}
     end
   end
 

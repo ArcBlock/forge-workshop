@@ -6,9 +6,12 @@ defmodule AbtDidWorkshop.Application do
 
   def start(_type, _args) do
     children = get_children()
-    register_type_urls()
     opts = [strategy: :one_for_one, name: AbtDidWorkshop.Supervisor]
     result = Supervisor.start_link(children, opts)
+
+    forge_state = ForgeSdk.get_forge_state()
+    ForgeSdk.update_type_url(forge_state)
+    register_type_urls()
 
     spawn(fn ->
       Process.sleep(5_000)
@@ -28,8 +31,8 @@ defmodule AbtDidWorkshop.Application do
   end
 
   defp register_type_urls do
-    ForgeAbi.register_type_urls([
-      {:workshop_asset, "ws:x:workshop_asset", WorkshopAsset}
+    ForgeAbi.add_type_urls([
+      {"ws:x:workshop_asset", WorkshopAsset}
     ])
   end
 

@@ -1,3 +1,8 @@
+## 0.3.9 (May 02, 2019)
+  - Uptake new version of forge
+  - styling did workshop (#54)
+  - Use abtwallet (#57)
+
 ## 0.3.8 (April 19, 2019)
   - Use abtwallet
   - Add logic to do async offer after update and consume.
