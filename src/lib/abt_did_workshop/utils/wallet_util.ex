@@ -65,7 +65,7 @@ defmodule AbtDidWorkshop.WalletUtil do
 
   def declare_wallet(wallet, moniker) do
     data = DeclareTx.new(moniker: moniker, pk: wallet.pk, type: wallet.type)
-    itx = ForgeAbi.encode_any!(:declare, data)
+    itx = ForgeAbi.encode_any!(data, "fg:t:declare")
 
     req_create =
       RequestCreateTx.new(from: wallet.address, itx: itx, nonce: 1, token: "", wallet: wallet)

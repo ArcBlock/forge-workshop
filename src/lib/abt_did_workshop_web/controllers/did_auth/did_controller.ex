@@ -9,11 +9,13 @@ defmodule AbtDidWorkshopWeb.DidController do
 
   def index(conn, _params) do
     case AppState.get() do
-      nil -> render(conn, "step1.html")
+      nil ->
+        render(conn, "step1.html")
+
       state ->
         conn
-          |> put_flash(:info, "Application already created!")
-          |> render("show.html", app_state: state, users: UserDb.get_all())
+        |> put_flash(:info, "Application already created!")
+        |> render("show.html", app_state: state, users: UserDb.get_all())
     end
   end
 
@@ -23,17 +25,17 @@ defmodule AbtDidWorkshopWeb.DidController do
     cond do
       app_state == nil ->
         conn
-          |> put_flash(:error, "You must create an application DID first.")
-          |> render("step1.html")
+        |> put_flash(:error, "You must create an application DID first.")
+        |> render("step1.html")
 
       Map.get(app_state, :name) == nil ->
         conn
-          |> put_flash(:error, "Please configure meta data for application.")
-          |> render("step2.html")
+        |> put_flash(:error, "Please configure meta data for application.")
+        |> render("step2.html")
 
       true ->
         conn
-          |> render("show.html", app_state: app_state, users: UserDb.get_all())
+        |> render("show.html", app_state: app_state, users: UserDb.get_all())
     end
   end
 
@@ -43,9 +45,11 @@ defmodule AbtDidWorkshopWeb.DidController do
     case app_state do
       nil ->
         conn
-          |> put_flash(:error, "You must create an application DID first.")
-          |> render("step1.html")
-      _ -> render(conn, "step3.html", id: app_state.id)
+        |> put_flash(:error, "You must create an application DID first.")
+        |> render("step1.html")
+
+      _ ->
+        render(conn, "step3.html", id: app_state.id)
     end
   end
 
@@ -54,8 +58,8 @@ defmodule AbtDidWorkshopWeb.DidController do
     UserDb.clear()
 
     conn
-      |> put_flash(:info, "Application state was reset!")
-      |> redirect(to: "/")
+    |> put_flash(:info, "Application state was reset!")
+    |> redirect(to: "/")
   end
 
   def create_did(conn, params) do
@@ -113,8 +117,8 @@ defmodule AbtDidWorkshopWeb.DidController do
     |> Repo.update!()
 
     conn
-      |> put_flash(:info, "Application succesfully updated!")
-      |> redirect(to: Routes.did_path(conn, :show))
+    |> put_flash(:info, "Application succesfully updated!")
+    |> redirect(to: Routes.did_path(conn, :show))
   end
 
   defp get_init_state do
