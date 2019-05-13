@@ -73,7 +73,7 @@ watch:
 
 run:
 	@echo "Running the software..."
-	@cd src; iex -S mix phx.server
+	@cd src;FORGE_CONFIG=/private/tmp/forge/resources/forge.toml iex -S mix phx.server
 
 submodule:
 	@git submodule update --init --recursive

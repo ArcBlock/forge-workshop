@@ -6,10 +6,12 @@ defmodule AbtDidWorkshop.WalletUtil do
     EncodingType,
     HashType,
     KeyType,
+    PokeTx,
     RequestCreateTx,
     RequestCreateWallet,
     RequestSendTx,
     RoleType,
+    TransferTx,
     WalletInfo,
     WalletType
   }
@@ -64,7 +66,7 @@ defmodule AbtDidWorkshop.WalletUtil do
   end
 
   def declare_wallet(wallet, moniker) do
-    data = DeclareTx.new(moniker: moniker, pk: wallet.pk, type: wallet.type)
+    data = apply(DeclareTx, :new, [[moniker: moniker, pk: wallet.pk, type: wallet.type]])
     itx = ForgeAbi.encode_any!(data, "fg:t:declare")
 
     req_create =
@@ -79,10 +81,9 @@ defmodule AbtDidWorkshop.WalletUtil do
     %{address: address} = ForgeSdk.get_forge_state().poke_config
 
     itx =
-      ForgeAbi.PokeTx.new(
-        address: address,
-        date: DateTime.utc_now() |> DateTime.to_date() |> Date.to_string()
-      )
+      apply(PokeTx, :new, [
+        [address: address, date: DateTime.utc_now() |> DateTime.to_date() |> Date.to_string()]
+      ])
 
     ForgeSdk.poke(itx, wallet: wallet)
   end
@@ -110,7 +111,7 @@ defmodule AbtDidWorkshop.WalletUtil do
       Process.sleep(5_000)
 
       %{amount: poke_amount} = ForgeSdk.get_forge_state().poke_config
-      itx = ForgeAbi.TransferTx.new(to: addr, value: ForgeAbi.token_to_unit(poke_amount))
+      itx = apply(TransferTx, :new, [[to: addr, value: ForgeAbi.token_to_unit(poke_amount)]])
 
       Enum.each(wallets, fn {w, _} -> ForgeSdk.transfer(itx, wallet: w) end)
     end)

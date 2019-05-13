@@ -4,9 +4,11 @@ defmodule AbtDidWorkshop.TxUtil do
   alias AbtDidWorkshop.AssetUtil
 
   alias ForgeAbi.{
+    ConsumeAssetTx,
     ExchangeInfo,
     ExchangeTx,
     Multisig,
+    PokeTx,
     Transaction,
     TransferTx,
     UpdateAssetTx
@@ -269,29 +271,39 @@ defmodule AbtDidWorkshop.TxUtil do
     state = ForgeSdk.get_forge_state()
 
     itx =
-      ForgeAbi.PokeTx.new(
-        address: state.poke_config.address,
-        date: DateTime.utc_now() |> DateTime.to_date() |> Date.to_string()
-      )
+      apply(PokeTx, :new, [
+        [
+          address: state.poke_config.address,
+          date: DateTime.utc_now() |> DateTime.to_date() |> Date.to_string()
+        ]
+      ])
 
     ForgeAbi.encode_any!(itx, "fg:t:poke")
   end
 
   defp get_itx_to_sign("TransferTx", sender, receiver) do
     itx =
-      TransferTx.new(
-        assets: to_assets(sender.asset),
-        to: receiver.address,
-        value: to_tba(sender.token)
-      )
+      apply(TransferTx, :new, [
+        [
+          assets: to_assets(sender.asset),
+          to: receiver.address,
+          value: to_tba(sender.token)
+        ]
+      ])
 
     ForgeAbi.encode_any!(itx, "fg:t:transfer")
   end
 
   defp get_itx_to_sign("ExchangeTx", sender, receiver) do
-    s = ExchangeInfo.new(assets: to_assets(sender.asset), value: to_tba(sender.token))
-    r = ExchangeInfo.new(assets: to_assets(receiver.asset), value: to_tba(receiver.token))
-    itx = ExchangeTx.new(receiver: r, sender: s, to: receiver.address)
+    s =
+      apply(ExchangeInfo, :new, [[assets: to_assets(sender.asset), value: to_tba(sender.token)]])
+
+    r =
+      apply(ExchangeInfo, :new, [
+        [assets: to_assets(receiver.asset), value: to_tba(receiver.token)]
+      ])
+
+    itx = apply(ExchangeTx, :new, [[receiver: r, sender: s, to: receiver.address]])
     ForgeAbi.encode_any!(itx, "fg:t:exchange")
   end
 
@@ -307,16 +319,18 @@ defmodule AbtDidWorkshop.TxUtil do
     new_cert = AssetUtil.gen_cert(receiver, sender.address, cert.title, new_content)
 
     itx =
-      UpdateAssetTx.new(
-        address: sender.asset,
-        data: ForgeAbi.encode_any!(new_cert, "ws:x:workshop_asset")
-      )
+      apply(UpdateAssetTx, :new, [
+        [
+          address: sender.asset,
+          data: ForgeAbi.encode_any!(new_cert, "ws:x:workshop_asset")
+        ]
+      ])
 
     ForgeAbi.encode_any!(itx, "fg:t:update_asset")
   end
 
   defp get_itx_to_sign("ConsumeAssetTx", sender, _receiver) do
-    itx = ForgeAbi.ConsumeAssetTx.new(issuer: sender.address)
+    itx = apply(ConsumeAssetTx, :new, [[issuer: sender.address]])
     ForgeAbi.encode_any!(itx, "fg:t:consume_asset")
   end
 

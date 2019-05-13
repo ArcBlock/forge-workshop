@@ -5,7 +5,7 @@ defmodule AbtDidWorkshop.Application do
   alias AbtDidWorkshopWeb.Endpoint
 
   def start(_type, _args) do
-    children = get_children()
+    children = get_servers()
     opts = [strategy: :one_for_one, name: AbtDidWorkshop.Supervisor]
     result = Supervisor.start_link(children, opts)
 
@@ -36,20 +36,29 @@ defmodule AbtDidWorkshop.Application do
     ])
   end
 
-  defp get_children do
-    filepath = read_config()
+  defp get_servers do
     env = Util.config(:env)
-    repo = set_db()
-    app_servers = [Endpoint, UserDb, repo]
+    app_servers = get_app_servers()
+    forge_servers = get_forge_servers()
 
     case env do
       "test" ->
         app_servers
 
       _ ->
-        forge_servers = ForgeSdk.init(:abt_did_workshop, "", filepath)
         forge_servers ++ app_servers
     end
+  end
+
+  defp get_app_servers() do
+    read_config()
+    repo = set_db()
+    [Endpoint, UserDb, repo]
+  end
+
+  defp get_forge_servers do
+    filepath = System.get_env("FORGE_CONFIG")
+    ForgeSdk.init(:abt_did_workshop, "", filepath)
   end
 
   def read_config() do
@@ -65,8 +74,6 @@ defmodule AbtDidWorkshop.Application do
     |> Enum.each(fn {key, value} ->
       Application.put_env(:abt_did_workshop, key, adjust_config(value))
     end)
-
-    filepath
   end
 
   defp adjust_config(config) when is_map(config) do

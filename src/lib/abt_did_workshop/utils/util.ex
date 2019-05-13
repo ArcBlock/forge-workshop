@@ -70,14 +70,14 @@ defmodule AbtDidWorkshop.Util do
   def get_chainhost do
     if Application.get_env(:abt_did_workshop, :forge_node) == nil do
       host =
-        ["forge", "sock_grpc"]
+        [:forge_config, "sock_grpc"]
         |> Util.config()
         |> String.split("//")
         |> List.last()
         |> String.split(":")
         |> List.first()
 
-      web_port = Util.config(["forge", "web", "port"])
+      web_port = Util.config([:forge_config, "web", "port"])
       Application.put_env(:abt_did_workshop, :forge_node, %{host: host, web_port: web_port})
     end
 
@@ -94,12 +94,12 @@ defmodule AbtDidWorkshop.Util do
   end
 
   def gen_deeplink(app_id) do
-    app_state = Repo.get(AppState, app_id)
+    app_state = apply(Repo, :get, [AppState, app_id])
     gen_deeplink(app_state.path, app_state.pk, app_state.did, get_callback() <> "auth/")
   end
 
   def gen_deeplink(demo_id, tx_id) do
-    demo = Repo.get(Demo, demo_id)
+    demo = apply(Repo, :get, [Demo, demo_id])
     gen_deeplink(demo.path, demo.pk, demo.did, get_callback() <> "workflow/#{tx_id}")
   end
 

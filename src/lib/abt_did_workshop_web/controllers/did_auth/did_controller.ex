@@ -111,10 +111,12 @@ defmodule AbtDidWorkshopWeb.DidController do
       end)
       |> Enum.map(fn {"agreement_" <> claim, _} -> claim end)
 
-    AppState
-    |> Repo.get!(app_id)
-    |> AppState.changeset(%{claims: %{profile: profile, agreements: agreements}})
-    |> Repo.update!()
+    changeset =
+      Repo
+      |> apply(:get!, [AppState, app_id])
+      |> AppState.changeset(%{claims: %{profile: profile, agreements: agreements}})
+
+    apply(Repo, :update!, [changeset])
 
     conn
     |> put_flash(:info, "Application succesfully updated!")
