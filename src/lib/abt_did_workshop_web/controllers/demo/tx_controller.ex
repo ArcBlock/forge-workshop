@@ -21,9 +21,12 @@ defmodule AbtDidWorkshopWeb.TxController do
     )
   end
 
-  def edit(conn, %{"id" => tx_id, "demo_id" => demo_id}) do
-    changeset = tx_id |> String.to_integer() |> Tx.get() |> Tx.changeset()
-    render(conn, "new.html", changeset: changeset, demo_id: demo_id, tx_id: tx_id)
+  def edit(conn, %{"id" => tx_id}) do
+    tx = Tx.get(tx_id)
+    demo_id = tx.demo_id
+    demo = Demo.get(demo_id)
+    changeset = Tx.changeset(tx)
+    render(conn, "new.html", changeset: changeset, demo_id: demo_id, tx_id: tx_id, demo: demo)
   end
 
   def delete(conn, %{"id" => tx_id, "demo_id" => demo_id}) do
@@ -236,9 +239,11 @@ defmodule AbtDidWorkshopWeb.TxController do
       |> redirect(to: Routes.tx_path(conn, :index, demo_id: demo_id))
     rescue
       e ->
+        demo = Demo.get(demo_id)
+
         conn
         |> put_flash(:error, "Failed to upsert transaction.")
-        |> render("new.html", changeset: e.changeset, demo_id: demo_id, tx_id: tx_id)
+        |> render("new.html", changeset: e.changeset, demo_id: demo_id, tx_id: tx_id, demo: demo)
     end
   end
 

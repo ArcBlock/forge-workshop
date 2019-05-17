@@ -154,6 +154,10 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
     |> reply(conn)
   end
 
+  defp reply_step(conn, []) do
+    reply(:ok, conn)
+  end
+
   defp get_require(step, conn) do
     case step.__struct__ do
       RequireAccount -> {"account", TxUtil.require_account(step.desc, step.token)}
@@ -318,7 +322,10 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
   end
 
   defp append_offer(workflow, behs) do
-    offer = Enum.find(behs, fn beh -> beh.behavior == "offer" end)
+    offer =
+      Enum.find(behs, fn beh ->
+        beh.behavior == "offer" and beh.token != nil and beh.asset != nil
+      end)
 
     case offer do
       nil -> workflow
