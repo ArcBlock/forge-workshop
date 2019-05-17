@@ -1,0 +1,46 @@
+<div class="row">
+  <div class="col s12 m3">
+    <div class="section">
+      <h5 class="page-header"><i class="material-icons">info</i>Custodians</h5>
+      <div class="row">
+        <div class="input-field col s12">
+          <label>Custodians are the key to resolve cross-chain transactions. Here you can try how do they work to keep justice on chains.</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col s12 m8 offset-m1">
+    <div class="section">
+      <h5 class="page-header"><i class="material-icons">control_point</i>Add Custodian for cross-chain transaction demo.</h5>
+      <%= form_for @changeset, Routes.custodian_path(@conn, :create), fn f -> %>
+
+        <div class="row">
+          <div class="input-field col s12">
+            <%= text_input f, :moniker, placeholder: "Custodian Moniker", class: "form-control" %>
+            <label>Moniker</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <%= text_input f, :commission, placeholder: "The part to reward custodian when the tether is withrew, e.g. 2% or 2." %>
+            <%= error_tag f, :commission %>
+            <label>Commission</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <%= text_input f, :charge, placeholder: "The part to rewarde custodian when the tether is revoked by depositor, e.g. 1% or 1." %>
+            <%= error_tag f, :charge %>
+            <label>Charge</label>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col s12">
+            <%= submit "Create Custodian", class: "btn btn-outlined blue-text text-accent-2 waves-effect" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

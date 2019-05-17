@@ -5,19 +5,22 @@ defmodule AbtDidWorkshop.Application do
   alias AbtDidWorkshopWeb.Endpoint
 
   def start(_type, _args) do
-    children = get_servers()
+    callback = fn ->
+      forge_state = ForgeSdk.get_forge_state()
+      ForgeSdk.update_type_url(forge_state)
+      register_type_urls()
+    end
+
+    children = get_servers(callback)
     opts = [strategy: :one_for_one, name: AbtDidWorkshop.Supervisor]
     result = Supervisor.start_link(children, opts)
-
-    forge_state = ForgeSdk.get_forge_state()
-    ForgeSdk.update_type_url(forge_state)
-    register_type_urls()
 
     spawn(fn ->
       Process.sleep(5_000)
       %{decimal: decimal} = ForgeSdk.get_forge_state().token
       Application.put_env(:forge_abi, :decimal, decimal)
       WalletUtil.get_robert()
+      WalletUtil.declare_anchors()
     end)
 
     result
@@ -36,10 +39,10 @@ defmodule AbtDidWorkshop.Application do
     ])
   end
 
-  defp get_servers do
+  defp get_servers(callback) do
     env = Util.config(:env)
     app_servers = get_app_servers()
-    forge_servers = get_forge_servers()
+    forge_servers = get_forge_servers(callback)
 
     case env do
       "test" ->
@@ -56,9 +59,12 @@ defmodule AbtDidWorkshop.Application do
     [Endpoint, UserDb, repo]
   end
 
-  defp get_forge_servers do
-    filepath = System.get_env("FORGE_CONFIG")
-    ForgeSdk.init(:abt_did_workshop, "", filepath)
+  defp get_forge_servers(callback) do
+    filepath = Util.config(:local_forge)
+    [{mod, sock}] = ForgeSdk.init(:abt_did_workshop, "", filepath)
+    Application.put_env(:abt_did_workshop, :local_chan, ForgeSdk.get_chan())
+    Util.remote_chan()
+    [{mod, addr: sock, callback: callback}]
   end
 
   def read_config() do

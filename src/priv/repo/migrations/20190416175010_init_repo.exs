@@ -49,5 +49,13 @@ defmodule AbtDidWorkshop.Repo.Migrations.InitRepo do
       add(:pk, :string)
       add(:claim, :map)
     end
+
+    create table(:custodian, primary_key: false) do
+      add(:address, :string, primary_key: true)
+      add(:pk, :string)
+      add(:sk, :string)
+      add(:commission, :decimal)
+      add(:charge, :decimal)
+    end
   end
 end

@@ -5,6 +5,29 @@ defmodule AbtDidWorkshop.Util do
   alias AbtDidWorkshopWeb.Endpoint
   alias AbtDidWorkshopWeb.Router.Helpers, as: Routes
 
+  def remote_chan do
+    chan = Application.get_env(:abt_did_workshop, :remote_chan)
+
+    if chan !== nil and Process.alive?(chan.adapter_payload.conn_pid) do
+      chan
+    else
+      remote_sock_grpc =
+        config(["workshop", "remote_forge"])
+        |> File.read!()
+        |> Toml.decode!()
+        |> get_in(["forge", "sock_grpc"])
+        |> sock_to_ip()
+
+      {:ok, remote_chan} = GRPC.Stub.connect(remote_sock_grpc)
+      Application.put_env(:abt_did_workshop, :remote_chan, remote_chan)
+      Application.get_env(:abt_did_workshop, :remote_chan)
+    end
+  end
+
+  def local_chan do
+    Application.get_env(:abt_did_workshop, :local_chan)
+  end
+
   def expand_icon_path(conn, icon) do
     icon =
       if icon == nil or icon == "" do
@@ -138,4 +161,7 @@ defmodule AbtDidWorkshop.Util do
   defp resolve_host("127.0.0.1"), do: get_ip()
   defp resolve_host("localhost"), do: get_ip()
   defp resolve_host(host), do: host
+
+  defp sock_to_ip("tcp://" <> ip), do: ip
+  defp sock_to_ip("grpc://" <> ip), do: ip
 end

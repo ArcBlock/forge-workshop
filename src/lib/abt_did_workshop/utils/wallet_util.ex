@@ -16,6 +16,46 @@ defmodule AbtDidWorkshop.WalletUtil do
     WalletType
   }
 
+  @anchor1 ForgeAbi.WalletInfo.new(
+             sk:
+               <<24, 23, 207, 213, 161, 85, 120, 7, 189, 105, 176, 17, 165, 107, 108, 94, 165, 34,
+                 159, 8, 146, 211, 90, 14, 53, 152, 21, 71, 51, 202, 87, 115, 247, 28, 3, 76, 102,
+                 215, 21, 157, 75, 162, 190, 231, 165, 22, 227, 128, 15, 188, 163, 33, 197, 166,
+                 167, 248, 24, 145, 120, 18, 54, 100, 198, 74>>,
+             pk:
+               <<247, 28, 3, 76, 102, 215, 21, 157, 75, 162, 190, 231, 165, 22, 227, 128, 15, 188,
+                 163, 33, 197, 166, 167, 248, 24, 145, 120, 18, 54, 100, 198, 74>>,
+             address: "zyt4TpbBV6kTaoPBggQpytQfBWQHSfuGmYma",
+             type: %ForgeAbi.WalletType{address: 1, hash: 2, pk: 0, role: 8}
+           )
+
+  @anchor2 ForgeAbi.WalletInfo.new(
+             sk:
+               <<13, 150, 154, 153, 50, 136, 96, 60, 165, 196, 168, 241, 44, 69, 106, 243, 225,
+                 136, 95, 25, 146, 126, 17, 249, 112, 198, 164, 45, 160, 226, 199, 67, 126, 148,
+                 71, 1, 60, 254, 67, 78, 252, 32, 51, 222, 95, 128, 228, 114, 224, 155, 242, 95,
+                 125, 170, 223, 252, 139, 68, 178, 46, 62, 105, 207, 168>>,
+             pk:
+               <<126, 148, 71, 1, 60, 254, 67, 78, 252, 32, 51, 222, 95, 128, 228, 114, 224, 155,
+                 242, 95, 125, 170, 223, 252, 139, 68, 178, 46, 62, 105, 207, 168>>,
+             address: "zyt3iSdM8RS2431opc6wy3sou6BKtjXiPYzY",
+             type: %ForgeAbi.WalletType{address: 1, hash: 2, pk: 0, role: 8}
+           )
+
+  def declare_anchors() do
+    ForgeSdk.declare(apply(ForgeAbi.DeclareTx, :new, [%{moniker: "anchor1"}]),
+      wallet: @anchor1,
+      commit: true,
+      chan: AbtDidWorkshop.Util.remote_chan()
+    )
+
+    ForgeSdk.declare(apply(ForgeAbi.DeclareTx, :new, [%{moniker: "anchor2"}]),
+      wallet: @anchor2,
+      commit: true,
+      chan: AbtDidWorkshop.Util.remote_chan()
+    )
+  end
+
   def check_balance(token, _) when token in [nil, 0], do: true
 
   def check_balance(token, user_addr) do
@@ -65,16 +105,27 @@ defmodule AbtDidWorkshop.WalletUtil do
     ForgeSdk.create_wallet(req)
   end
 
-  def declare_wallet(wallet, moniker) do
+  def declare_wallet(wallet, moniker, chan \\ nil) do
     data = apply(DeclareTx, :new, [[moniker: moniker, pk: wallet.pk, type: wallet.type]])
     itx = ForgeAbi.encode_any!(data, "fg:t:declare")
 
     req_create =
       RequestCreateTx.new(from: wallet.address, itx: itx, nonce: 1, token: "", wallet: wallet)
 
-    tx = ForgeSdk.create_tx(req_create)
+    tx = ForgeSdk.create_tx(req_create, chan)
     req_send = RequestSendTx.new(commit: false, token: "", tx: tx, wallet: wallet)
-    ForgeSdk.send_tx(req_send)
+    ForgeSdk.send_tx(req_send, chan)
+  end
+
+  @doc """
+  Generates a wallet without talke to chain.
+  """
+  def gen_wallet(
+        did_type \\ %AbtDid.Type{role_type: :account, key_type: :ed25519, hash_type: :sha3}
+      ) do
+    {pk, sk} = gen_key_pair(did_type.key_type)
+    address = AbtDid.pk_to_did(did_type, pk, form: :short)
+    ForgeAbi.WalletInfo.new(address: address, pk: pk, sk: sk)
   end
 
   def poke(wallet) do
@@ -117,5 +168,13 @@ defmodule AbtDidWorkshop.WalletUtil do
     end)
 
     {w, hash}
+  end
+
+  defp gen_key_pair(:ed25519) do
+    Mcrypto.keypair(%Mcrypto.Signer.Ed25519{})
+  end
+
+  defp gen_key_pair(:secp256k1) do
+    Mcrypto.keypair(%Mcrypto.Signer.Secp256k1{})
   end
 end
