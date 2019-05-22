@@ -16,6 +16,8 @@ defmodule AbtDidWorkshop.WalletUtil do
     WalletType
   }
 
+  alias AbtDidWorkshop.Util
+
   @anchor1 ForgeAbi.WalletInfo.new(
              sk:
                <<24, 23, 207, 213, 161, 85, 120, 7, 189, 105, 176, 17, 165, 107, 108, 94, 165, 34,
@@ -46,14 +48,40 @@ defmodule AbtDidWorkshop.WalletUtil do
     ForgeSdk.declare(apply(ForgeAbi.DeclareTx, :new, [%{moniker: "anchor1"}]),
       wallet: @anchor1,
       commit: true,
-      chan: AbtDidWorkshop.Util.remote_chan()
+      chan: Util.remote_chan()
     )
 
     ForgeSdk.declare(apply(ForgeAbi.DeclareTx, :new, [%{moniker: "anchor2"}]),
       wallet: @anchor2,
       commit: true,
-      chan: AbtDidWorkshop.Util.remote_chan()
+      chan: Util.remote_chan()
     )
+  end
+
+  def raise_validator_power() do
+    chan = Util.remote_chan()
+    validator = ForgeSdk.get_chain_info(chan).address
+
+    Task.async(fn ->
+      wallets = init_wallets(100, chan)
+      Process.sleep(5_000)
+      Enum.each(wallets, fn {w, _} -> poke(w) end)
+      Process.sleep(5_000)
+
+      Enum.each(wallets, fn {w, _} ->
+        state =
+          ForgeSdk.get_account_state([address: w.address], chan) ||
+            %{balance: ForgeAbi.token_to_unit(0)}
+
+        ForgeSdk.stake_for_node(
+          validator,
+          ForgeAbi.unit_to_token(state.balance),
+          wallet: w,
+          commit: true,
+          chan: chan
+        )
+      end)
+    end)
   end
 
   def check_balance(token, _) when token in [nil, 0], do: true
@@ -80,17 +108,17 @@ defmodule AbtDidWorkshop.WalletUtil do
     end
   end
 
-  def init_wallets(number) do
+  def init_wallets(number, chan \\ nil) do
     moniker_prefix = AbtDidWorkshop.Util.config([:wallet, :moniker_prefix])
 
     for i <- 1..number do
-      {w, _} = create_wallet()
-      tx_hash = declare_wallet(w, moniker_prefix <> "#{i}")
+      {w, _} = create_wallet(chan)
+      tx_hash = declare_wallet(w, moniker_prefix <> "#{i}", chan)
       {w, tx_hash}
     end
   end
 
-  def create_wallet do
+  def create_wallet(chan \\ nil) do
     passphrase = AbtDidWorkshop.Util.config([:wallet, :passphrase])
 
     type =
@@ -102,7 +130,7 @@ defmodule AbtDidWorkshop.WalletUtil do
       )
 
     req = RequestCreateWallet.new(moniker: "", passphrase: passphrase, type: type)
-    ForgeSdk.create_wallet(req)
+    ForgeSdk.create_wallet(req, chan)
   end
 
   def declare_wallet(wallet, moniker, chan \\ nil) do

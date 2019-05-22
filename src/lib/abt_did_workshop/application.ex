@@ -20,6 +20,7 @@ defmodule AbtDidWorkshop.Application do
       %{decimal: decimal} = ForgeSdk.get_forge_state().token
       Application.put_env(:forge_abi, :decimal, decimal)
       WalletUtil.get_robert()
+      WalletUtil.raise_validator_power()
       WalletUtil.declare_anchors()
     end)
 
@@ -60,7 +61,7 @@ defmodule AbtDidWorkshop.Application do
   end
 
   defp get_forge_servers(callback) do
-    filepath = Util.config(:local_forge)
+    filepath = Util.config(["workshop", "local_forge"])
     [{mod, sock}] = ForgeSdk.init(:abt_did_workshop, "", filepath)
     Application.put_env(:abt_did_workshop, :local_chan, ForgeSdk.get_chan())
     Util.remote_chan()

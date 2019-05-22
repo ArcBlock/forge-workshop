@@ -26,6 +26,13 @@ defmodule AbtDidWorkshopWeb.TxView do
     |> Map.get(String.to_atom(col), "")
   end
 
+  def to_tether(tx_behavior) do
+    case tx_behavior.tx_type do
+      "ExchangeTetherTx" -> tx_behavior.function <> " tether"
+      _ -> tx_behavior.function
+    end
+  end
+
   # def do_extract_id(behaviors) when not is_list(behaviors), do: []
 
   # def do_extract_id(behaviors) do

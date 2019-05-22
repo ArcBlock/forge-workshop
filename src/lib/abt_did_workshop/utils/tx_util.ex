@@ -1,14 +1,17 @@
 defmodule AbtDidWorkshop.TxUtil do
   @moduledoc false
 
-  alias AbtDidWorkshop.AssetUtil
+  alias AbtDidWorkshop.{AssetUtil, Util}
 
   alias ForgeAbi.{
     ConsumeAssetTx,
+    DepositTetherTx,
     ExchangeInfo,
     ExchangeTx,
+    ExchangeTetherTx,
     Multisig,
     PokeTx,
+    TetherExchangeInfo,
     Transaction,
     TransferTx,
     UpdateAssetTx
@@ -16,8 +19,15 @@ defmodule AbtDidWorkshop.TxUtil do
 
   require Logger
 
+  @one_week 604_800
+
   def hash(:keccak, data), do: Mcrypto.hash(%Mcrypto.Hasher.Keccak{}, data)
   def hash(:sha3, data), do: Mcrypto.hash(%Mcrypto.Hasher.Sha3{}, data)
+
+  def get_locktime(deposit) do
+    itx = ForgeAbi.decode_any!(deposit.itx)
+    itx.locktime
+  end
 
   def assemble_sig(tx_str, sig_str) do
     tx = tx_str |> Multibase.decode!() |> Transaction.decode()
@@ -35,25 +45,19 @@ defmodule AbtDidWorkshop.TxUtil do
 
   # for TransferTx, UpdateAssetTx, PokeTx
   def require_signature(conn, desc) do
-    tx = conn.assigns.tx
-    robert = conn.assigns.robert
-    user = conn.assigns.user
-    asset = Map.get(conn.assigns, :asset)
-
-    tx
-    |> prepare_transaction(robert, user, asset)
+    conn.assigns.tx
+    |> prepare_transaction(conn)
     |> do_require_signature(desc)
   end
 
   # For ExchangeTx, ConsumeAssetTx
   def require_multi_sig(conn, desc) do
-    tx = conn.assigns.tx
     robert = conn.assigns.robert
     user = conn.assigns.user
     asset = Map.get(conn.assigns, :asset)
 
-    tx
-    |> prepare_transaction(robert, user, asset)
+    conn.assigns.tx
+    |> prepare_transaction(conn)
     |> sign_tx(robert)
     |> do_require_multi_sig(user, desc, asset)
   end
@@ -102,6 +106,31 @@ defmodule AbtDidWorkshop.TxUtil do
     ]
   end
 
+  def require_tether(description, token) do
+    [
+      %{
+        meta: %{
+          description: description
+        },
+        type: "deposit",
+        target: token,
+        deposit: ""
+      }
+    ]
+  end
+
+  def require_deposit_value(description) do
+    [
+      %{
+        meta: %{
+          description: description
+        },
+        type: "token",
+        value: ""
+      }
+    ]
+  end
+
   def gen_asset(_from, _to, nil), do: nil
   def gen_asset(_from, _to, ""), do: nil
 
@@ -123,9 +152,17 @@ defmodule AbtDidWorkshop.TxUtil do
   end
 
   def send_tx(tx) do
-    case ForgeSdk.send_tx(tx: tx) do
+    local = ForgeSdk.get_chain_info().network
+
+    chan =
+      case tx.chain_id == local do
+        true -> nil
+        _ -> Util.remote_chan()
+      end
+
+    case ForgeSdk.send_tx([tx: tx, commit: true], chan) do
       {:error, reason} ->
-        Logger.error(
+        Logger.warn(
           "Failed to send tx. Reason: #{inspect(reason)}. Transaction: #{
             inspect(tx, limit: :infinity)
           }"
@@ -146,11 +183,11 @@ defmodule AbtDidWorkshop.TxUtil do
     %{tx | signatures: [%{msig | signature: sig} | tx.signatures]}
   end
 
-  def get_transaction_to_sign(tx_type, sender, receiver) do
+  def get_transaction_to_sign(tx_type, sender, receiver, chan \\ nil) do
     itx = get_itx_to_sign(tx_type, sender, receiver)
 
     Transaction.new(
-      chain_id: ForgeSdk.get_chain_info().network,
+      chain_id: ForgeSdk.get_chain_info(chan).network,
       from: sender.address,
       pk: sender.pk,
       itx: itx,
@@ -228,14 +265,20 @@ defmodule AbtDidWorkshop.TxUtil do
   end
 
   # User is always the sender.
-  defp prepare_transaction(%{tx_type: "PokeTx"}, _, user, _) do
+  defp prepare_transaction(%{tx_type: "PokeTx"}, conn) do
+    user = conn.assigns.user
+
     "PokeTx"
     |> get_transaction_to_sign(user, nil)
     |> Map.put(:nonce, 0)
   end
 
   # User is always the sender.
-  defp prepare_transaction(%{tx_type: "TransferTx"} = tx, robert, user, asset) do
+  defp prepare_transaction(%{tx_type: "TransferTx"} = tx, conn) do
+    robert = conn.assigns.robert
+    user = conn.assigns.user
+    asset = Map.get(conn.assigns, :asset)
+
     [beh] = tx.tx_behaviors
     sender = %{address: user.address, pk: user.pk, token: beh.token, asset: asset}
     receiver = %{address: robert.address}
@@ -243,7 +286,11 @@ defmodule AbtDidWorkshop.TxUtil do
   end
 
   # Robert is the sender, always requires multi sig from user
-  defp prepare_transaction(%{tx_type: "ExchangeTx"} = tx, robert, user, asset) do
+  defp prepare_transaction(%{tx_type: "ExchangeTx"} = tx, conn) do
+    robert = conn.assigns.robert
+    user = conn.assigns.user
+    asset = Map.get(conn.assigns, :asset)
+
     offer = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "offer" end)
     demand = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "demand" end)
 
@@ -254,8 +301,27 @@ defmodule AbtDidWorkshop.TxUtil do
     get_transaction_to_sign("ExchangeTx", sender, receiver)
   end
 
+  # Robert is the sender, always requires multi sig from user
+  defp prepare_transaction(%{tx_type: "ExchangeTetherTx"} = tx, conn) do
+    robert = conn.assigns.robert
+    user = conn.assigns.user
+    deposit = conn.assigns.deposit
+
+    offer = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "offer" end)
+
+    offer_asset = gen_asset(robert, user.address, offer.asset)
+    sender = %{address: robert.address, pk: robert.pk, token: offer.token, asset: offer_asset}
+    receiver = %{address: user.address, pk: user.pk, deposit: deposit}
+
+    get_transaction_to_sign("ExchangeTetherTx", sender, receiver)
+  end
+
   # User is always the sender.
-  defp prepare_transaction(%{tx_type: "UpdateAssetTx"} = tx, robert, user, asset) do
+  defp prepare_transaction(%{tx_type: "UpdateAssetTx"} = tx, conn) do
+    robert = conn.assigns.robert
+    user = conn.assigns.user
+    asset = Map.get(conn.assigns, :asset)
+
     update = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "update" end)
     sender = %{address: user.address, pk: user.pk, asset: asset}
     receiver = %{address: robert.address, sk: robert.sk, function: update.function}
@@ -263,8 +329,25 @@ defmodule AbtDidWorkshop.TxUtil do
   end
 
   # Robert is the sender, requires multi sig from user
-  defp prepare_transaction(%{tx_type: "ConsumeAssetTx"}, robert, user, _) do
+  defp prepare_transaction(%{tx_type: "ConsumeAssetTx"}, conn) do
+    robert = conn.assigns.robert
+    user = conn.assigns.user
+
     get_transaction_to_sign("ConsumeAssetTx", robert, user)
+  end
+
+  defp prepare_transaction(%{tx_type: "DepositTetherTx"}, conn) do
+    robert = conn.assigns.robert
+    user = conn.assigns.user
+    value = Map.get(conn.assigns, :deposit_value)
+    custodian = conn.assigns.custodian
+
+    receiver =
+      custodian
+      |> Map.put(:withdrawer, robert.address)
+      |> Map.put(:deposit_value, value)
+
+    get_transaction_to_sign("DepositTetherTx", user, receiver, Util.remote_chan())
   end
 
   defp get_itx_to_sign("PokeTx", _, _) do
@@ -307,6 +390,38 @@ defmodule AbtDidWorkshop.TxUtil do
     ForgeAbi.encode_any!(itx, "fg:t:exchange")
   end
 
+  defp get_itx_to_sign("DepositTetherTx", _sender, receiver) do
+    chan = Util.remote_chan()
+    block_time = ForgeSdk.get_chain_info(chan).block_time
+
+    args = [
+      value: to_tba(receiver.deposit_value),
+      commission: to_tba(receiver.deposit_value * receiver.commission / 100),
+      charge: to_tba(receiver.deposit_value * receiver.charge / 100),
+      target: ForgeSdk.get_chain_info().network,
+      withdrawer: receiver.withdrawer,
+      locktime: %{block_time | seconds: block_time.seconds + @one_week}
+    ]
+
+    itx = apply(DepositTetherTx, :new, [args])
+    ForgeAbi.encode_any!(itx, "fg:t:deposit_tether")
+  end
+
+  defp get_itx_to_sign("ExchangeTetherTx", sender, receiver) do
+    s =
+      apply(ExchangeInfo, :new, [[assets: to_assets(sender.asset), value: to_tba(sender.token)]])
+
+    locktime = get_locktime(receiver.deposit)
+    expired_at = %{locktime | seconds: locktime.seconds - 7200}
+
+    r = apply(TetherExchangeInfo, :new, [[deposit: receiver.deposit, value: to_tba(nil)]])
+
+    args = [receiver: r, sender: s, to: receiver.address, expired_at: expired_at]
+    itx = apply(ExchangeTetherTx, :new, [args])
+
+    ForgeAbi.encode_any!(itx, "fg:t:exchange_tether")
+  end
+
   defp get_itx_to_sign("UpdateAssetTx", sender, receiver) do
     {_, cert} =
       case ForgeSdk.get_asset_state(address: sender.asset) do
@@ -334,7 +449,7 @@ defmodule AbtDidWorkshop.TxUtil do
     ForgeAbi.encode_any!(itx, "fg:t:consume_asset")
   end
 
-  defp to_tba(nil), do: nil
+  defp to_tba(nil), do: ForgeAbi.token_to_unit(0)
   defp to_tba(token), do: ForgeAbi.token_to_unit(token)
 
   defp to_assets(nil), do: []

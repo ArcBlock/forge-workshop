@@ -1,18 +1,28 @@
 defmodule AbtDidWorkshopWeb.WorkflowController do
   use AbtDidWorkshopWeb, :controller
 
-  alias AbtDidWorkshop.{AssetUtil, Demo, TxUtil, Util, WalletUtil}
-  alias AbtDidWorkshop.Plugs.{PrepareArgs, VerifySig}
+  alias AbtDidWorkshop.{AssetUtil, Custodian, Demo, TxUtil, Util, WalletUtil}
+  alias AbtDidWorkshop.Plugs.{PrepareArgs, PrepareTx, VerifySig}
 
   alias AbtDidWorkshop.Step.{
     GenOffer,
     RequireAccount,
     RequireAsset,
     RequireMultiSig,
-    RequireSig
+    RequireSig,
+    RequireTether,
+    RequireDepositValue
   }
 
+  alias AbtDidWorkshopWeb.WorkflowHelper
+
+  alias ForgeAbi.Transaction
+  alias ForgeAbi.Util.BigInt
+
+  @hasher %Mcrypto.Hasher.Sha2{round: 1}
+
   plug(PrepareArgs)
+  plug(PrepareTx)
   plug(VerifySig when action != :request)
 
   def request(conn, %{"userDid" => did, "userPk" => pk}) do
@@ -22,16 +32,17 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
         pk: Multibase.decode!(pk)
       })
 
-    workflow = gen_workflow(conn.assigns.tx)
+    tx = conn.assigns.tx
+    workflow = WorkflowHelper.gen_workflow(tx)
     reply_step(conn, workflow)
-  rescue
-    e -> reply({:error, Exception.message(e)}, conn)
+    # rescue
+    #   e -> reply({:error, Exception.message(e)}, conn)
   end
 
   def response_account(conn, _) do
     tx = conn.assigns.tx
     user = conn.assigns.user
-    workflow = gen_workflow(tx)
+    workflow = WorkflowHelper.gen_workflow(tx)
     {current, rest} = get_step(workflow, RequireAccount)
 
     case WalletUtil.check_balance(current.token, user.address) do
@@ -43,7 +54,7 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
   def response_asset(conn, _) do
     tx = conn.assigns.tx
     user = conn.assigns.user
-    workflow = gen_workflow(tx)
+    workflow = WorkflowHelper.gen_workflow(tx)
     {current, rest} = get_step(workflow, RequireAsset)
 
     asset =
@@ -82,6 +93,7 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
       _ ->
         claim["origin"]
         |> TxUtil.assemble_sig(claim["sig"])
+        |> multi_sign(conn)
         |> TxUtil.send_tx()
         |> async_offer(conn, RequireSig)
         |> reply(conn)
@@ -109,9 +121,66 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
     end
   end
 
+  def response_deposit_value(conn, param) do
+    claim =
+      conn.assigns.claims
+      |> Enum.find(fn
+        %{"type" => "token", "value" => value} -> value != ""
+        _ -> false
+      end)
+
+    cond do
+      claim == nil ->
+        reply({:error, "Deposit value is required."}, conn)
+
+      :error == Float.parse(claim["value"]) ->
+        reply({:error, "Invalid token value."}, conn)
+
+      true ->
+        {value, _} = Float.parse(claim["value"])
+        [_, rest] = WorkflowHelper.gen_workflow(conn.assigns.tx)
+
+        conn
+        |> Plug.Conn.assign(:deposit_value, value)
+        |> reply_step([rest])
+    end
+  end
+
+  def response_tether(conn, param) do
+    claim =
+      conn.assigns.claims
+      |> Enum.find(fn
+        %{"type" => "deposit", "deposit" => deposit} -> deposit != ""
+        _ -> false
+      end)
+
+    tx = conn.assigns.tx
+    workflow = WorkflowHelper.gen_workflow(tx)
+    {current, rest} = get_step(workflow, RequireTether)
+
+    deposit_bin = claim["deposit"] |> Multibase.decode!()
+
+    case check_deposit(deposit_bin, current.value) do
+      "ok" ->
+        conn
+        |> Plug.Conn.assign(:deposit, Transaction.decode(deposit_bin))
+        |> reply_step(rest)
+
+      error ->
+        reply({:error, error}, conn)
+    end
+  end
+
+  defp multi_sign(tx, conn) do
+    case tx.itx.type_url do
+      "fg:t:deposit_tether" -> TxUtil.multi_sign(tx, conn.assigns.custodian)
+      _ -> tx
+    end
+  end
+
   defp async_offer(result, conn, currentStep) do
     tx = conn.assigns.tx
-    workflow = gen_workflow(tx)
+    workflow = WorkflowHelper.gen_workflow(tx)
     {_, rest} = get_step(workflow, currentStep)
 
     case rest do
@@ -160,6 +229,8 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
       RequireAsset -> {"asset", TxUtil.require_asset(step.desc, step.title)}
       RequireSig -> {"sig", TxUtil.require_signature(conn, step.desc)}
       RequireMultiSig -> {"multisig", TxUtil.require_multi_sig(conn, step.desc)}
+      RequireTether -> {"tether", TxUtil.require_tether(step.desc, step.value)}
+      RequireDepositValue -> {"deposit", TxUtil.require_deposit_value(step.desc)}
     end
   end
 
@@ -189,141 +260,28 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
 
   defp reply({action, claims}, conn) do
     tx = conn.assigns.tx
-    demo = Demo.get_by_tx_id(tx.id)
-    chain_info = ForgeSdk.get_chain_info()
-    forge_state = ForgeSdk.get_forge_state()
-
-    app_info =
-      demo
-      |> Map.take([:name, :subtitle, :description, :icon])
-      |> Map.merge(%{
-        icon: Util.expand_icon_path(conn, demo.icon),
-        chainId: chain_info.network,
-        chainVersion: chain_info.version,
-        chainHost: Util.get_chainhost(),
-        chainToken: forge_state.token.symbol,
-        decimals: forge_state.token.decimal
-      })
+    app_info = get_app_info(conn, tx.id)
+    chain_info = get_chain_info(tx.id)
+    wallet = get_app_wallet(tx.id)
 
     extra = %{
       url: Util.get_callback() <> "workflow/#{action}/#{tx.id}",
       requestedClaims: claims,
       appInfo: app_info,
+      chainInfo: chain_info,
       workflow: %{description: tx.description}
     }
 
+    do_reply(conn, extra, wallet)
+  end
+
+  defp do_reply(conn, extra, wallet) do
     response = %{
-      appPk: demo.pk,
-      authInfo: AbtDid.Signer.gen_and_sign(demo.did, Multibase.decode!(demo.sk), extra)
+      appPk: Multibase.encode!(wallet.pk, :base58_btc),
+      authInfo: AbtDid.Signer.gen_and_sign(wallet.address, wallet.sk, extra)
     }
 
     json(conn, response)
-  end
-
-  defp gen_workflow(%{tx_type: "PokeTx"}) do
-    [
-      RequireAccount.new("Please select an account to poke."),
-      RequireSig.new("Please confirm this poke by signing the transaction.")
-    ]
-  end
-
-  defp gen_workflow(%{tx_type: "TransferTx", tx_behaviors: [beh]}) do
-    cond do
-      # When robert only offers something to the user.
-      beh.behavior == "offer" ->
-        [
-          RequireAccount.new("Please select an account to receive this transfer."),
-          GenOffer.new(beh.token, beh.asset)
-        ]
-
-      # When robert only demands token from the user.
-      beh.behavior == "demand" and Util.empty?(beh.asset) ->
-        [
-          RequireAccount.new("Please select an account to transfer out."),
-          RequireSig.new("Please confirm this transfer by signing the transaction.")
-        ]
-
-      # When robert demands asset from the user.
-      true ->
-        [
-          RequireAsset.new("Please select the #{beh.asset} to transfer.", beh.asset),
-          RequireSig.new("Please confirm this transfer by signing the transaction")
-        ]
-    end
-  end
-
-  defp gen_workflow(%{tx_type: "ExchangeTx", tx_behaviors: behs}) do
-    demand = Enum.find(behs, fn beh -> beh.behavior == "demand" end)
-
-    # When robert does not demand asset from the user.
-    if Util.empty?(demand.asset) do
-      [
-        RequireAccount.new("Please select an account to start the exchange."),
-        RequireMultiSig.new("Please confirm this exchange by signing the transaction.")
-      ]
-    else
-      # When robert demands asset from the user.
-      [
-        RequireAsset.new("Please select the #{demand.asset} to exchange.", demand.asset),
-        RequireMultiSig.new("Please confirm this exchange by signing the transaction.")
-      ]
-    end
-  end
-
-  defp gen_workflow(%{tx_type: "UpdateAssetTx", tx_behaviors: behs}) do
-    update = Enum.find(behs, fn beh -> beh.behavior == "update" end)
-
-    [
-      RequireAsset.new("Please select the #{update.asset} to update.", update.asset),
-      RequireSig.new("Please confirm this update by signing the transaction.")
-    ]
-    |> append_offer(behs)
-  end
-
-  defp gen_workflow(%{tx_type: "ConsumeAssetTx", tx_behaviors: behs}) do
-    con = Enum.find(behs, fn beh -> beh.behavior == "consume" end)
-
-    [
-      RequireAsset.new("Please select the #{con.asset} to consume.", con.asset),
-      RequireMultiSig.new("Please confirm this consumption by signing the transaction.")
-    ]
-    |> append_offer(behs)
-  end
-
-  defp gen_workflow(%{tx_type: "ProofOfHolding", tx_behaviors: behs}) do
-    poh = Enum.find(behs, fn beh -> beh.behavior == "poh" end)
-
-    cond do
-      Util.empty?(poh.asset) == false and Util.empty?(poh.token) == false ->
-        [
-          RequireAccount.new(
-            "Please select an account with minimal #{poh.token} token.",
-            poh.token
-          ),
-          RequireAsset.new("Please prove you have #{poh.asset}.", poh.asset)
-        ]
-
-      Util.empty?(poh.asset) == false ->
-        [RequireAsset.new("Please prove you have #{poh.asset}.", poh.asset)]
-
-      Util.empty?(poh.token) == false ->
-        [
-          RequireAccount.new(
-            "Please select an account with minimal #{poh.token} token.",
-            poh.token
-          )
-        ]
-    end
-    |> append_offer(behs)
-  end
-
-  defp append_offer(workflow, behs) do
-    offer = Enum.find(behs, fn beh -> beh.behavior == "offer" end)
-
-    case offer do
-      nil -> workflow
-      _ -> workflow ++ [GenOffer.new(offer.token, offer.asset)]
-    end
   end
 
   defp get_step([], _), do: nil
@@ -333,5 +291,88 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
       true -> {current, rest}
       _ -> get_step(rest, target)
     end
+  end
+
+  defp get_app_wallet(tx_id) when is_integer(tx_id) do
+    demo = Demo.get_by_tx_id(tx_id)
+
+    %{
+      address: demo.did,
+      sk: Multibase.decode!(demo.sk),
+      pk: Multibase.decode!(demo.pk)
+    }
+  end
+
+  defp get_app_wallet(address) do
+    Custodian.get(address)
+  end
+
+  defp get_app_info(conn, tx_id) when is_integer(tx_id) do
+    demo = Demo.get_by_tx_id(tx_id)
+
+    demo
+    |> Map.take([:name, :subtitle, :description, :icon])
+    |> Map.merge(%{
+      icon: Util.expand_icon_path(conn, demo.icon)
+    })
+  end
+
+  defp get_app_info(_, _) do
+    %{name: "TBA Chain", description: "The test chain for ABT."}
+  end
+
+  defp get_chain_info(tx_id) when is_integer(tx_id) do
+    chain_info = ForgeSdk.get_chain_info()
+    forge_state = ForgeSdk.get_forge_state()
+
+    chain_info
+    |> do_get_chain_info(forge_state)
+    |> Map.put(:chainHost, Util.get_chainhost())
+  end
+
+  defp get_chain_info(_) do
+    chan = Util.remote_chan()
+    chain_info = ForgeSdk.get_chain_info(chan)
+    forge_state = ForgeSdk.get_forge_state(chan)
+
+    chain_info
+    |> do_get_chain_info(forge_state)
+    |> Map.put(:chainHost, Util.get_chainhost(:remote))
+  end
+
+  defp do_get_chain_info(chain_info, forge_state) do
+    %{
+      chainId: chain_info.network,
+      chainVersion: chain_info.version,
+      chainToken: forge_state.token.symbol,
+      decimals: forge_state.token.decimal
+    }
+  end
+
+  defp check_deposit(deposit_bin, value) do
+    tether_address =
+      @hasher
+      |> Mcrypto.hash(deposit_bin)
+      |> Base.encode16()
+      |> ForgeSdk.Util.to_tether_address()
+
+    chan = Util.remote_chan()
+
+    tether = [address: tether_address] |> ForgeSdk.get_tether_state(chan)
+
+    cond do
+      tether == nil -> "Deposited tether not found."
+      tether.available != true -> "Invalid tether."
+      BigInt.to_int(tether.value) != str_to_unit(value) -> "Invalid tether value."
+      true -> "ok"
+    end
+  end
+
+  defp str_to_unit(str) do
+    {value, _} = Float.parse(str)
+
+    value
+    |> ForgeAbi.token_to_unit()
+    |> BigInt.to_int()
   end
 end

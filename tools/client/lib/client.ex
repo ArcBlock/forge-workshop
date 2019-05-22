@@ -7,8 +7,28 @@ defmodule Client do
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
   @localhost "localhost:4000"
 
-  def create_wallet(host \\ @localhost) do
-    %HTTPoison.Response{body: body} = HTTPoison.post!(host <> "/api/wallet/recover", "")
+  @doc """
+  options:
+
+  `:cross`: `true` means create the wallet on both workshop chain and remote forge chain.
+
+  `:host`: The host of workshop.
+  """
+  def create_wallet(opts) do
+    cross = Keyword.get(opts, :cross, false)
+    host = Keyword.get(opts, :host, @localhost)
+
+    request_body =
+      case cross do
+        false -> ""
+        true -> Jason.encode!(%{cross_chain: true})
+      end
+
+    %HTTPoison.Response{body: body} =
+      HTTPoison.post!(host <> "/api/wallet/recover", request_body, [
+        {"content-type", "application/json"}
+      ])
+
     w = Jason.decode!(body)
 
     ForgeAbi.WalletInfo.new(
@@ -120,6 +140,18 @@ defmodule Client do
     display_claim(claim)
     answer = IO.gets("") |> String.trim_trailing("\n")
     Map.put(claim, "did", answer)
+  end
+
+  defp handle_claim(%{"type" => "token"} = claim, _) do
+    display_claim(claim)
+    answer = IO.gets("") |> String.trim_trailing("\n")
+    Map.put(claim, "value", answer)
+  end
+
+  defp handle_claim(%{"type" => "deposit"} = claim, _) do
+    display_claim(claim)
+    answer = IO.gets("") |> String.trim_trailing("\n")
+    Map.put(claim, "deposit", answer)
   end
 
   defp display_claim(%{"meta" => %{"description" => des}}) do

@@ -54,6 +54,7 @@ defmodule AbtDidWorkshop.Repo.Migrations.InitRepo do
       add(:address, :string, primary_key: true)
       add(:pk, :string)
       add(:sk, :string)
+      add(:moniker, :string)
       add(:commission, :decimal)
       add(:charge, :decimal)
     end

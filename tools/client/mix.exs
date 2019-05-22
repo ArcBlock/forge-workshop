@@ -32,8 +32,8 @@ defmodule Client.MixProject do
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
       {:httpoison, "~> 1.4"},
-      {:abt_did_elixir, git: "git@github.com:arcblock/abt-did-elixir.git"},
-      {:forge_sdk, git: "git@github.com:arcblock/forge-elixir-sdk.git"},
+      {:abt_did_elixir, "~> 0.3"},
+      {:forge_sdk, "~> 0.27"},
       {:multibase, "~> 0.0.1"}
     ]
   end

@@ -77,7 +77,7 @@ defmodule AbtDidWorkshop.AssetUtil do
 
   defp create_cert(wallet, cert) do
     itx = apply(CreateAssetTx, :new, [[data: ForgeAbi.encode_any!(cert, "ws:x:workshop_asset")]])
-    address = ForgeSdk.Util.to_asset_address(wallet.address, itx)
+    address = ForgeSdk.Util.to_asset_address(itx)
     itx = %{itx | address: address}
 
     case ForgeSdk.create_asset(itx, wallet: wallet, commit: true) do

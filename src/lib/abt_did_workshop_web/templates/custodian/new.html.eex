@@ -17,6 +17,7 @@
         <div class="row">
           <div class="input-field col s12">
             <%= text_input f, :moniker, placeholder: "Custodian Moniker", class: "form-control" %>
+            <%= error_tag f, :moniker %>
             <label>Moniker</label>
           </div>
         </div>

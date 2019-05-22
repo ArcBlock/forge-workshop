@@ -29,6 +29,12 @@
                     <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Update transaction"><i class="material-icons">edit</i></button>
                   <% end %>
                 </div>
+                <div class="qrcode-wrapper">
+                  <input id='<%= "qrValue_#{custodian.address}" %>' type="hidden" value="<%= AbtDidWorkshop.Util.gen_deeplink("http://abtwallet.io/i/", custodian.pk, custodian.address, custodian.address) %>"></input>
+                  <div align="center">
+                    <canvas class="qrcode qrcode-small" id='<%= "canvas_#{custodian.address}" %>'></canvas>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

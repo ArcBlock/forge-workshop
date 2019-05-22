@@ -6,7 +6,7 @@ defmodule AbtDidWorkshop.Util do
   alias AbtDidWorkshopWeb.Router.Helpers, as: Routes
 
   def remote_chan do
-    chan = Application.get_env(:abt_did_workshop, :remote_chan)
+    chan = config(:remote_chan)
 
     if chan !== nil and Process.alive?(chan.adapter_payload.conn_pid) do
       chan
@@ -16,7 +16,7 @@ defmodule AbtDidWorkshop.Util do
         |> File.read!()
         |> Toml.decode!()
         |> get_in(["forge", "sock_grpc"])
-        |> sock_to_ip()
+        |> to_ip_and_port()
 
       {:ok, remote_chan} = GRPC.Stub.connect(remote_sock_grpc)
       Application.put_env(:abt_did_workshop, :remote_chan, remote_chan)
@@ -25,7 +25,7 @@ defmodule AbtDidWorkshop.Util do
   end
 
   def local_chan do
-    Application.get_env(:abt_did_workshop, :local_chan)
+    config(:local_chan)
   end
 
   def expand_icon_path(conn, icon) do
@@ -91,21 +91,34 @@ defmodule AbtDidWorkshop.Util do
   end
 
   def get_chainhost do
-    if Application.get_env(:abt_did_workshop, :forge_node) == nil do
-      host =
-        [:forge_config, "sock_grpc"]
-        |> Util.config()
-        |> String.split("//")
-        |> List.last()
-        |> String.split(":")
-        |> List.first()
-
+    if config(:local_forge_node) == nil do
+      sock = Util.config([:forge_config, "sock_grpc"])
+      ip_and_port = to_ip_and_port(sock)
+      [ip, _] = split_ip_and_port(ip_and_port)
       web_port = Util.config([:forge_config, "web", "port"])
-      Application.put_env(:abt_did_workshop, :forge_node, %{host: host, web_port: web_port})
+      Application.put_env(:abt_did_workshop, :local_forge_node, %{ip: ip, web_port: web_port})
     end
 
-    forge_node = Application.get_env(:abt_did_workshop, :forge_node)
-    "http://#{resolve_host(forge_node.host)}:#{forge_node.web_port}/api/"
+    forge_node = config(:local_forge_node)
+    do_get_chainhost(forge_node)
+  end
+
+  def get_chainhost(:remote) do
+    if config(:remote_forge_node) == nil do
+      remote_forge = config(["workshop", "remote_forge"]) |> File.read!() |> Toml.decode!()
+      sock = get_in(remote_forge, ["forge", "sock_grpc"])
+      ip_and_port = to_ip_and_port(sock)
+      [ip, _] = split_ip_and_port(ip_and_port)
+      web_port = get_in(remote_forge, ["forge", "web", "port"])
+      Application.put_env(:abt_did_workshop, :remote_forge_node, %{ip: ip, web_port: web_port})
+    end
+
+    forge_node = config(:remote_forge_node)
+    do_get_chainhost(forge_node)
+  end
+
+  defp do_get_chainhost(%{ip: ip, web_port: port}) do
+    "http://#{resolve_host(ip)}:#{port}/api/"
   end
 
   def get_body(jwt) do
@@ -126,7 +139,7 @@ defmodule AbtDidWorkshop.Util do
     gen_deeplink(demo.path, demo.pk, demo.did, get_callback() <> "workflow/#{tx_id}")
   end
 
-  defp gen_deeplink(path, pk, did, url) do
+  def gen_deeplink(path, pk, did, url) do
     path = String.trim_trailing(path, "/")
 
     pk =
@@ -162,6 +175,8 @@ defmodule AbtDidWorkshop.Util do
   defp resolve_host("localhost"), do: get_ip()
   defp resolve_host(host), do: host
 
-  defp sock_to_ip("tcp://" <> ip), do: ip
-  defp sock_to_ip("grpc://" <> ip), do: ip
+  defp to_ip_and_port("tcp://" <> ip), do: ip
+  defp to_ip_and_port("grpc://" <> ip), do: ip
+
+  defp split_ip_and_port(value), do: String.split(value, ":")
 end

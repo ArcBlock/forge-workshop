@@ -56,7 +56,7 @@
         </div>
         <div class="row">
           <div class="input-field col s12">
-            <%= select f, :tx_type, ["PokeTx", "TransferTx", "ExchangeTx", "ConsumeAssetTx", "UpdateAssetTx", [key: "Proof of Holding", value: "ProofOfHolding"]], prompt: "Choose your transaction type", id: :tx_type, value: init_tx_type %>
+            <%= select f, :tx_type, ["PokeTx", "TransferTx", "ExchangeTx", "ExchangeTetherTx", "ConsumeAssetTx", "UpdateAssetTx", [key: "Proof of Holding", value: "ProofOfHolding"]], prompt: "Choose your transaction type", id: :tx_type, value: init_tx_type %>
             <label>Transaction Type</label>
           </div>
         </div>
@@ -134,6 +134,36 @@
             </div>
           </div>
         </div>
+
+        <div class="form-group" id="ExchangeTetherTx">
+          <div class="section">
+            <h7> ExchangeTetherTx </h7>
+            <div class="divider"></div>
+            <br/>
+            <p style="font-size: smaller"> ExchangeTetherTx is for cross-chain trading. </p>
+          </div>
+
+          <div class="row">
+            <div class="col s2">
+              <span style="font-size: smaller"> Offer: </span>
+            </div>
+            <div class="col s4">
+              <%= text_input f, :exchange_tether_offer_token, placeholder: "Token amout to offer.", value: behavior_value("ExchangeTetherTx_offer_token", @changeset.data) %>
+            </div>
+            <div class="col s6">
+              <%= text_input f, :exchange_tether_offer_asset, placeholder: "Asset title to offer.", value: behavior_value("ExchangeTetherTx_offer_asset", @changeset.data) %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col s2">
+              <span style="font-size: smaller"> Demand: </span>
+            </div>
+            <div class="col s10">
+              <%= text_input f, :exchange_tether_demand_tether, placeholder: "Tether amout to demand.", value: behavior_value("ExchangeTetherTx_demand_tether", @changeset.data) %>
+            </div>
+          </div>
+        </div>
+
 
         <div class="form-group" id="ConsumeAssetTx">
           <div class="section">
@@ -222,7 +252,7 @@
 
 <script>
 function showSubForm(form_id) {
-  list = ["PokeTx", "TransferTx", "ExchangeTx", "ConsumeAssetTx", "UpdateAssetTx", "ProofOfHolding"]
+  list = ["PokeTx", "TransferTx", "ExchangeTx", "ExchangeTetherTx", "ConsumeAssetTx", "UpdateAssetTx", "ProofOfHolding"]
   list.forEach(function (id) {
     if (form_id == "") {
       $('#' + id).hide();

@@ -109,6 +109,36 @@ defmodule AbtDidWorkshopWeb.TxController do
 
   defp do_create(
          conn,
+         %{"demo_id" => demo_id, "tx_id" => tx_id, "tx_type" => "ExchangeTetherTx"} = tx
+       ) do
+    offer_asset = tx["exchange_tether_offer_asset"]
+    offer_token = tx["exchange_tether_offer_token"]
+    demand_tether = tx["exchange_tether_demand_tether"]
+
+    case parse_token_amount([offer_token, demand_tether]) do
+      :error ->
+        go_to_new(conn, demo_id, tx_id, "The token amount must be positive integer or empty")
+
+      [token_offer, tether_demand] ->
+        cond do
+          tether_demand == nil ->
+            go_to_new(conn, demo_id, tx_id, "Tether cannot be empty.")
+
+          offer_token <> offer_asset != "" ->
+            behaviors =
+              to_beh("offer", offer_asset, token_offer, tx) ++
+                to_beh("demand", nil, nil, tx, Integer.to_string(tether_demand))
+
+            do_upsert(conn, demo_id, tx_id, behaviors, tx)
+
+          true ->
+            go_to_new(conn, demo_id, tx_id, "Must offer something.")
+        end
+    end
+  end
+
+  defp do_create(
+         conn,
          %{"demo_id" => demo_id, "tx_id" => tx_id, "tx_type" => "ConsumeAssetTx"} = tx
        ) do
     case tx["consume_asset"] do
@@ -188,7 +218,7 @@ defmodule AbtDidWorkshopWeb.TxController do
   end
 
   defp to_beh(beh, asset, token, tx, func \\ nil)
-  defp to_beh(_, "", "", _, _), do: []
+  # defp to_beh(_, "", "", _, ""), do: []
 
   defp to_beh(beh, asset, token, tx, func) do
     asset =

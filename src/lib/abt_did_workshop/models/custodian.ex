@@ -15,6 +15,7 @@ defmodule AbtDidWorkshop.Custodian do
     field(:address, :string)
     field(:pk, :string)
     field(:sk, :string)
+    field(:moniker, :string)
     field(:commission, :decimal)
     field(:charge, :decimal)
   end
@@ -24,13 +25,14 @@ defmodule AbtDidWorkshop.Custodian do
       address: Map.get(params, :address),
       pk: Base.encode16(Map.get(params, :pk, "")),
       sk: Base.encode16(Map.get(params, :sk, "")),
+      moniker: Map.get(params, :moniker),
       commission: Map.get(params, :commission),
       charge: Map.get(params, :charge)
     }
 
     struct
-    |> cast(incomming, [:address, :pk, :sk, :commission, :charge])
-    |> validate_required([:address, :pk, :sk, :commission, :charge])
+    |> cast(incomming, [:address, :pk, :sk, :moniker, :commission, :charge])
+    |> validate_required([:address, :pk, :sk, :moniker, :commission, :charge])
   end
 
   def insert(changeset) do
@@ -61,8 +63,9 @@ defmodule AbtDidWorkshop.Custodian do
       address: cus.address,
       pk: Base.decode16!(cus.pk),
       sk: Base.decode16!(cus.sk),
-      commission: cus.commission,
-      charge: cus.charge
+      moniker: cus.moniker,
+      commission: Decimal.to_float(cus.commission),
+      charge: Decimal.to_float(cus.charge)
     }
   end
 end

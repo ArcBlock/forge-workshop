@@ -6,8 +6,16 @@ defmodule AbtDidWorkshopWeb.WalletController do
   @ed25519 %Mcrypto.Signer.Ed25519{}
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
 
-  def create_wallet(conn, _) do
-    [{wallet, _}] = WalletUtil.init_wallets(1)
+  def create_wallet(conn, params) do
+    cross_chain = Map.get(params, "cross_chain")
+    wallet = WalletUtil.gen_wallet()
+
+    WalletUtil.declare_wallet(wallet, "Awesome")
+
+    if cross_chain != nil do
+      chan = Util.remote_chan()
+      WalletUtil.declare_wallet(wallet, "Awesome", chan)
+    end
 
     json(conn, %{
       address: wallet.address,

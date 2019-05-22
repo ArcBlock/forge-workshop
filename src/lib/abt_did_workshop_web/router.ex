@@ -52,5 +52,7 @@ defmodule AbtDidWorkshopWeb.Router do
     post("/workflow/asset/:id", WorkflowController, :response_asset)
     post("/workflow/sig/:id", WorkflowController, :response_sig)
     post("/workflow/multisig/:id", WorkflowController, :response_multi_sig)
+    post("/workflow/deposit/:id", WorkflowController, :response_deposit_value)
+    post("/workflow/tether/:id", WorkflowController, :response_tether)
   end
 end

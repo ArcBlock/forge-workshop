@@ -31,6 +31,7 @@ defmodule AbtDidWorkshopWeb.CustodianController do
         address: custodian.address,
         pk: custodian.pk,
         sk: custodian.sk,
+        moniker: args["moniker"],
         charge: normalize(args["charge"]),
         commission: normalize(args["commission"])
       })
@@ -42,7 +43,7 @@ defmodule AbtDidWorkshopWeb.CustodianController do
         |> render("new.html", changeset: Custodian.changeset(%Custodian{}))
 
       hash ->
-        Logger.warn("Successfully created custodian, hash: #{inspect(hash)} ")
+        Logger.info("Successfully created custodian, hash: #{inspect(hash)} ")
 
         case Custodian.insert(changeset) do
           {:ok, _} ->
@@ -95,7 +96,7 @@ defmodule AbtDidWorkshopWeb.CustodianController do
     chan = Util.remote_chan()
     res = ForgeSdk.stake_for_node(anchor, amount, wallet: custodian, commit: true, chan: chan)
 
-    case res |> IO.inspect(label: "@@@@") do
+    case res do
       {:error, reason} ->
         conn
         |> put_flash(:error, "Failed to stake to anchor, reason: #{inspect(reason)}")
@@ -110,8 +111,7 @@ defmodule AbtDidWorkshopWeb.CustodianController do
 
   defp enrich(custodian) do
     state =
-      get_account_state(custodian) ||
-        %{moniker: "", balance: ForgeAbi.token_to_unit(0), deposit_received: nil}
+      get_account_state(custodian) || %{balance: ForgeAbi.token_to_unit(0), deposit_received: nil}
 
     received =
       case state.deposit_received do
@@ -126,7 +126,7 @@ defmodule AbtDidWorkshopWeb.CustodianController do
       address: custodian.address,
       cap: unit_to_token(cap),
       received: unit_to_token(received),
-      moniker: state.moniker,
+      moniker: custodian.moniker,
       balance: unit_to_token(state.balance)
     }
   end
