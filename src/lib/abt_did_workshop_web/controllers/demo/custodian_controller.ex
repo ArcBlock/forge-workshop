@@ -2,7 +2,7 @@ defmodule AbtDidWorkshopWeb.CustodianController do
   use AbtDidWorkshopWeb, :controller
   use ForgeAbi.Unit
 
-  alias AbtDidWorkshop.{Custodian, WalletUtil, TxUtil, Util}
+  alias AbtDidWorkshop.{Custodian, WalletUtil, Tether, TxUtil, Util}
 
   alias ForgeAbi.{
     AddressFilter,
@@ -36,7 +36,7 @@ defmodule AbtDidWorkshopWeb.CustodianController do
       )
 
     {indexed_withdraw, _} = ForgeSdk.list_transactions(r, chan)
-    withdraws = display_withdraw(indexed_withdraw)
+    withdraws = indexed_withdraw |> display_withdraw() |> filter_approve()
     render(conn, "one.html", custodian: custodian, tethers: tethers, withdraws: withdraws)
   end
 
@@ -116,9 +116,9 @@ defmodule AbtDidWorkshopWeb.CustodianController do
     end
   end
 
-  def approve(conn, %{"hash" => hash, "address" => address}) do
+  def approve(conn, %{"hash" => withdraw_hash, "address" => address}) do
     custodian = Custodian.get(address)
-    itx = apply(ApproveTetherTx, :new, [[withdraw: hash]])
+    itx = apply(ApproveTetherTx, :new, [[withdraw: withdraw_hash]])
     res = ForgeSdk.approve_tether(itx, wallet: custodian, chan: Util.remote_chan(), send: :commit)
 
     case res do
@@ -128,6 +128,8 @@ defmodule AbtDidWorkshopWeb.CustodianController do
         |> redirect(to: Routes.custodian_path(conn, :get, address))
 
       hash ->
+        store_approve_info(withdraw_hash, hash)
+
         conn
         |> put_flash(:info, "Approve Tether Tx: #{hash}")
         |> redirect(to: Routes.custodian_path(conn, :get, address))
@@ -295,5 +297,27 @@ defmodule AbtDidWorkshopWeb.CustodianController do
     |> Map.put(:charge, Util.to_token(t.charge))
     |> Map.put(:commission, Util.to_token(t.commission))
     |> Map.put(:value, Util.to_token(t.value))
+  end
+
+  defp filter_approve(withdraws) do
+    hashs = Enum.map(withdraws, fn %{withdraw_hash: hash} -> hash end)
+
+    to_be_rejected =
+      hashs
+      |> Tether.get_by_withdraws()
+      |> Enum.filter(fn %{approve: approve} -> approve != nil and approve != "" end)
+      |> Enum.into(%{}, fn t -> {t.withdraw, t} end)
+
+    Enum.reject(withdraws, fn withdraw -> Map.has_key?(to_be_rejected, withdraw.withdraw_hash) end)
+  end
+
+  defp store_approve_info(withdraw, approve) do
+    records = Tether.get_by_withdraws([withdraw])
+
+    Enum.each(records, fn record ->
+      record
+      |> Tether.changeset(%{approve: approve})
+      |> Tether.update()
+    end)
   end
 end

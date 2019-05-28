@@ -58,10 +58,10 @@
               <div class="col s3">
                 <div class="action-buttons">
                   <%= form_for @conn, Routes.custodian_path(@conn, :verify, @custodian.address, hash: withdraw.exchange_hash), fn _ -> %>
-                    <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Verify Exchange"><i class="material-icons">verify</i></button>
+                    <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Verify Exchange"><i class="material-icons">edit</i></button>
                   <% end %>
                   <%= form_for @conn, Routes.custodian_path(@conn, :approve, @custodian.address, hash: withdraw.withdraw_hash), fn _ -> %>
-                    <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Approve Withdraw"><i class="material-icons">approve</i></button>
+                    <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Approve Withdraw"><i class="material-icons">edit</i></button>
                   <% end %>
                 </div>
               </div>

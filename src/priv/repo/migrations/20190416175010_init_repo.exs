@@ -58,5 +58,18 @@ defmodule AbtDidWorkshop.Repo.Migrations.InitRepo do
       add(:commission, :decimal)
       add(:charge, :decimal)
     end
+
+    create table(:tether) do
+      add(:address, :string)
+      add(:deposit, :string)
+      add(:exchange, :string)
+      add(:withdraw, :string)
+      add(:approve, :string)
+    end
+
+    create(index(:tether, [:address]))
+    create(index(:tether, [:exchange]))
+    create(index(:tether, [:withdraw]))
+    create(index(:tether, [:approve]))
   end
 end

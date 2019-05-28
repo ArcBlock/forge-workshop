@@ -30,7 +30,7 @@
               <div class="col s3">
                 <div class="action-buttons">
                   <%= form_for @conn, Routes.custodian_path(@conn, :edit, custodian.address), [method: "get"], fn _ -> %>
-                    <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Update transaction"><i class="material-icons">edit</i></button>
+                    <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Raise Deposit Cap"><i class="material-icons">edit</i></button>
                   <% end %>
                 </div>
                 <div class="qrcode-wrapper">
