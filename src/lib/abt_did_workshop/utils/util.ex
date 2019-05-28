@@ -5,6 +5,12 @@ defmodule AbtDidWorkshop.Util do
   alias AbtDidWorkshopWeb.Endpoint
   alias AbtDidWorkshopWeb.Router.Helpers, as: Routes
 
+  def to_token(%ForgeAbi.BigUint{} = value),
+    do: value |> ForgeAbi.Util.BigInt.to_int() |> Kernel./(ForgeAbi.one_token())
+
+  def to_token(number) when is_number(number),
+    do: number / ForgeAbi.one_token()
+
   def remote_chan do
     chan = config(:remote_chan)
 

@@ -3,14 +3,13 @@ defmodule AbtDidWorkshop.Plugs.PrepareArgs do
   Prepare common arguments.
   """
   import Plug.Conn
-  import Phoenix.Controller
 
-  alias AbtDidWorkshop.{Tx, WalletUtil}
+  alias AbtDidWorkshop.WalletUtil
 
   def init(_) do
   end
 
-  def call(%Plug.Conn{params: %{"id" => id}} = conn, _) do
+  def call(conn, _) do
     assign(conn, :robert, WalletUtil.get_robert())
   end
 end

@@ -20,6 +20,19 @@ defmodule AbtDidWorkshop.TxUtil do
   require Logger
 
   @one_week 604_800
+  @hasher %Mcrypto.Hasher.Sha2{round: 1}
+
+  def get_tx_hash(%Transaction{} = tx) do
+    tx
+    |> Transaction.encode()
+    |> get_tx_hash()
+  end
+
+  def get_tx_hash(tx_bin) when is_binary(tx_bin) do
+    @hasher
+    |> Mcrypto.hash(tx_bin)
+    |> Base.encode16()
+  end
 
   def hash(:keccak, data), do: Mcrypto.hash(%Mcrypto.Hasher.Keccak{}, data)
   def hash(:sha3, data), do: Mcrypto.hash(%Mcrypto.Hasher.Sha3{}, data)

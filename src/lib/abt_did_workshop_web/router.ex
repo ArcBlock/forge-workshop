@@ -29,9 +29,15 @@ defmodule AbtDidWorkshopWeb.Router do
 
     get("/custodian", CustodianController, :index)
     get("/custodian/:address/edit", CustodianController, :edit)
+    get("/custodian/:address/tethers", CustodianController, :get)
     get("/custodian/new", CustodianController, :new)
+    post("/custodian/:address/verify", CustodianController, :verify)
+    post("/custodian/:address/approve", CustodianController, :approve)
     post("/custodian", CustodianController, :create)
     put("/custodian", CustodianController, :update)
+
+    get("/withdrawer", WithdrawerController, :index)
+    post("/withdrawer/:hash", WithdrawerController, :withdraw)
 
     resources("/demo", DemoController)
     resources("/tx", TxController)

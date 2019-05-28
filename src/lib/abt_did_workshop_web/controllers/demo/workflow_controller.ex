@@ -15,11 +15,8 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
   }
 
   alias AbtDidWorkshopWeb.WorkflowHelper
-
-  alias ForgeAbi.Transaction
   alias ForgeAbi.Util.BigInt
-
-  @hasher %Mcrypto.Hasher.Sha2{round: 1}
+  alias ForgeAbi.Transaction
 
   plug(PrepareArgs)
   plug(PrepareTx)
@@ -121,7 +118,7 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
     end
   end
 
-  def response_deposit_value(conn, param) do
+  def response_deposit_value(conn, _) do
     claim =
       conn.assigns.claims
       |> Enum.find(fn
@@ -146,7 +143,7 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
     end
   end
 
-  def response_tether(conn, param) do
+  def response_tether(conn, _) do
     claim =
       conn.assigns.claims
       |> Enum.find(fn
@@ -158,12 +155,12 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
     workflow = WorkflowHelper.gen_workflow(tx)
     {current, rest} = get_step(workflow, RequireTether)
 
-    deposit_bin = claim["deposit"] |> Multibase.decode!()
+    deposit_tx = claim["deposit"] |> Multibase.decode!() |> Transaction.decode()
 
-    case check_deposit(deposit_bin, current.value) do
+    case check_deposit(deposit_tx, current.value) do
       "ok" ->
         conn
-        |> Plug.Conn.assign(:deposit, Transaction.decode(deposit_bin))
+        |> Plug.Conn.assign(:deposit, deposit_tx)
         |> reply_step(rest)
 
       error ->
@@ -349,11 +346,10 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
     }
   end
 
-  defp check_deposit(deposit_bin, value) do
+  defp check_deposit(deposit, value) do
     tether_address =
-      @hasher
-      |> Mcrypto.hash(deposit_bin)
-      |> Base.encode16()
+      deposit
+      |> TxUtil.get_tx_hash()
       |> ForgeSdk.Util.to_tether_address()
 
     chan = Util.remote_chan()

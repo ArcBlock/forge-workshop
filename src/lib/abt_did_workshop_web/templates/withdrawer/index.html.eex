@@ -1,0 +1,43 @@
+<div class="row">
+  <div class="col s12 m3">
+    <div class="section">
+      <h5 class="page-header"><i class="material-icons">info</i>Withdrawer</h5>
+      <div class="row">
+        <div class="col s9">
+          <p class="tx-description"><%= @robert.address %></p>
+          <p class="tx-description">Balance <%= @robert.balance %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col s12 m8 offset-m1">
+    <div class="section">
+      <h5 class="page-header"><i class="material-icons">view_exchange</i>Exchange Tether Transaction List</h5>
+      <div class="txs">
+        <%= for exchange <- @exchanges do %>
+          <div class="tx info-panel">
+            <div class="row">
+              <div class="col s9">
+                <h6 class="tx-description">Address <%= exchange.tether %></h6>
+                <p class="tx-description">Hash <%= exchange.hash %></p>
+                <p class="tx-description">Depositor <%= exchange.depositor %></p>
+                <p class="tx-description">Withdrawer <%= exchange.withdrawer %></p>
+                <p class="tx-description">Value <%= exchange.value %></p>
+                <p class="tx-description">Commission <%= exchange.commission %></p>
+                <p class="tx-description">Charge <%= exchange.charge %></p>
+                <p class="tx-description">Locktime <%= exchange.locktime %></p>
+              </div>
+              <div class="col s3">
+                <div class="action-buttons">
+                  <%= form_for @conn, Routes.withdrawer_path(@conn, :withdraw, exchange.hash), fn _ -> %>
+                    <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Withdraw Tether"><i class="material-icons">withdraw</i></button>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -2,12 +2,43 @@ defmodule AbtDidWorkshopWeb.CustodianController do
   use AbtDidWorkshopWeb, :controller
   use ForgeAbi.Unit
 
-  alias AbtDidWorkshop.{Custodian, WalletUtil, Util}
+  alias AbtDidWorkshop.{Custodian, WalletUtil, TxUtil, Util}
+
+  alias ForgeAbi.{
+    AddressFilter,
+    ApproveTetherTx,
+    ExchangeTetherTx,
+    IndexedTransaction,
+    RequestListTransactions,
+    TetherExchangeInfo,
+    Transaction,
+    TypeFilter,
+    ValidityFilter
+  }
 
   require Logger
 
   @anchor1 "zyt4TpbBV6kTaoPBggQpytQfBWQHSfuGmYma"
   @anchor2 "zyt3iSdM8RS2431opc6wy3sou6BKtjXiPYzY"
+
+  def get(conn, %{"address" => address}) do
+    chan = Util.remote_chan()
+    custodian = address |> Custodian.get() |> enrich()
+
+    {indexed_tethers, _} = ForgeSdk.list_tethers([custodian: address, available: true], chan)
+    tethers = display_tether(indexed_tethers)
+
+    r =
+      RequestListTransactions.new(
+        address_filter: AddressFilter.new(receiver: address),
+        type_filter: TypeFilter.new(types: ["withdraw_tether"]),
+        validity_filter: ValidityFilter.new(validity: 1)
+      )
+
+    {indexed_withdraw, _} = ForgeSdk.list_transactions(r, chan)
+    withdraws = display_withdraw(indexed_withdraw)
+    render(conn, "one.html", custodian: custodian, tethers: tethers, withdraws: withdraws)
+  end
 
   def index(conn, _) do
     custodians =
@@ -64,6 +95,43 @@ defmodule AbtDidWorkshopWeb.CustodianController do
   def update(conn, params) do
     %{"address" => address, "amount" => amount, "anchor" => anchor} = params
     do_update(conn, address, Float.parse(amount), anchor)
+  end
+
+  def verify(conn, %{"hash" => hash, "address" => address}) do
+    case ForgeSdk.get_tx(hash: hash) do
+      nil ->
+        conn
+        |> put_flash(:error, "The Exchange Tether Tx is NOT found.")
+        |> redirect(to: Routes.custodian_path(conn, :get, address))
+
+      %{code: :ok} ->
+        conn
+        |> put_flash(:info, "The Exchange Tether Tx is valid.")
+        |> redirect(to: Routes.custodian_path(conn, :get, address))
+
+      _ ->
+        conn
+        |> put_flash(:error, "The Exchange Tether Tx is NOT valid.")
+        |> redirect(to: Routes.custodian_path(conn, :get, address))
+    end
+  end
+
+  def approve(conn, %{"hash" => hash, "address" => address}) do
+    custodian = Custodian.get(address)
+    itx = apply(ApproveTetherTx, :new, [[withdraw: hash]])
+    res = ForgeSdk.approve_tether(itx, wallet: custodian, chan: Util.remote_chan(), send: :commit)
+
+    case res do
+      {:error, reason} ->
+        conn
+        |> put_flash(:error, "Approve Tether Failed: #{inspect(reason)}")
+        |> redirect(to: Routes.custodian_path(conn, :get, address))
+
+      hash ->
+        conn
+        |> put_flash(:info, "Approve Tether Tx: #{hash}")
+        |> redirect(to: Routes.custodian_path(conn, :get, address))
+    end
   end
 
   def do_update(conn, address, _, "") do
@@ -158,5 +226,74 @@ defmodule AbtDidWorkshopWeb.CustodianController do
   defp normalize(value) do
     {v, _} = Float.parse(value)
     v
+  end
+
+  defp display_withdraw(list) when is_list(list), do: Enum.map(list, &display_withdraw/1)
+
+  defp display_withdraw(%IndexedTransaction{} = indexed_withdraw) do
+    chan = Util.remote_chan()
+    %{tx: withdraw_tx} = indexed_withdraw
+    withdraw_itx = ForgeAbi.decode_any!(withdraw_tx.itx)
+    tether = withdraw_itx.receiver.tether
+    tether_state = ForgeSdk.get_tether_state([address: tether], chan)
+    %{tx: deposit_tx} = ForgeSdk.get_tx([hash: tether_state.hash], chan)
+    exchange = to_exchange(withdraw_itx, deposit_tx)
+    exchange_hash = TxUtil.get_tx_hash(exchange)
+
+    %{
+      address: tether_state.address,
+      available: tether_state.available,
+      depositor: tether_state.depositor,
+      withdrawer: tether_state.withdrawer,
+      value: Util.to_token(tether_state.value),
+      commission: Util.to_token(tether_state.commission),
+      charge: Util.to_token(tether_state.charge),
+      target: tether_state.target,
+      locktime: ForgeSdk.Util.proto_to_datetime(tether_state.locktime),
+      time: indexed_withdraw.time,
+      withdraw_hash: indexed_withdraw.hash,
+      exchange_hash: exchange_hash
+    }
+  end
+
+  defp to_exchange(withdraw_itx, deposit_tx) do
+    receiver =
+      apply(TetherExchangeInfo, :new, [
+        [
+          assets: withdraw_itx.receiver.assets,
+          value: withdraw_itx.receiver.value,
+          deposit: deposit_tx
+        ]
+      ])
+
+    itx =
+      apply(ExchangeTetherTx, :new, [
+        [
+          sender: withdraw_itx.sender,
+          receiver: receiver,
+          expired_at: withdraw_itx.expired_at
+        ]
+      ])
+
+    Transaction.new(
+      chain_id: withdraw_itx.chain_id,
+      from: withdraw_itx.from,
+      itx: ForgeAbi.encode_any!(itx, "fg:t:exchange_tether"),
+      nonce: withdraw_itx.nonce,
+      pk: withdraw_itx.pk,
+      signature: withdraw_itx.signature,
+      signatures: withdraw_itx.signatures
+    )
+  end
+
+  defp display_tether(list) when is_list(list), do: Enum.map(list, &display_tether/1)
+
+  defp display_tether(tether) do
+    t = ForgeSdk.display(tether)
+
+    t
+    |> Map.put(:charge, Util.to_token(t.charge))
+    |> Map.put(:commission, Util.to_token(t.commission))
+    |> Map.put(:value, Util.to_token(t.value))
   end
 end
