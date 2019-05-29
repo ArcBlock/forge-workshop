@@ -1,3 +1,6 @@
+## 0.4.0 (May 29, 2019)
+  - Support cross chain transactions.
+
 ## 0.3.9 (May 02, 2019)
   - Uptake new version of forge
   - styling did workshop (#54)
