@@ -20,7 +20,7 @@
           <div class="tx info-panel">
             <div class="row">
               <div class="col s9">
-                <h6 class="tx-description">Address <%= exchange.tether %></h6>
+                <p class="tx-description">Address <%= exchange.tether %></p>
                 <p class="tx-description">Hash <%= exchange.hash %></p>
                 <p class="tx-description">Depositor <%= exchange.depositor %></p>
                 <p class="tx-description">Withdrawer <%= exchange.withdrawer %></p>
@@ -50,7 +50,7 @@
           <div class="tx info-panel">
             <div class="row">
               <div class="col s9">
-                <h6 class="tx-description">Address <%= submitted.address %></h6>
+                <p class="tx-description">Address <%= submitted.address %></p>
                 <p class="tx-description">Withdraw Hash <%= submitted.withdraw %></p>
                 <p class="tx-description">Exchange Hash <%= submitted.exchange %></p>
               </div>
@@ -67,7 +67,7 @@
         <%= for approved <- @approved do %>
           <div class="tx info-panel">
             <div class="row">
-              <div class="col 12">
+              <div class="col s12 style='word-break: break-word">
                 <p class="tx-description">Hash <%= approved.hash %></p>
                 <p class="tx-description">Withdraw <%= approved.withdraw %></p>
                 <p class="tx-description">Time <%= approved.time %></p>

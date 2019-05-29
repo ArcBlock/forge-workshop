@@ -213,6 +213,7 @@ a {
 }
 .tx .tx-description {
   font-size: 0.9rem;
+  word-break: break-word;
 }
 .tx .tx-behaviors {
   margin-top: 2rem;
