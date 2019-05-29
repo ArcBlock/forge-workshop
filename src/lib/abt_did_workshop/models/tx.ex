@@ -26,32 +26,38 @@ defmodule AbtDidWorkshop.Tx do
   end
 
   def get_all(demo_id) do
-    from(
-      t in Tx,
-      where: t.demo_id == ^demo_id,
-      preload: [:tx_behaviors]
-    )
-    |> Repo.all()
+    query =
+      from(
+        t in Tx,
+        where: t.demo_id == ^demo_id,
+        preload: [:tx_behaviors]
+      )
+
+    apply(Repo, :all, [query])
   end
 
   def get(id) do
-    from(
-      t in Tx,
-      preload: [:tx_behaviors],
-      where: t.id == ^id
-    )
-    |> Repo.one()
+    query =
+      from(
+        t in Tx,
+        preload: [:tx_behaviors],
+        where: t.id == ^id
+      )
+
+    apply(Repo, :one, [query])
   end
 
   def get_offer_txs(demo_id) do
-    from(
-      t in Tx,
-      join: b in TxBehavior,
-      on: t.id == b.tx_id and b.behavior == "offer" and b.asset != "",
-      where: t.demo_id == ^demo_id,
-      preload: [:tx_behaviors]
-    )
-    |> Repo.all()
+    query =
+      from(
+        t in Tx,
+        join: b in TxBehavior,
+        on: t.id == b.tx_id and b.behavior == "offer" and b.asset != "",
+        where: t.demo_id == ^demo_id,
+        preload: [:tx_behaviors]
+      )
+
+    apply(Repo, :all, [query])
   end
 
   def upsert(tx, "", demo_id) do
@@ -59,23 +65,29 @@ defmodule AbtDidWorkshop.Tx do
   end
 
   def upsert(tx, tx_id, demo_id) do
-    Repo.transaction(fn ->
-      delete(tx_id)
+    apply(Repo, :transaction, [
+      fn ->
+        delete(tx_id)
 
-      tx_record =
-        demo_id
-        |> Demo.get()
-        |> build_assoc(:txs)
-        |> Tx.changeset(tx)
-        |> Repo.insert!()
+        changeset =
+          demo_id
+          |> Demo.get()
+          |> build_assoc(:txs)
+          |> Tx.changeset(tx)
 
-      tx.tx_behaviors
-      |> Enum.each(fn b ->
-        build_assoc(tx_record, :tx_behaviors)
-        |> TxBehavior.changeset(b)
-        |> Repo.insert!()
-      end)
-    end)
+        tx_record = apply(Repo, :insert!, [changeset])
+
+        tx.tx_behaviors
+        |> Enum.each(fn b ->
+          changeset =
+            tx_record
+            |> build_assoc(:tx_behaviors)
+            |> TxBehavior.changeset(b)
+
+          apply(Repo, :insert!, [changeset])
+        end)
+      end
+    ])
   end
 
   def delete(nil), do: :ok
@@ -90,7 +102,7 @@ defmodule AbtDidWorkshop.Tx do
   def delete(id) do
     case get(id) do
       nil -> :ok
-      tx -> Repo.delete(tx)
+      tx -> apply(Repo, :delete, [tx])
     end
   end
 end

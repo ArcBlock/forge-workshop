@@ -59,7 +59,7 @@
                           <div class="col s12 m12 l4 behavior-value"> <%= x.asset %></div>
                         <% end %>
                         <%= if x.function != nil and x.function != "" do %>
-                          <div class="col s12 m12 l4 behavior-value"> <%= x.function %></div>
+                          <div class="col s12 m12 l4 behavior-value"> <%= to_tether(x) %></div>
                         <% end %>
                       </div>
                     </div>

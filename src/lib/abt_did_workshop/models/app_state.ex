@@ -61,19 +61,17 @@ defmodule AbtDidWorkshop.AppState do
   end
 
   def get do
-    from(a in AppState)
-    |> Repo.all()
+    Repo
+    |> apply(:all, [from(a in AppState)])
     |> List.first()
   end
 
   def delete do
-    from(a in AppState)
-    |> Repo.delete_all()
+    apply(Repo, :delete_all, [from(a in AppState)])
   end
 
   def insert(state) do
-    %AppState{}
-    |> AppState.changeset(state)
-    |> Repo.insert()
+    changeset = AppState.changeset(%AppState{}, state)
+    apply(Repo, :insert, [changeset])
   end
 end

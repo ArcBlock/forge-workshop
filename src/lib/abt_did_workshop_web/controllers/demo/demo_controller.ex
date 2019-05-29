@@ -50,16 +50,16 @@ defmodule AbtDidWorkshopWeb.DemoController do
   end
 
   def edit(conn, %{"id" => demo_id}) do
-    demo = Repo.get(Demo, demo_id)
+    demo = apply(Repo, :get, [Demo, demo_id])
     changeset = Demo.changeset(demo)
     render(conn, "edit.html", changeset: changeset, demo: demo)
   end
 
   def update(conn, %{"id" => demo_id, "demo" => new_demo}) do
-    old_demo = Repo.get(Demo, demo_id)
+    old_demo = apply(Repo, :get, [Demo, demo_id])
     changeset = Demo.changeset(old_demo, new_demo)
 
-    case Repo.update(changeset) do
+    case apply(Repo, :update, [changeset]) do
       {:ok, _} ->
         conn
         |> put_flash(:info, "Demo updated.")

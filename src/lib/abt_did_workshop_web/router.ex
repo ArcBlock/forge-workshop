@@ -27,6 +27,18 @@ defmodule AbtDidWorkshopWeb.Router do
     get("/wallet/auth", WalletController, :request_auth)
     post("/wallet/auth", WalletController, :response_auth)
 
+    get("/custodian", CustodianController, :index)
+    get("/custodian/:address/edit", CustodianController, :edit)
+    get("/custodian/:address/tethers", CustodianController, :get)
+    get("/custodian/new", CustodianController, :new)
+    post("/custodian/:address/verify", CustodianController, :verify)
+    post("/custodian/:address/approve", CustodianController, :approve)
+    post("/custodian", CustodianController, :create)
+    put("/custodian", CustodianController, :update)
+
+    get("/withdrawer", WithdrawerController, :index)
+    post("/withdrawer/:hash", WithdrawerController, :withdraw)
+
     resources("/demo", DemoController)
     resources("/tx", TxController)
     put("/tx", TxController, :create)
@@ -46,5 +58,7 @@ defmodule AbtDidWorkshopWeb.Router do
     post("/workflow/asset/:id", WorkflowController, :response_asset)
     post("/workflow/sig/:id", WorkflowController, :response_sig)
     post("/workflow/multisig/:id", WorkflowController, :response_multi_sig)
+    post("/workflow/deposit/:id", WorkflowController, :response_deposit_value)
+    post("/workflow/tether/:id", WorkflowController, :response_tether)
   end
 end

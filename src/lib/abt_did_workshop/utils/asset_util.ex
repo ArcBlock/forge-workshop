@@ -70,20 +70,14 @@ defmodule AbtDidWorkshop.AssetUtil do
     nbf = exp = 0
     sig = sign_cert(from.sk, from.address, to, now, nbf, exp, title, content)
 
-    WorkshopAsset.new(
-      from: from.address,
-      to: to,
-      iat: now,
-      exp: exp,
-      title: title,
-      content: content,
-      sig: sig
-    )
+    apply(WorkshopAsset, :new, [
+      [from: from.address, to: to, iat: now, exp: exp, title: title, content: content, sig: sig]
+    ])
   end
 
   defp create_cert(wallet, cert) do
-    itx = CreateAssetTx.new(data: ForgeAbi.encode_any!(cert, "ws:x:workshop_asset"))
-    address = ForgeSdk.Util.to_asset_address(wallet.address, itx)
+    itx = apply(CreateAssetTx, :new, [[data: ForgeAbi.encode_any!(cert, "ws:x:workshop_asset")]])
+    address = ForgeSdk.Util.to_asset_address(itx)
     itx = %{itx | address: address}
 
     case ForgeSdk.create_asset(itx, wallet: wallet, commit: true) do

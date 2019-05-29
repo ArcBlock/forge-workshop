@@ -13,7 +13,7 @@ defmodule AbtDidWorkshop.SqliteRepo do
   end
 
   defp get_db_file do
-    config = Util.config("workshop")
+    config = get_config()
     home = config["path"]
     "sqlite://" <> db = config["db"]
     filename = Path.join(home, db)
@@ -33,5 +33,18 @@ defmodule AbtDidWorkshop.SqliteRepo do
     end
 
     filename
+  end
+
+  defp get_config() do
+    case Util.config("workshop") do
+      nil ->
+        %{
+          "db" => "sqlite://workshop.sqlite3",
+          "path" => Path.expand("~/.workshop")
+        }
+
+      config ->
+        config
+    end
   end
 end

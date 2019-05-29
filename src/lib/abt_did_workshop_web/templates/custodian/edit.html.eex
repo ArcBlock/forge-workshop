@@ -1,0 +1,31 @@
+<div class="row">
+  <div class="col s12 m3">
+    <div class="section">
+      <h5 class="page-header"><i class="material-icons">info</i>Custodians</h5>
+      <div class="row">
+        <div class="input-field col s12">
+          <label>Custodians are the key to resolve cross-chain transactions. Here you can try how do they work to keep justice on chains.</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col s12 m8 offset-m1">
+    <div class="section">
+      <h5 class="page-header"><i class="material-icons">control_point</i>Stake/Unstake to anchor accounts to raise/lower deposit cap.</h5>
+      <%= form_for @conn, Routes.custodian_path(@conn, :update), [method: "put"], fn c -> %>
+      <%= text_input c, :address, value: @address, type: "hidden" %>
+        <div class="input-field col s12">
+          <%= select c, :anchor, ["zyt4TpbBV6kTaoPBggQpytQfBWQHSfuGmYma", "zyt3iSdM8RS2431opc6wy3sou6BKtjXiPYzY"], prompt: "Choose anchor to stake/unstake" %>
+          <label>Anchor</label>
+        </div>
+        <div class="input-field col s12">
+          <%= text_input c, :amount, placeholder: "Input positve number to stake, negative number to unstake.", class: "form-control" %>
+          <label>Amount</label>
+        </div>
+        <div class="col s12">
+          <%= submit "Update Deposit Cap", class: "btn btn-outlined blue-text text-accent-2 waves-effect" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

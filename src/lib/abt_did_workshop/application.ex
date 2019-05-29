@@ -5,19 +5,24 @@ defmodule AbtDidWorkshop.Application do
   alias AbtDidWorkshopWeb.Endpoint
 
   def start(_type, _args) do
-    children = get_children()
+    callback = fn ->
+      forge_state = ForgeSdk.get_forge_state()
+      ForgeSdk.update_type_url(forge_state)
+      register_type_urls()
+    end
+
+    children = get_servers(callback)
     opts = [strategy: :one_for_one, name: AbtDidWorkshop.Supervisor]
     result = Supervisor.start_link(children, opts)
-
-    forge_state = ForgeSdk.get_forge_state()
-    ForgeSdk.update_type_url(forge_state)
-    register_type_urls()
 
     spawn(fn ->
       Process.sleep(5_000)
       %{decimal: decimal} = ForgeSdk.get_forge_state().token
       Application.put_env(:forge_abi, :decimal, decimal)
-      WalletUtil.get_robert()
+      robert = WalletUtil.get_robert()
+      WalletUtil.declare_wallet(robert, "robert", Util.remote_chan())
+      WalletUtil.raise_validator_power()
+      WalletUtil.declare_anchors()
     end)
 
     result
@@ -36,20 +41,32 @@ defmodule AbtDidWorkshop.Application do
     ])
   end
 
-  defp get_children do
-    filepath = read_config()
+  defp get_servers(callback) do
     env = Util.config(:env)
-    repo = set_db()
-    app_servers = [Endpoint, UserDb, repo]
+    app_servers = get_app_servers()
+    forge_servers = get_forge_servers(callback)
 
     case env do
       "test" ->
         app_servers
 
       _ ->
-        forge_servers = ForgeSdk.init(:abt_did_workshop, "", filepath)
         forge_servers ++ app_servers
     end
+  end
+
+  defp get_app_servers() do
+    read_config()
+    repo = set_db()
+    [Endpoint, UserDb, repo]
+  end
+
+  defp get_forge_servers(callback) do
+    filepath = Util.config(["workshop", "local_forge"])
+    [{mod, sock}] = ForgeSdk.init(:abt_did_workshop, "", filepath)
+    Application.put_env(:abt_did_workshop, :local_chan, ForgeSdk.get_chan())
+    Util.remote_chan()
+    [{mod, addr: sock, callback: callback}]
   end
 
   def read_config() do
@@ -65,8 +82,6 @@ defmodule AbtDidWorkshop.Application do
     |> Enum.each(fn {key, value} ->
       Application.put_env(:abt_did_workshop, key, adjust_config(value))
     end)
-
-    filepath
   end
 
   defp adjust_config(config) when is_map(config) do

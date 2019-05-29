@@ -29,48 +29,52 @@ defmodule AbtDidWorkshop.Demo do
   end
 
   def get(id) do
-    from(
-      d in Demo,
-      where: d.id == ^id,
-      preload: [:txs]
-    )
-    |> Repo.one()
+    query =
+      from(d in Demo,
+        where: d.id == ^id,
+        preload: [:txs]
+      )
+
+    apply(Repo, :one, [query])
   end
 
   def get_by_tx_id(tx_id) do
-    from(
-      d in Demo,
-      join: t in Tx,
-      on: d.id == t.demo_id,
-      where: t.id == ^tx_id
-    )
-    |> Repo.one()
+    query =
+      from(
+        d in Demo,
+        join: t in Tx,
+        on: d.id == t.demo_id,
+        where: t.id == ^tx_id
+      )
+
+    apply(Repo, :one, [query])
   end
 
   def get_all do
-    from(
-      d in Demo,
-      preload: [:txs]
-    )
-    |> Repo.all()
+    query =
+      from(
+        d in Demo,
+        preload: [:txs]
+      )
+
+    apply(Repo, :all, [query])
   end
 
   def insert(demo) do
-    %Demo{}
-    |> Demo.changeset(demo)
-    |> Repo.insert()
+    changeset = Demo.changeset(%Demo{}, demo)
+    apply(Repo, :insert, [changeset])
   end
 
   def delete(id) do
-    id
-    |> get()
-    |> Repo.delete()
+    apply(Repo, :delete, [get(id)])
   end
 
   def update(id, param) do
-    id
-    |> get()
-    |> Demo.changeset(param)
-    |> Repo.update()
+    changeset =
+      id
+      |> get()
+      |> Demo.changeset(param)
+
+    apply(Repo, :update, [changeset])
   end
 end
