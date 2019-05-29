@@ -220,6 +220,10 @@ defmodule AbtDidWorkshopWeb.WorkflowController do
     |> reply(conn)
   end
 
+  defp reply_step(conn, []) do
+    reply(:ok, conn)
+  end
+
   defp get_require(step, conn) do
     case step.__struct__ do
       RequireAccount -> {"account", TxUtil.require_account(step.desc, step.token)}
