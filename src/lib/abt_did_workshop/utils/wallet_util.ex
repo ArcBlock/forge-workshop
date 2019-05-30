@@ -190,7 +190,7 @@ defmodule AbtDidWorkshop.WalletUtil do
     Task.async(fn ->
       wallets = init_wallets(number, chan)
       Process.sleep(number * 50)
-      Enum.each(wallets, fn {w, _} -> poke(w) end)
+      Enum.each(wallets, fn {w, _} -> poke(w, chan) end)
       Process.sleep(number * 50)
       %{amount: poke_amount} = ForgeSdk.get_forge_state(chan).poke_config
       itx = apply(TransferTx, :new, [[to: address, value: ForgeAbi.token_to_unit(poke_amount)]])
