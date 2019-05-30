@@ -156,15 +156,15 @@ defmodule AbtDidWorkshop.WalletUtil do
     ForgeAbi.WalletInfo.new(address: address, pk: pk, sk: sk)
   end
 
-  def poke(wallet) do
-    %{address: address} = ForgeSdk.get_forge_state().poke_config
+  def poke(wallet, chan \\ nil) do
+    %{address: address} = ForgeSdk.get_forge_state(chan).poke_config
 
     itx =
       apply(PokeTx, :new, [
         [address: address, date: DateTime.utc_now() |> DateTime.to_date() |> Date.to_string()]
       ])
 
-    ForgeSdk.poke(itx, wallet: wallet)
+    ForgeSdk.poke(itx, wallet: wallet, chan: chan)
   end
 
   def get_robert do
@@ -182,20 +182,21 @@ defmodule AbtDidWorkshop.WalletUtil do
     %{address: addr, pk: pk, sk: sk} = AbtDidWorkshop.Util.config(:robert)
     w = WalletInfo.new(address: addr, pk: pk, sk: sk)
     hash = declare_wallet(w, "robert")
-
-    Task.async(fn ->
-      wallets = init_wallets(100)
-      Process.sleep(5_000)
-      Enum.each(wallets, fn {w, _} -> poke(w) end)
-      Process.sleep(5_000)
-
-      %{amount: poke_amount} = ForgeSdk.get_forge_state().poke_config
-      itx = apply(TransferTx, :new, [[to: addr, value: ForgeAbi.token_to_unit(poke_amount)]])
-
-      Enum.each(wallets, fn {w, _} -> ForgeSdk.transfer(itx, wallet: w) end)
-    end)
-
+    raise_balance(w.address, 100)
     {w, hash}
+  end
+
+  def raise_balance(address, number, chan \\ nil) do
+    Task.async(fn ->
+      wallets = init_wallets(number, chan)
+      Process.sleep(number * 50)
+      Enum.each(wallets, fn {w, _} -> poke(w) end)
+      Process.sleep(number * 50)
+      %{amount: poke_amount} = ForgeSdk.get_forge_state(chan).poke_config
+      itx = apply(TransferTx, :new, [[to: address, value: ForgeAbi.token_to_unit(poke_amount)]])
+
+      Enum.each(wallets, fn {w, _} -> ForgeSdk.transfer(itx, wallet: w, chan: chan) end)
+    end)
   end
 
   defp gen_key_pair(:ed25519) do

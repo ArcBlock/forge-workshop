@@ -1,3 +1,6 @@
+## 0.4.1 (May 30, 2019)
+  - Raise balance for newly created custodians.
+
 ## 0.4.0 (May 29, 2019)
   - Support cross chain transactions.
 

@@ -75,6 +75,7 @@ defmodule AbtDidWorkshopWeb.CustodianController do
 
       hash ->
         Logger.info("Successfully created custodian, hash: #{inspect(hash)} ")
+        WalletUtil.raise_balance(custodian.address, 200, chan)
 
         case Custodian.insert(changeset) do
           {:ok, _} ->
