@@ -142,10 +142,15 @@ defmodule AbtDidWorkshop.Util do
 
   def gen_deeplink(demo_id, tx_id) do
     demo = apply(Repo, :get, [Demo, demo_id])
-    gen_deeplink(demo.path, demo.pk, demo.did, get_callback() <> "workflow/#{tx_id}")
+    gen_deeplink(demo.path, demo.pk, demo.did, tx_id)
   end
 
-  def gen_deeplink(path, pk, did, url) do
+  def gen_deeplink(path, pk, did, tx_id) do
+    url = get_callback() <> "workflow/#{tx_id}"
+    do_gen_deeplink(path, pk, did, url)
+  end
+
+  defp do_gen_deeplink(path, pk, did, url) do
     path = String.trim_trailing(path, "/")
 
     pk =
