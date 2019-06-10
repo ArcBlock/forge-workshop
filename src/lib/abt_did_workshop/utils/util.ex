@@ -137,7 +137,7 @@ defmodule AbtDidWorkshop.Util do
 
   def gen_deeplink(app_id) do
     app_state = apply(Repo, :get, [AppState, app_id])
-    gen_deeplink(app_state.path, app_state.pk, app_state.did, get_callback() <> "auth/")
+    do_gen_deeplink(app_state.path, app_state.pk, app_state.did, get_callback() <> "auth/")
   end
 
   def gen_deeplink(demo_id, tx_id) do
