@@ -1,3 +1,3 @@
-defmodule AbtDidWorkshopWeb.PageViewTest do
-  use AbtDidWorkshopWeb.ConnCase, async: true
+defmodule ForgeWorkshopWeb.PageViewTest do
+  use ForgeWorkshopWeb.ConnCase, async: true
 end

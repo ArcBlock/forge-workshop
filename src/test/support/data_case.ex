@@ -1,4 +1,4 @@
-defmodule AbtDidWorkshop.DataCase do
+defmodule ForgeWorkshop.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -16,20 +16,20 @@ defmodule AbtDidWorkshop.DataCase do
 
   using do
     quote do
-      alias AbtDidWorkshop.Repo
+      alias ForgeWorkshop.Repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import AbtDidWorkshop.DataCase
+      import ForgeWorkshop.DataCase
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(AbtDidWorkshop.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(ForgeWorkshop.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(AbtDidWorkshop.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(ForgeWorkshop.Repo, {:shared, self()})
     end
 
     :ok

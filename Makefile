@@ -4,14 +4,14 @@ README=$(TOP_DIR)/README.md
 PROTO_PATH=$(TOP_DIR)/src/priv/proto
 PROTO_GEN_PATH=$(TOP_DIR)/src/lib/gen
 
-BUILD_NAME=abt_did_workshop
+BUILD_NAME=forge_workshop
 VERSION=$(strip $(shell cat version))
 ELIXIR_VERSION=$(strip $(shell cat .elixir_version))
 OTP_VERSION=$(strip $(shell cat .otp_version))
 
 build:
 	@echo "Building the software..."
-	@rm -rf _build/dev/lib/abt_did_workshop
+	@rm -rf _build/dev/lib/forge_workshop
 	@make format
 	@cd tools/client; mix compile; mix format;
 

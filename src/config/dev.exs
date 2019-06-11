@@ -6,7 +6,7 @@ use Mix.Config
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
-config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
+config :forge_workshop, ForgeWorkshopWeb.Endpoint,
   http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
@@ -46,13 +46,13 @@ config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
+config :forge_workshop, ForgeWorkshopWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
-      ~r{lib/abt_did_workshop_web/views/.*(ex)$},
-      ~r{lib/abt_did_workshop_web/templates/.*(eex|drab)$}
+      ~r{lib/forge_workshop_web/views/.*(ex)$},
+      ~r{lib/forge_workshop_web/templates/.*(eex|drab)$}
     ]
   ]
 
@@ -67,9 +67,9 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 # # Configure your database
-# config :abt_did_workshop, AbtDidWorkshop.Repo,
+# config :forge_workshop, ForgeWorkshop.Repo,
 #   username: "postgres",
 #   password: "postgres",
-#   database: "abt_did_workshop_dev",
+#   database: "forge_workshop_dev",
 #   hostname: "localhost",
 #   pool_size: 10

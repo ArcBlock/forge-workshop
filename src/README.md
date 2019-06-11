@@ -1,6 +1,6 @@
-# AbtDidWorkshop
+# ForgeWorkshop
 
-`WORKSHOP_CONFIG= path/of/the/config release/path/bin/abt_did_workshop console`
+`WORKSHOP_CONFIG= path/of/the/config release/path/bin/forge_workshop console`
 
 ## Learn more
 

@@ -2,7 +2,7 @@ use Mix.Config
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
+config :forge_workshop, ForgeWorkshopWeb.Endpoint,
   http: [port: 4002],
   server: false
 
@@ -10,9 +10,9 @@ config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
 config :logger, level: :warn
 
 # Configure your database
-# config :abt_did_workshop, AbtDidWorkshop.Repo,
+# config :forge_workshop, ForgeWorkshop.Repo,
 #   username: "postgres",
 #   password: "postgres",
-#   database: "abt_did_workshop_test",
+#   database: "forge_workshop_test",
 #   hostname: "localhost",
 #   pool: Ecto.Adapters.SQL.Sandbox

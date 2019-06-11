@@ -1,9 +1,9 @@
-# defmodule AbtDidWorkshopWeb.ApiControllerTest do
-#   use AbtDidWorkshopWeb.ConnCase
+# defmodule ForgeWorkshopWeb.ApiControllerTest do
+#   use ForgeWorkshopWeb.ConnCase
 
 #   import Mock
 
-#   alias AbtDidWorkshop.Util
+#   alias ForgeWorkshop.Util
 
 #   test "POST /api/requireMultiSig", %{conn: conn} do
 #     {sk1, pk1, did1} = get_keys()

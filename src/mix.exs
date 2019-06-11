@@ -1,4 +1,4 @@
-defmodule AbtDidWorkshop.MixProject do
+defmodule ForgeWorkshop.MixProject do
   use Mix.Project
 
   @top "../"
@@ -12,7 +12,7 @@ defmodule AbtDidWorkshop.MixProject do
 
   def project do
     [
-      app: :abt_did_workshop,
+      app: :forge_workshop,
       version: @version,
       elixir: @elixir_version,
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -29,7 +29,7 @@ defmodule AbtDidWorkshop.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {AbtDidWorkshop.Application, []},
+      mod: {ForgeWorkshop.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end

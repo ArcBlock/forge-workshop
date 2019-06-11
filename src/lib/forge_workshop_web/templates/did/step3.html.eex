@@ -1,0 +1,41 @@
+<div class="row">
+  <div class="col s12 m8">
+    <div class="section">
+      <h5 class="page-header"><span class="step-badge">3</span>Choose Application Claims</h5>
+      <%= form_for @conn, Routes.did_path(@conn, :upsert_claims), fn f -> %>
+        <%= text_input(f, :id, value: @id, type: "hidden") %>
+        <h6 class="section-header">Choose the required profile.</h6>
+
+        <div class="form-group">
+          <%= for {claim_id, claim_descrip} <- ForgeWorkshop.Util.config(:profile) do %>
+            <div>
+              <label>
+                <%= checkbox f, "profile_" <> claim_id  %>
+                <span><%= claim_descrip %></span>
+              </label>
+            </div>
+          <% end %>
+        </div>
+
+        <h6 class="section-header">Choose the required agreements.</h6>
+
+        <div class="form-group">
+          <%= for agr <- ForgeWorkshop.Util.config(:agreement) do %>
+            <% meta = agr.meta %>
+            <div>
+              <label>
+                <%= checkbox f, "agreement_" <> meta.id %>
+                <span><%= meta.description %></span>
+              </label>
+            </div>
+          <% end %>
+        </div>
+        <div class="row">
+          <div class="col s12">
+            <%= submit "Generate Auth QRCode", class: "btn btn-outlined blue-text text-accent-2" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

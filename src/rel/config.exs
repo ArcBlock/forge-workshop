@@ -1,5 +1,5 @@
-version = AbtDidWorkshop.MixProject.get_version()
-otp_version = AbtDidWorkshop.MixProject.get_otp_version()
+version = ForgeWorkshop.MixProject.get_version()
+otp_version = ForgeWorkshop.MixProject.get_otp_version()
 
 # Import all plugins from `rel/plugins`
 # They can then be used by adding `plugin MyPlugin` to
@@ -55,7 +55,7 @@ end
 # when running `mix release`, the first release in the file
 # will be used by default
 
-release :abt_did_workshop do
+release :forge_workshop do
   set(version: version)
 
   set(

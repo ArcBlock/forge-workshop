@@ -6,7 +6,7 @@ use Mix.Config
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
-config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
+config :forge_workshop, ForgeWorkshopWeb.Endpoint,
   server: true,
   url: [host: "did-workshop.arcblock.co", port: 8807],
   http: [port: 8807],
@@ -23,9 +23,9 @@ config :logger, :console,
 config :phoenix, :stacktrace_depth, 20
 
 # Configure your database
-# config :abt_did_workshop, AbtDidWorkshop.Repo,
+# config :forge_workshop, ForgeWorkshop.Repo,
 #   username: "postgres",
 #   password: "postgres",
-#   database: "abt_did_workshop_staging",
+#   database: "forge_workshop_staging",
 #   hostname: "localhost",
 #   pool_size: 10

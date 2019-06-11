@@ -1,4 +1,4 @@
-defmodule AbtDidWorkshopWeb.ChannelCase do
+defmodule ForgeWorkshopWeb.ChannelCase do
   @moduledoc """
   This module defines the test case to be used by
   channel tests.
@@ -21,15 +21,15 @@ defmodule AbtDidWorkshopWeb.ChannelCase do
       use Phoenix.ChannelTest
 
       # The default endpoint for testing
-      @endpoint AbtDidWorkshopWeb.Endpoint
+      @endpoint ForgeWorkshopWeb.Endpoint
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(AbtDidWorkshop.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(ForgeWorkshop.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(AbtDidWorkshop.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(ForgeWorkshop.Repo, {:shared, self()})
     end
 
     :ok
