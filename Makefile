@@ -15,9 +15,9 @@ TARGETS=centos ubuntu darwin
 $(TARGETS):
 	@echo "Building the $@ release"
 	@mkdir -p $(REL_DIR)
-	@cd assets; npm install; npm run deploy
-	@mix phx.digest
-	@rm -rf _build/staging/rel/forge_web; MIX_ENV=staging mix release --env=$@ --no-tar; tar zcf $(REL_DIR)/forge_web_$@_amd64.tgz -C _build/staging/rel/forge_web .
+	@cd src/assets; npm install; npm run deploy
+	@cd src; mix phx.digest
+	@rm -rf _build/staging/rel/$(BUILD_NAME); cd src; MIX_ENV=staging mix release --env=$@ --no-tar; tar zcf $(REL_DIR)/$(BUILD_NAME)_$@_amd64.tgz -C _build/staging/rel/$(BUILD_NAME) .
 
 build:
 	@echo "Building the software..."
