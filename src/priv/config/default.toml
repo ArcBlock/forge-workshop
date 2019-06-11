@@ -1,7 +1,7 @@
 [workshop]
 path = "~/.workshop"
 
-remote_forge = "/Users/peiling/Documents/GitHub/ArcBlock/forge/resources/forge.toml"
+# remote_forge = "/Users/peiling/Documents/GitHub/ArcBlock/forge/resources/forge.toml"
 local_forge = "/Users/peiling/Documents/Github/my_repos/forge/resources/forge.toml"
 
 # the index db path

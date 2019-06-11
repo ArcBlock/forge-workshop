@@ -56,7 +56,7 @@
         </div>
         <div class="row">
           <div class="input-field col s12">
-            <%= select f, :tx_type, ["PokeTx", "TransferTx", "ExchangeTx", "ExchangeTetherTx", "ConsumeAssetTx", "UpdateAssetTx", [key: "Proof of Holding", value: "ProofOfHolding"]], prompt: "Choose your transaction type", id: :tx_type, value: init_tx_type %>
+            <%= select f, :tx_type, ["PokeTx", "TransferTx", "ExchangeTx", "ConsumeAssetTx", "UpdateAssetTx", [key: "Proof of Holding", value: "ProofOfHolding"]], prompt: "Choose your transaction type", id: :tx_type, value: init_tx_type %>
             <label>Transaction Type</label>
           </div>
         </div>

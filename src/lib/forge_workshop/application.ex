@@ -20,9 +20,9 @@ defmodule ForgeWorkshop.Application do
       %{decimal: decimal} = ForgeSdk.get_forge_state().token
       Application.put_env(:forge_abi, :decimal, decimal)
       robert = WalletUtil.get_robert()
-      WalletUtil.declare_wallet(robert, "robert", Util.remote_chan())
-      WalletUtil.raise_validator_power()
-      WalletUtil.declare_anchors()
+      # WalletUtil.declare_wallet(robert, "robert", Util.remote_chan())
+      # WalletUtil.raise_validator_power()
+      # WalletUtil.declare_anchors()
     end)
 
     result
@@ -65,7 +65,7 @@ defmodule ForgeWorkshop.Application do
     filepath = Util.config(["workshop", "local_forge"])
     [{mod, sock}] = ForgeSdk.init(:forge_workshop, "", filepath)
     Application.put_env(:forge_workshop, :local_chan, ForgeSdk.get_chan())
-    Util.remote_chan()
+    # Util.remote_chan()
     [{mod, addr: sock, callback: callback}]
   end
 

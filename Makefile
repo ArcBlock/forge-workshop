@@ -1,5 +1,6 @@
 TOP_DIR=.
 OUTPUT_DIR=$(TOP_DIR)/output
+REL_DIR=_build/releases
 README=$(TOP_DIR)/README.md
 PROTO_PATH=$(TOP_DIR)/src/priv/proto
 PROTO_GEN_PATH=$(TOP_DIR)/src/lib/gen
@@ -8,6 +9,15 @@ BUILD_NAME=forge_workshop
 VERSION=$(strip $(shell cat version))
 ELIXIR_VERSION=$(strip $(shell cat .elixir_version))
 OTP_VERSION=$(strip $(shell cat .otp_version))
+
+TARGETS=centos ubuntu darwin
+
+$(TARGETS):
+	@echo "Building the $@ release"
+	@mkdir -p $(REL_DIR)
+	@cd assets; npm install; npm run deploy
+	@mix phx.digest
+	@rm -rf _build/staging/rel/forge_web; MIX_ENV=staging mix release --env=$@ --no-tar; tar zcf $(REL_DIR)/forge_web_$@_amd64.tgz -C _build/staging/rel/forge_web .
 
 build:
 	@echo "Building the software..."
