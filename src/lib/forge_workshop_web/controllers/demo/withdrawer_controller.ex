@@ -19,7 +19,7 @@ defmodule ForgeWorkshopWeb.WithdrawerController do
     robert = WalletUtil.get_robert()
 
     state =
-      ForgeSdk.get_account_state([address: robert.address], Util.remote_chan()) ||
+      ForgeSdk.get_account_state([address: robert.address], "remote") ||
         %{balance: ForgeAbi.token_to_unit(0)}
 
     balance = Util.to_token(state.balance)
@@ -61,7 +61,7 @@ defmodule ForgeWorkshopWeb.WithdrawerController do
           data: exchange_itx.data
         }
       ])
-      |> ForgeSdk.withdraw_tether(wallet: robert, send: :commit, chan: Util.remote_chan())
+      |> ForgeSdk.withdraw_tether(wallet: robert, send: :commit, conn: "remote")
 
     case res do
       {:error, reason} ->
@@ -124,7 +124,7 @@ defmodule ForgeWorkshopWeb.WithdrawerController do
         validity_filter: ValidityFilter.new(validity: 1)
       )
 
-    {indexed_approves, _} = ForgeSdk.list_transactions(r, Util.remote_chan())
+    {indexed_approves, _} = ForgeSdk.list_transactions(r, "remote")
 
     indexed_approves |> display_approve()
   end

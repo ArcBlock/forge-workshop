@@ -1,7 +1,7 @@
 defmodule ForgeWorkshop.TxUtil do
   @moduledoc false
 
-  alias ForgeWorkshop.{AssetUtil, Util}
+  alias ForgeWorkshop.AssetUtil
 
   alias ForgeAbi.{
     ConsumeAssetTx,
@@ -169,8 +169,8 @@ defmodule ForgeWorkshop.TxUtil do
 
     chan =
       case tx.chain_id == local do
-        true -> nil
-        _ -> Util.remote_chan()
+        true -> ""
+        _ -> "remote"
       end
 
     case ForgeSdk.send_tx([tx: tx, commit: true], chan) do
@@ -196,7 +196,7 @@ defmodule ForgeWorkshop.TxUtil do
     %{tx | signatures: [%{msig | signature: sig} | tx.signatures]}
   end
 
-  def get_transaction_to_sign(tx_type, sender, receiver, chan \\ nil) do
+  def get_transaction_to_sign(tx_type, sender, receiver, chan \\ "") do
     itx = get_itx_to_sign(tx_type, sender, receiver)
 
     Transaction.new(
@@ -360,7 +360,7 @@ defmodule ForgeWorkshop.TxUtil do
       |> Map.put(:withdrawer, robert.address)
       |> Map.put(:deposit_value, value)
 
-    get_transaction_to_sign("DepositTetherTx", user, receiver, Util.remote_chan())
+    get_transaction_to_sign("DepositTetherTx", user, receiver, "remote")
   end
 
   defp get_itx_to_sign("PokeTx", _, _) do
@@ -404,8 +404,7 @@ defmodule ForgeWorkshop.TxUtil do
   end
 
   defp get_itx_to_sign("DepositTetherTx", _sender, receiver) do
-    chan = Util.remote_chan()
-    block_time = ForgeSdk.get_chain_info(chan).block_time
+    block_time = ForgeSdk.get_chain_info("remote").block_time
 
     args = [
       value: to_tba(receiver.deposit_value),

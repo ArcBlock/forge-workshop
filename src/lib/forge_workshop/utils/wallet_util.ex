@@ -16,8 +16,6 @@ defmodule ForgeWorkshop.WalletUtil do
     WalletType
   }
 
-  alias ForgeWorkshop.Util
-
   @anchor1 ForgeAbi.WalletInfo.new(
              sk:
                <<24, 23, 207, 213, 161, 85, 120, 7, 189, 105, 176, 17, 165, 107, 108, 94, 165, 34,
@@ -48,29 +46,28 @@ defmodule ForgeWorkshop.WalletUtil do
     ForgeSdk.declare(apply(ForgeAbi.DeclareTx, :new, [%{moniker: "anchor1"}]),
       wallet: @anchor1,
       commit: true,
-      chan: Util.remote_chan()
+      conn: "remote"
     )
 
     ForgeSdk.declare(apply(ForgeAbi.DeclareTx, :new, [%{moniker: "anchor2"}]),
       wallet: @anchor2,
       commit: true,
-      chan: Util.remote_chan()
+      conn: "remote"
     )
   end
 
   def raise_validator_power() do
-    chan = Util.remote_chan()
-    validator = ForgeSdk.get_chain_info(chan).address
+    validator = ForgeSdk.get_chain_info("remote").address
 
     Task.async(fn ->
-      wallets = init_wallets(100, chan)
+      wallets = init_wallets(100, "remote")
       Process.sleep(5_000)
       Enum.each(wallets, fn {w, _} -> poke(w) end)
       Process.sleep(5_000)
 
       Enum.each(wallets, fn {w, _} ->
         state =
-          ForgeSdk.get_account_state([address: w.address], chan) ||
+          ForgeSdk.get_account_state([address: w.address], "remote") ||
             %{balance: ForgeAbi.token_to_unit(0)}
 
         ForgeSdk.stake_for_node(
@@ -78,7 +75,7 @@ defmodule ForgeWorkshop.WalletUtil do
           ForgeAbi.unit_to_token(state.balance),
           wallet: w,
           commit: true,
-          chan: chan
+          conn: "remote"
         )
       end)
     end)
@@ -108,7 +105,7 @@ defmodule ForgeWorkshop.WalletUtil do
     end
   end
 
-  def init_wallets(number, chan \\ nil) do
+  def init_wallets(number, chan \\ "") do
     moniker_prefix = ForgeWorkshop.Util.config([:wallet, :moniker_prefix])
 
     for i <- 1..number do
@@ -118,7 +115,7 @@ defmodule ForgeWorkshop.WalletUtil do
     end
   end
 
-  def create_wallet(chan \\ nil) do
+  def create_wallet(chan \\ "") do
     passphrase = ForgeWorkshop.Util.config([:wallet, :passphrase])
 
     type =
@@ -133,7 +130,7 @@ defmodule ForgeWorkshop.WalletUtil do
     ForgeSdk.create_wallet(req, chan)
   end
 
-  def declare_wallet(wallet, moniker, chan \\ nil) do
+  def declare_wallet(wallet, moniker, chan \\ "") do
     data = apply(DeclareTx, :new, [[moniker: moniker, pk: wallet.pk, type: wallet.type]])
     itx = ForgeAbi.encode_any!(data, "fg:t:declare")
 
@@ -156,7 +153,7 @@ defmodule ForgeWorkshop.WalletUtil do
     ForgeAbi.WalletInfo.new(address: address, pk: pk, sk: sk)
   end
 
-  def poke(wallet, chan \\ nil) do
+  def poke(wallet, chan \\ "") do
     %{address: address} = ForgeSdk.get_forge_state(chan).poke_config
 
     itx =
@@ -164,7 +161,7 @@ defmodule ForgeWorkshop.WalletUtil do
         [address: address, date: DateTime.utc_now() |> DateTime.to_date() |> Date.to_string()]
       ])
 
-    ForgeSdk.poke(itx, wallet: wallet, chan: chan)
+    ForgeSdk.poke(itx, wallet: wallet, conn: chan)
   end
 
   def get_robert do
@@ -186,7 +183,7 @@ defmodule ForgeWorkshop.WalletUtil do
     {w, hash}
   end
 
-  def raise_balance(address, number, chan \\ nil) do
+  def raise_balance(address, number, chan \\ "") do
     Task.async(fn ->
       wallets = init_wallets(number, chan)
       Process.sleep(number * 50)
@@ -195,7 +192,7 @@ defmodule ForgeWorkshop.WalletUtil do
       %{amount: poke_amount} = ForgeSdk.get_forge_state(chan).poke_config
       itx = apply(TransferTx, :new, [[to: address, value: ForgeAbi.token_to_unit(poke_amount)]])
 
-      Enum.each(wallets, fn {w, _} -> ForgeSdk.transfer(itx, wallet: w, chan: chan) end)
+      Enum.each(wallets, fn {w, _} -> ForgeSdk.transfer(itx, wallet: w, conn: chan) end)
     end)
   end
 

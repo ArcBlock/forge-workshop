@@ -65,7 +65,7 @@ defmodule ForgeWorkshop.MixProject do
       # ArcBlock
       {:abt_did_elixir, "~> 0.3"},
       # {:abt_did_elixir, path: "../abt-did-elixir"},
-      {:forge_sdk, "~> 0.28"},
+      {:forge_sdk, "~> 0.30"},
       # {:forge_sdk, path: "../../forge-elixir-sdk", override: true},
 
       # utility tools for error logs and metrics

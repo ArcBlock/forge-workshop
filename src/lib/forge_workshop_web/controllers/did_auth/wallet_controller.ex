@@ -13,8 +13,7 @@ defmodule ForgeWorkshopWeb.WalletController do
     WalletUtil.declare_wallet(wallet, "Awesome")
 
     if cross_chain != nil do
-      chan = Util.remote_chan()
-      WalletUtil.declare_wallet(wallet, "Awesome", chan)
+      WalletUtil.declare_wallet(wallet, "Awesome", "remote")
     end
 
     json(conn, %{

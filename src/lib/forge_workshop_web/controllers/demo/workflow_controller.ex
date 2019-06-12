@@ -332,9 +332,8 @@ defmodule ForgeWorkshopWeb.WorkflowController do
   end
 
   defp get_chain_info(_) do
-    chan = Util.remote_chan()
-    chain_info = ForgeSdk.get_chain_info(chan)
-    forge_state = ForgeSdk.get_forge_state(chan)
+    chain_info = ForgeSdk.get_chain_info("remote")
+    forge_state = ForgeSdk.get_forge_state("remote")
 
     chain_info
     |> do_get_chain_info(forge_state)
@@ -356,9 +355,7 @@ defmodule ForgeWorkshopWeb.WorkflowController do
       |> TxUtil.get_tx_hash()
       |> ForgeSdk.Util.to_tether_address()
 
-    chan = Util.remote_chan()
-
-    tether = [address: tether_address] |> ForgeSdk.get_tether_state(chan)
+    tether = [address: tether_address] |> ForgeSdk.get_tether_state("remote")
 
     cond do
       tether == nil -> "Deposited tether not found."

@@ -22,10 +22,9 @@ defmodule ForgeWorkshopWeb.CustodianController do
   @anchor2 "zyt3iSdM8RS2431opc6wy3sou6BKtjXiPYzY"
 
   def get(conn, %{"address" => address}) do
-    chan = Util.remote_chan()
     custodian = address |> Custodian.get() |> enrich()
 
-    {indexed_tethers, _} = ForgeSdk.list_tethers([custodian: address, available: true], chan)
+    {indexed_tethers, _} = ForgeSdk.list_tethers([custodian: address, available: true], "remote")
     tethers = display_tether(indexed_tethers)
 
     r =
@@ -35,7 +34,7 @@ defmodule ForgeWorkshopWeb.CustodianController do
         validity_filter: ValidityFilter.new(validity: 1)
       )
 
-    {indexed_withdraw, _} = ForgeSdk.list_transactions(r, chan)
+    {indexed_withdraw, _} = ForgeSdk.list_transactions(r, "remote")
     withdraws = indexed_withdraw |> display_withdraw() |> filter_approve()
     render(conn, "one.html", custodian: custodian, tethers: tethers, withdraws: withdraws)
   end
@@ -54,7 +53,6 @@ defmodule ForgeWorkshopWeb.CustodianController do
   end
 
   def create(conn, %{"custodian" => args}) do
-    chan = Util.remote_chan()
     custodian = WalletUtil.gen_wallet()
 
     changeset =
@@ -67,7 +65,7 @@ defmodule ForgeWorkshopWeb.CustodianController do
         commission: normalize(args["commission"])
       })
 
-    case WalletUtil.declare_wallet(custodian, args["moniker"], chan) do
+    case WalletUtil.declare_wallet(custodian, args["moniker"], "remote") do
       {:error, reason} ->
         conn
         |> put_flash(:error, "#{inspect(reason)}")
@@ -75,7 +73,7 @@ defmodule ForgeWorkshopWeb.CustodianController do
 
       hash ->
         Logger.info("Successfully created custodian, hash: #{inspect(hash)} ")
-        WalletUtil.raise_balance(custodian.address, 200, chan)
+        WalletUtil.raise_balance(custodian.address, 200, "remote")
 
         case Custodian.insert(changeset) do
           {:ok, _} ->
@@ -120,7 +118,7 @@ defmodule ForgeWorkshopWeb.CustodianController do
   def approve(conn, %{"hash" => withdraw_hash, "address" => address}) do
     custodian = Custodian.get(address)
     itx = apply(ApproveTetherTx, :new, [[withdraw: withdraw_hash]])
-    res = ForgeSdk.approve_tether(itx, wallet: custodian, chan: Util.remote_chan(), send: :commit)
+    res = ForgeSdk.approve_tether(itx, wallet: custodian, conn: "remote", send: :commit)
 
     case res do
       {:error, reason} ->
@@ -164,8 +162,7 @@ defmodule ForgeWorkshopWeb.CustodianController do
   defp stake_to_anchor(conn, address, anchor, amount) do
     custodian = Custodian.get(address)
     # value = ForgeAbi.token_to_unit(amount)
-    chan = Util.remote_chan()
-    res = ForgeSdk.stake_for_node(anchor, amount, wallet: custodian, commit: true, chan: chan)
+    res = ForgeSdk.stake_for_node(anchor, amount, wallet: custodian, commit: true, conn: "remote")
 
     case res do
       {:error, reason} ->
@@ -203,9 +200,7 @@ defmodule ForgeWorkshopWeb.CustodianController do
   end
 
   defp get_account_state(custodian) do
-    chan = Util.remote_chan()
-
-    case ForgeSdk.get_account_state([address: custodian.address], chan) do
+    case ForgeSdk.get_account_state([address: custodian.address], "remote") do
       nil ->
         nil
 
@@ -215,10 +210,9 @@ defmodule ForgeWorkshopWeb.CustodianController do
   end
 
   defp get_deposit_cap(custodian, anchor) do
-    chan = Util.remote_chan()
     addr = ForgeSdk.Util.to_stake_address(custodian.address, anchor)
 
-    case ForgeSdk.get_stake_state([address: addr], chan) do
+    case ForgeSdk.get_stake_state([address: addr], "remote") do
       nil -> 0
       stake -> stake.balance
     end
@@ -234,12 +228,11 @@ defmodule ForgeWorkshopWeb.CustodianController do
   defp display_withdraw(list) when is_list(list), do: Enum.map(list, &display_withdraw/1)
 
   defp display_withdraw(%IndexedTransaction{} = indexed_withdraw) do
-    chan = Util.remote_chan()
     %{tx: withdraw_tx} = indexed_withdraw
     withdraw_itx = ForgeAbi.decode_any!(withdraw_tx.itx)
     tether = withdraw_itx.receiver.tether
-    tether_state = ForgeSdk.get_tether_state([address: tether], chan)
-    %{tx: deposit_tx} = ForgeSdk.get_tx([hash: tether_state.hash], chan)
+    tether_state = ForgeSdk.get_tether_state([address: tether], "remote")
+    %{tx: deposit_tx} = ForgeSdk.get_tx([hash: tether_state.hash], "remote")
     exchange = to_exchange(withdraw_itx, deposit_tx)
     exchange_hash = TxUtil.get_tx_hash(exchange)
 

@@ -1,7 +1,7 @@
 defmodule ForgeWorkshop.Util do
   @moduledoc false
 
-  alias ForgeWorkshop.{AppState, Demo, Repo, Util}
+  alias ForgeWorkshop.{AppState, Demo, Repo}
   alias ForgeWorkshopWeb.Endpoint
   alias ForgeWorkshopWeb.Router.Helpers, as: Routes
 
@@ -10,25 +10,6 @@ defmodule ForgeWorkshop.Util do
 
   def to_token(number) when is_number(number),
     do: number / ForgeAbi.one_token()
-
-  def remote_chan do
-    chan = config(:remote_chan)
-
-    if chan !== nil and Process.alive?(chan.adapter_payload.conn_pid) do
-      chan
-    else
-      remote_sock_grpc =
-        config(["workshop", "remote_forge"])
-        |> File.read!()
-        |> Toml.decode!()
-        |> get_in(["forge", "sock_grpc"])
-        |> to_ip_and_port()
-
-      {:ok, remote_chan} = GRPC.Stub.connect(remote_sock_grpc)
-      Application.put_env(:forge_workshop, :remote_chan, remote_chan)
-      Application.get_env(:forge_workshop, :remote_chan)
-    end
-  end
 
   def local_chan do
     config(:local_chan)
@@ -98,10 +79,10 @@ defmodule ForgeWorkshop.Util do
 
   def get_chainhost do
     if config(:local_forge_node) == nil do
-      sock = Util.config([:forge_config, "sock_grpc"])
+      sock = config(["workshop", "local_forge"])
       ip_and_port = to_ip_and_port(sock)
       [ip, _] = split_ip_and_port(ip_and_port)
-      web_port = Util.config([:forge_config, "web", "port"])
+      web_port = get_forge_web_port()
       Application.put_env(:forge_workshop, :local_forge_node, %{ip: ip, web_port: web_port})
     end
 
@@ -111,20 +92,15 @@ defmodule ForgeWorkshop.Util do
 
   def get_chainhost(:remote) do
     if config(:remote_forge_node) == nil do
-      remote_forge = config(["workshop", "remote_forge"]) |> File.read!() |> Toml.decode!()
-      sock = get_in(remote_forge, ["forge", "sock_grpc"])
+      sock = config(["workshop", "remote_forge"])
       ip_and_port = to_ip_and_port(sock)
       [ip, _] = split_ip_and_port(ip_and_port)
-      web_port = get_in(remote_forge, ["forge", "web", "port"])
+      web_port = get_forge_web_port("remote")
       Application.put_env(:forge_workshop, :remote_forge_node, %{ip: ip, web_port: web_port})
     end
 
     forge_node = config(:remote_forge_node)
     do_get_chainhost(forge_node)
-  end
-
-  defp do_get_chainhost(%{ip: ip, web_port: port}) do
-    "http://#{resolve_host(ip)}:#{port}/api/"
   end
 
   def get_body(jwt) do
@@ -185,6 +161,18 @@ defmodule ForgeWorkshop.Util do
   defp resolve_host("127.0.0.1"), do: get_ip()
   defp resolve_host("localhost"), do: get_ip()
   defp resolve_host(host), do: host
+
+  defp do_get_chainhost(%{ip: ip, web_port: port}) do
+    "http://#{resolve_host(ip)}:#{port}/api/"
+  end
+
+  defp get_forge_web_port(conn_name \\ "") do
+    [parsed: true]
+    |> ForgeAbi.RequestGetConfig.new()
+    |> ForgeSdk.get_config(conn_name)
+    |> Jason.decode!()
+    |> get_in(["forge", "web", "port"])
+  end
 
   defp to_ip_and_port("tcp://" <> ip), do: ip
   defp to_ip_and_port("grpc://" <> ip), do: ip
