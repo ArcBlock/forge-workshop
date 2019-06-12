@@ -1,4 +1,4 @@
-## abt-did-workshop
+## forge-workshop
 
 Simple workshop for developers to quickly develop, design and debug the DID flow.
 
