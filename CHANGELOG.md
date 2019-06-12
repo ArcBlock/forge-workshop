@@ -1,3 +1,9 @@
+## 0.5.0 (June 12, 2019)
+  - Release Forge Workshop
+  - Rename from ABT DID Workshop to Forge Workshop
+  - Use the latest ForgeSdk
+  - Add script to build
+
 ## 0.4.1 (May 30, 2019)
   - Raise balance for newly created custodians.
 
