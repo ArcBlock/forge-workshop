@@ -7,19 +7,19 @@
 # General application configuration
 use Mix.Config
 
-config :abt_did_workshop, AbtDidWorkshop.SqliteRepo, adapter: Sqlite.Ecto2, priv: "priv/repo"
+config :forge_workshop, ForgeWorkshop.SqliteRepo, adapter: Sqlite.Ecto2, priv: "priv/repo"
 
-config :abt_did_workshop,
-  ecto_repos: [AbtDidWorkshop.SqliteRepo]
+config :forge_workshop,
+  ecto_repos: [ForgeWorkshop.SqliteRepo]
 
 # Configures the endpoint
-config :abt_did_workshop, AbtDidWorkshopWeb.Endpoint,
+config :forge_workshop, ForgeWorkshopWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "tP0sXPbNxA/aWZRlp/B2NiXthD/ryC5dYpyl9OPL40sRmXRxCg0VZhADZFoS18dX",
-  render_errors: [view: AbtDidWorkshopWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: AbtDidWorkshop.PubSub, adapter: Phoenix.PubSub.PG2]
+  render_errors: [view: ForgeWorkshopWeb.ErrorView, accepts: ~w(html json)],
+  pubsub: [name: ForgeWorkshop.PubSub, adapter: Phoenix.PubSub.PG2]
 
-config :abt_did_workshop,
+config :forge_workshop,
   sample_keys: [
     "639A2938FD45B317AED1912F88D59BC1BA7D4DD47A1C4AD9A1C2B6BCF00B60F7A124B30D5D82BE5169BF91960B3C0DD992E63A4F9A5B23090473FD7C9836119C",
     "4DA94E2EA71550736C617DDAB1FE27DA4C75EE3ABF1F30BF1459C8D9EFB0CACF"
@@ -61,7 +61,7 @@ config :abt_did_workshop,
     }
   ],
   app_info: %{
-    name: "ABT DID Workshop",
+    name: "Forge Workshop",
     subtitle: "Play with DID authentication protocol.",
     description:
       "A simple workshop for developers to quickly develop, design and debug the DID flow.",
@@ -85,9 +85,9 @@ config :abt_did_workshop,
   }
 
 # Configures Drab
-config :drab, AbtDidWorkshopWeb.Endpoint, otp_app: :abt_did_workshop
+config :drab, ForgeWorkshopWeb.Endpoint, otp_app: :forge_workshop
 # Configures Drab for webpack
-config :drab, AbtDidWorkshopWeb.Endpoint, js_socket_constructor: "window.__socket"
+config :drab, ForgeWorkshopWeb.Endpoint, js_socket_constructor: "window.__socket"
 
 # Configures default Drab file extension
 config :phoenix, :template_engines, drab: Drab.Live.Engine
@@ -100,7 +100,7 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-config :abt_did_workshop, :env, "#{Mix.env()}"
+config :forge_workshop, :env, "#{Mix.env()}"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

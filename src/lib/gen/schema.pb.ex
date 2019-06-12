@@ -1,4 +1,4 @@
-defmodule AbtDidWorkshop.WorkshopAsset do
+defmodule ForgeWorkshop.WorkshopAsset do
   @moduledoc false
   use Protobuf, syntax: :proto3
 

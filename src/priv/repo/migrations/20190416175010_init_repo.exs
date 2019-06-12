@@ -1,4 +1,4 @@
-defmodule AbtDidWorkshop.Repo.Migrations.InitRepo do
+defmodule ForgeWorkshop.Repo.Migrations.InitRepo do
   use Ecto.Migration
 
   def change do

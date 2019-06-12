@@ -1,5 +1,5 @@
 syntax = "proto3";
-package abt_did_workshop;
+package forge_workshop;
 
 message Certificate {
   string from = 1;

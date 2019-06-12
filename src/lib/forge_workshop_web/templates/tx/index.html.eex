@@ -1,0 +1,98 @@
+<div class="row">
+  <div class="col s12 m3">
+    <div class="section">
+      <h5 class="page-header"><i class="material-icons">info</i>Demo Detail</h5>
+      <div class="row">
+        <div class="input-field col s12">
+          <p><%= @demo.name %></p>
+          <label>Name</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <p class="info-text"><%= @demo.subtitle %></p>
+          <label>Subtitle</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <p class="info-text"><%= @demo.description %></p>
+          <label>Description</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <p class="info-text"><%= @demo.icon %></p>
+          <label>Icon URL</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <p class="info-text"><%= @demo.path %></p>
+          <label>Deep Link Path</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col s12 m8 offset-m1">
+    <div class="section">
+      <h5 class="page-header"><i class="material-icons">view_list</i>Transaction List</h5>
+      <div class="txs">
+        <%= for tx <- @txs do %>
+          <div class="tx info-panel">
+            <div class="row">
+              <div class="col s9">
+                <h6 class="tx-name page-header">TX#<%= tx.id %>: <%= String.upcase(tx.tx_type) %></h6>
+                <p class="tx-name"><%= tx.name %></p>
+                <p class="tx-description"><%= tx.description %></p>
+                <div class="tx-behaviors">
+                  <%= for x <- tx.tx_behaviors do %>
+                    <div class="tx-behavior" style="font-size: smaller">
+                      <div class="row">
+                        <div class="col s12 m12 behavior-name">
+                          <%= x.behavior %>
+                        </div>
+                        <%= if x.token != nil do %>
+                          <div class="col s12 m12 l4 behavior-value"> <%= x.token %> TBA </div>
+                        <% end %>
+                        <%= if x.asset != nil and x.asset != "" do %>
+                          <div class="col s12 m12 l4 behavior-value"> <%= x.asset %></div>
+                        <% end %>
+                        <%= if x.function != nil and x.function != "" do %>
+                          <div class="col s12 m12 l4 behavior-value"> <%= to_tether(x) %></div>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+              <div class="col s3">
+                <div class="action-buttons">
+                  <%= form_for @conn, Routes.tx_path(@conn, :edit, tx, demo_id: @demo.id), [method: "get"], fn _ -> %>
+                    <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Update transaction"><i class="material-icons">edit</i></button>
+                  <% end %>
+                  <%= form_for @conn, Routes.tx_path(@conn, :delete, tx, demo_id: @demo.id), [method: :delete], fn _ -> %>
+                    <button type="submit" class="btn-floating btn-flat btn-small red waves-effect tooltipped" data-position="top" data-tooltip="Delete transaction"><i class="material-icons">delete</i></button>
+                  <% end %>
+                </div>
+                <div class="qrcode-wrapper">
+                  <input id='<%= "qrValue_#{tx.id}" %>' type="hidden" value="<%= ForgeWorkshop.Util.gen_deeplink(@demo.id, tx.id) %>"></input>
+                  <div align="center">
+                    <canvas class="qrcode qrcode-small" id='<%= "canvas_#{tx.id}" %>'></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col s12">
+        <%= link(to: Routes.tx_path(@conn, :new, demo_id: @demo.id), class: "btn btn-outlined blue-text text-accent-2 waves-effect") do %>
+          Create New Transaction
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

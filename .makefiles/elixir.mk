@@ -5,7 +5,7 @@ TMP_OTP_PATH=/tmp/esl_otp_$(OTP_VERSION)
 TMP_OTP_FILE=$(TMP_OTP_PATH)/otp_$(OTP_VERSION).rpm
 
 copy-docs: $(RELEASE_DIR)
-	@cd $(OUTPUT_DIR); tar zcf abt_did_workshop_docs.tgz *; mv abt_did_workshop_docs.tgz ../_build/releases/;
+	@cd $(OUTPUT_DIR); tar zcf forge_workshop_docs.tgz *; mv forge_workshop_docs.tgz ../_build/releases/;
 
 build-dev:
 	@echo "Building the dev release..."

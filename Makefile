@@ -1,17 +1,27 @@
 TOP_DIR=.
 OUTPUT_DIR=$(TOP_DIR)/output
+REL_DIR=_build/releases
 README=$(TOP_DIR)/README.md
 PROTO_PATH=$(TOP_DIR)/src/priv/proto
 PROTO_GEN_PATH=$(TOP_DIR)/src/lib/gen
 
-BUILD_NAME=abt_did_workshop
+BUILD_NAME=forge_workshop
 VERSION=$(strip $(shell cat version))
 ELIXIR_VERSION=$(strip $(shell cat .elixir_version))
 OTP_VERSION=$(strip $(shell cat .otp_version))
 
+TARGETS=centos ubuntu darwin
+
+$(TARGETS):
+	@echo "Building the $@ release"
+	@mkdir -p $(REL_DIR)
+	@cd src/assets; npm install; npm run deploy
+	@cd src; mix phx.digest
+	@rm -rf _build/staging/rel/$(BUILD_NAME); cd src; MIX_ENV=staging mix release --env=$@ --no-tar; tar zcf $(REL_DIR)/$(BUILD_NAME)_$@_amd64.tgz -C _build/staging/rel/$(BUILD_NAME) .
+
 build:
 	@echo "Building the software..."
-	@rm -rf _build/dev/lib/abt_did_workshop
+	@rm -rf _build/dev/lib/forge_workshop
 	@make format
 	@cd tools/client; mix compile; mix format;
 
