@@ -1,3 +1,6 @@
+## 0.5.1 (June 12, 2019)
+  - Change the default port to connect forge.
+
 ## 0.5.0 (June 12, 2019)
   - Release Forge Workshop
   - Rename from ABT DID Workshop to Forge Workshop

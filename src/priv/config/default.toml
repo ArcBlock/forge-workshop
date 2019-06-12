@@ -1,7 +1,7 @@
 [workshop]
 path = "~/.workshop"
 
-local_forge = "tcp://127.0.0.1:27211"
+local_forge = "tcp://127.0.0.1:27210"
 
 # the index db path
 # sqlite://workshop.sqlite3 or postgres://postgres:postgres@localhost:5432/workshop
