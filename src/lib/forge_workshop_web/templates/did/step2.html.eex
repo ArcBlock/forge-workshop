@@ -1,7 +1,13 @@
+<div class="app-header">
+  <h5 class="page-header" style="color:#6c6c6c;">
+    <i class="material-icons">desktop_mac</i>Application for Authentication
+  </h5>
+</div>
+
 <div class="row">
   <div class="col s12 m8">
     <div class="section">
-      <h5 class="page-header page-header-done"><span class="step-badge">1</span>Generate Application DID</h5>
+      <h5 class="page-header page-header-done"><span class="step-badge">1</span>Generate DID</h5>
     </div>
     <div class="section">
       <h5 class="page-header"><span class="step-badge">2</span>Configure Metadata</h5>

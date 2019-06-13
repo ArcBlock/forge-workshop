@@ -18,11 +18,15 @@ a {
   padding: 12px 30px;
 }
 
+.header .brand {
+  text-decoration: none;
+}
+
 .header .brand p {
   margin: 0;
 }
 
-.header .brand-title a {
+.header .brand-title {
   font-family: Avenir;
   font-size: 24px;
   font-weight: 900;

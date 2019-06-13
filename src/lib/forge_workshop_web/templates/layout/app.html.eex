@@ -11,10 +11,10 @@
   </head>
   <body>
     <div class="header">
-      <div class="brand">
-        <p class="brand-title"><a href="/">DApps Workshop</a></p>
+      <a class="brand" href="/" title="DApps Workshop Home Page">
+        <p class="brand-title">DApps Workshop</p>
         <p class="brand-description">Create and test for Forge powered applications</p>
-      </div>
+      </a>
     </div>
 
     <main id="main" role="main" class="container">
