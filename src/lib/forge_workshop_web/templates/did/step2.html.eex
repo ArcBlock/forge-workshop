@@ -58,7 +58,7 @@
             <label>Deeplink path</label>
           </div>
         </div>
-        <div class="row">
+        <div class="row right-align">
           <div class="col s12">
             <%= submit "Save & Continue", class: "btn btn-outlined blue-text text-accent-2 waves-effect" %>
           </div>

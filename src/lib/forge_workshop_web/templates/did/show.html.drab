@@ -1,7 +1,13 @@
-<h5 class="page-header" style="color:#6c6c6c;">My Application</h5>
+<div class="app-header">
+  <h5 class="page-header" style="color:#6c6c6c;">
+    <i class="material-icons">desktop_mac</i>Application
+  </h5>
+  <%= form_for @conn, Routes.demo_path(@conn, :index), [method: "get"], fn _ -> %>
+    <button type="submit" class="btn btn-outlined blue-text text-accent-2 waves-effect">Application Workflows</button>
+  <% end %>
+</div>
 
 <div class="info-panel">
-  <h5 class="page-header"><i class="material-icons">desktop_mac</i>Application</h5>
   <div class="row">
     <div class="col s12 m9">
       <h6 class="app-name"><%= @app_state.name %></h6>
@@ -97,7 +103,7 @@
       </div>
       <% end %>
     </div>
-    <div class="col s12 m3">
+    <div class="col s12 m3" style="margin-top: 80px;">
       <div class="action-buttons">
         <%= form_for @conn, Routes.did_path(@conn, :reselect_claims), [method: "get"], fn _ -> %>
           <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Update application claims"><i class="material-icons">edit</i></button>

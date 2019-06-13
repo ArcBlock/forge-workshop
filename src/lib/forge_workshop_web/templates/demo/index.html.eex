@@ -1,7 +1,8 @@
-<h5 class="page-header" style="color:#6c6c6c;">My Application</h5>
+<h5 class="page-header" style="color:#6c6c6c; font-size: 24px;">
+  <i class="material-icons">desktop_mac</i>Application
+</h5>
 
 <div class="info-panel">
-  <h5 class="page-header"><i class="material-icons">desktop_mac</i>Application</h5>
   <div class="row">
     <div class="col s12 m9">
       <h6 class="app-name"><a href="/did"><%= @app_state.name %></a></h6>
@@ -11,8 +12,8 @@
   </div>
 </div>
 
-<h5 class="page-header" style="color:#6c6c6c;">
-  My Workflows
+<h5 class="page-header" style="color:#6c6c6c; font-size: 24px; margin-top: 3rem;">
+  <i class="material-icons">device_hub</i>Workflows
 </h5>
 
 <div class="demo-cases">
@@ -35,10 +36,10 @@
         <div class="col s3">
           <div class="action-buttons">
             <%= form_for @conn, Routes.demo_path(@conn, :edit, demo), [method: "get"], fn _ -> %>
-              <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Update demo case"><i class="material-icons">edit</i></button>
+              <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Update workflow"><i class="material-icons">edit</i></button>
             <% end %>
             <%= form_for @conn, Routes.demo_path(@conn, :delete, demo), [method: :delete], fn _ -> %>
-              <button type="submit" class="btn-floating btn-flat btn-small red waves-effect tooltipped" data-position="top" data-tooltip="Delete demo case"><i class="material-icons">delete</i></button>
+              <button type="submit" class="btn-floating btn-flat btn-small red waves-effect tooltipped" data-position="top" data-tooltip="Delete workflow"><i class="material-icons">delete</i></button>
             <% end %>
           </div>
         </div>

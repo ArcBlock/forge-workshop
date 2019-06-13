@@ -57,9 +57,10 @@ defmodule ForgeWorkshopWeb.DemoController do
   end
 
   def edit(conn, %{"id" => demo_id}) do
+    app_state = AppState.get()
     demo = apply(Repo, :get, [Demo, demo_id])
     changeset = Demo.changeset(demo)
-    render(conn, "edit.html", changeset: changeset, demo: demo)
+    render(conn, "edit.html", changeset: changeset, demo: demo, app_state: app_state)
   end
 
   def update(conn, %{"id" => demo_id, "demo" => new_demo}) do

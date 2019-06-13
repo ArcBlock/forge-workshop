@@ -8,7 +8,8 @@ body {
 }
 
 a {
-  color: #71b5b2;
+  color: #4e6af6;
+  text-decoration: underline;
 }
 
 @import './materialize.css';
@@ -28,6 +29,7 @@ a {
   letter-spacing: 2.7px;
   color: #222222;
   text-transform: uppercase;
+  text-decoration: none;
 }
 
 .header .brand-description {
@@ -96,9 +98,6 @@ a {
 
 .page-header-done {
   margin-bottom: 0;
-}
-.page-header-done .step-badge {
-  background-color: green;
 }
 
 .section-header {
@@ -227,7 +226,7 @@ a {
 
 /* demo list */
 .demo-case {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 .demo-case .demo-name {
   margin-bottom: 1rem;
@@ -262,3 +261,6 @@ a {
   color: #4a4a4a;
   margin-bottom: 0.5rem;
 }
+
+.app-header { display: flex; justify-content: space-between; }
+p.info-text { margin: 0; }
