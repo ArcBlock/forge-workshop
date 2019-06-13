@@ -4,21 +4,18 @@
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>DID Workshop | ABT Chain Node</title>
+    <title>Forge Workshop | ArcBlock</title>
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   </head>
   <body>
-    <nav class="nav">
-      <div class="nav-wrapper container">
-        <a href="/" class="brand-logo">Forge Workshop</a>
-        <ul class="right hide-on-med-and-down">
-          <li class="menu menu-app"><a href="/">Application</a></li>
-          <li class="menu menu-demo"><a href="/demo">Demo Case</a></li>
-        </ul>
+    <div class="header">
+      <div class="brand">
+        <p class="brand-title"><a href="/">Forge Workshop</a></p>
+        <p class="brand-description">Create and test for Forge powered applications</p>
       </div>
-    </nav>
+    </div>
 
     <main id="main" role="main" class="container">
       <div class="row">

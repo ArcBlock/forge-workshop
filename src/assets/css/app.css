@@ -13,6 +13,30 @@ a {
 
 @import './materialize.css';
 
+.header {
+  padding: 12px 30px;
+}
+
+.header .brand p {
+  margin: 0;
+}
+
+.header .brand-title a {
+  font-family: Avenir;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 2.7px;
+  color: #222222;
+  text-transform: uppercase;
+}
+
+.header .brand-description {
+  font-size: 14px;
+  line-height: 1.71;
+  letter-spacing: 2px;
+  color: #9b9b9b;
+}
+
 /* Rewrite */
 .collapsible {
   box-shadow: 0 0 0 0 transparent;
