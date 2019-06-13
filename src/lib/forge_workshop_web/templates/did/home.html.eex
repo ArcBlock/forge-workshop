@@ -1,0 +1,90 @@
+<style>
+  .page-home {
+    width: 540px;
+    margin: 15% auto 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .page-home p {
+    margin: 0;
+    font-size: 14px;
+    color: #6e6e6e;
+    text-align: left;
+  }
+  .page-home .page-header {
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 2.7px;
+    color: #222222;
+    text-transform: uppercase;
+    margin: 0 0 1rem;
+  }
+  .page-home .page-description {
+    margin: 0 0 1rem;
+  }
+  .page-home .steps {
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .page-home .step {
+    width: 42%;
+  }
+  .page-home .step .step-icon {
+    font-size: 32px;
+    color: #4e6af6;
+  }
+  .page-home .step .step-title {
+    margin: 0.5rem 0 1rem;
+    font-size: 16px;
+    font-weight: 500;
+    color: #4e6af6;
+  }
+  .page-home .step .step-description {
+  }
+  .page-home .summary-tip {
+    margin: 2rem 0 0;
+  }
+  .page-home .summary-btn {
+    margin-top: 2rem;
+    text-align: right;
+  }
+</style>
+
+<div class="page page-home">
+  <h2 class="page-header">
+    Workshop
+  </h2>
+  <div class="page-description">
+    <p>
+      The Workshop lets you create and test different types of transaction workflows and
+      authentication requirements for Forge built applications.
+    </p>
+    <p>To start, you can create:</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <i class="material-icons step-icon">developer_board</i>
+      <div class="step-title">Application</div>
+      <p class="step-description">
+        Generate and test the DID authentication protocol using different transaction types, DSA
+        Algorithms and Hash Functions.
+      </p>
+    </div>
+    <div class="step">
+      <i class="material-icons step-icon">device_hub</i>
+      <div class="step-title">Workflow</div>
+      <p class="step-description">
+        After you got an application, you can add workflows for it. Create DID workflows to test and
+        validate different transaction scenarios.
+      </p>
+    </div>
+  </div>
+  <p class="summary-tip">Got an idea? Let’s start with creating your application.</p>
+  <div class="summary-btn">
+    <%= link(to: Routes.did_path(@conn, :step1), class: "btn btn-outlined blue-text text-accent-2 waves-effect") do %>
+      Get started
+    <% end %>
+  </div>
+</div>
