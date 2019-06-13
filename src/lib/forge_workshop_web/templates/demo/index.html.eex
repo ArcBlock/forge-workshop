@@ -1,6 +1,8 @@
-<h5 class="page-header" style="color:#6c6c6c; font-size: 24px;">
-  <i class="material-icons">desktop_mac</i>Application
-</h5>
+<div class="app-header">
+  <h5 class="page-header" style="color:#6c6c6c; font-size: 24px;">
+    <i class="material-icons">desktop_mac</i>Application
+  </h5>
+</div>
 
 <div class="info-panel">
   <div class="row">
@@ -12,9 +14,14 @@
   </div>
 </div>
 
-<h5 class="page-header" style="color:#6c6c6c; font-size: 24px; margin-top: 3rem;">
-  <i class="material-icons">device_hub</i>Workflows
-</h5>
+<div class="app-header" style="margin-top: 3rem;">
+  <h5 class="page-header" style="color:#6c6c6c; font-size: 24px;">
+    <i class="material-icons">device_hub</i>Workflows
+  </h5>
+  <%= form_for @conn, Routes.demo_path(@conn, :new), [method: "get"], fn _ -> %>
+    <button type="submit" class="btn btn-outlined blue-text text-accent-2 waves-effect">Create Workflow</button>
+  <% end %>
+</div>
 
 <div class="demo-cases">
   <%= for demo <- @demos do %>
