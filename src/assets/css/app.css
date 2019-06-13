@@ -86,6 +86,21 @@ a {
   font-size: 1rem;
 }
 
+.page-header-disabled {
+  color: #222222;
+  margin-bottom: 0;
+}
+.page-header-disabled .step-badge {
+  background-color: #bcbcbc;
+}
+
+.page-header-done {
+  margin-bottom: 0;
+}
+.page-header-done .step-badge {
+  background-color: green;
+}
+
 .section-header {
   height: 16px;
   font-size: 1rem;

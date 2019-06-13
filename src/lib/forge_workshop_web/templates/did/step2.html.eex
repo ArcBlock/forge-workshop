@@ -1,6 +1,9 @@
 <div class="row">
   <div class="col s12 m8">
     <div class="section">
+      <h5 class="page-header page-header-done"><span class="step-badge">1</span>Generate Application DID</h5>
+    </div>
+    <div class="section">
       <h5 class="page-header"><span class="step-badge">2</span>Configure Metadata</h5>
       <%= form_for @changeset, Routes.did_path(@conn, :upsert_app_state), fn f -> %>
         <%= text_input(f, :sk, type: "hidden") %>
@@ -61,6 +64,9 @@
           </div>
         </div>
       <% end %>
+    </div>
+    <div class="section">
+      <h5 class="page-header page-header-disabled"><span class="step-badge">3</span>Configure Claims</h5>
     </div>
   </div>
 </div>

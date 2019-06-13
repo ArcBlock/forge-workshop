@@ -1,11 +1,21 @@
+<style scoped>
+form {
+  padding-left: 8px;
+}
+</style>
 <div class="row">
   <div class="col s12 m8">
+    <div class="section">
+      <h5 class="page-header page-header-done"><span class="step-badge">1</span>Generate Application DID</h5>
+    </div>
+    <div class="section">
+      <h5 class="page-header page-header-done"><span class="step-badge">2</span>Configure Metadata</h5>
+    </div>
     <div class="section">
       <h5 class="page-header"><span class="step-badge">3</span>Choose Application Claims</h5>
       <%= form_for @conn, Routes.did_path(@conn, :upsert_claims), fn f -> %>
         <%= text_input(f, :id, value: @id, type: "hidden") %>
         <h6 class="section-header">Choose the required profile.</h6>
-
         <div class="form-group">
           <%= for {claim_id, claim_descrip} <- ForgeWorkshop.Util.config(:profile) do %>
             <div>
@@ -16,9 +26,7 @@
             </div>
           <% end %>
         </div>
-
-        <h6 class="section-header">Choose the required agreements.</h6>
-
+        <h6 class="section-header" style="margin-top:2rem;">Choose the required agreements.</h6>
         <div class="form-group">
           <%= for agr <- ForgeWorkshop.Util.config(:agreement) do %>
             <% meta = agr.meta %>
@@ -30,9 +38,9 @@
             </div>
           <% end %>
         </div>
-        <div class="row">
+        <div class="row right-align">
           <div class="col s12">
-            <%= submit "Generate Auth QRCode", class: "btn btn-outlined blue-text text-accent-2" %>
+            <%= submit "Create Application", class: "btn btn-outlined blue-text text-accent-2" %>
           </div>
         </div>
       <% end %>

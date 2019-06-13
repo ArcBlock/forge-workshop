@@ -65,7 +65,7 @@
   </div>
   <div class="steps">
     <div class="step">
-      <i class="material-icons step-icon">developer_board</i>
+      <i class="material-icons step-icon">desktop_mac</i>
       <div class="step-title">Application</div>
       <p class="step-description">
         Generate and test the DID authentication protocol using different transaction types, DSA
