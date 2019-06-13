@@ -1,3 +1,6 @@
+## 0.5.2 (June 12, 2019)
+  - Update the make script.
+
 ## 0.5.1 (June 12, 2019)
   - Change the default port to connect forge.
 
