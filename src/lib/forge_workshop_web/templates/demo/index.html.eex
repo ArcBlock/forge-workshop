@@ -1,25 +1,9 @@
-<div class="app-header">
-  <h5 class="page-header" style="color:#6c6c6c; font-size: 24px;">
-    <i class="material-icons">desktop_mac</i>Application
-  </h5>
-</div>
-
-<div class="info-panel">
-  <div class="row">
-    <div class="col s12 m9">
-      <h6 class="app-name"><a href="/did"><%= @app_state.name %></a></h6>
-      <p class="app-subtitle"><%= @app_state.subtitle %></p>
-      <p class="app-description"><%= @app_state.description %></p>
-    </div>
-  </div>
-</div>
-
 <div class="app-header" style="margin-top: 3rem;">
   <h5 class="page-header" style="color:#6c6c6c; font-size: 24px;">
-    <i class="material-icons">device_hub</i>Workflows
+    <i class="material-icons">device_hub</i>Applications for Transactions
   </h5>
   <%= form_for @conn, Routes.demo_path(@conn, :new), [method: "get"], fn _ -> %>
-    <button type="submit" class="btn btn-outlined blue-text text-accent-2 waves-effect">Create Workflow</button>
+    <button type="submit" class="btn btn-outlined blue-text text-accent-2 waves-effect">Create Application</button>
   <% end %>
 </div>
 
@@ -43,10 +27,10 @@
         <div class="col s3">
           <div class="action-buttons">
             <%= form_for @conn, Routes.demo_path(@conn, :edit, demo), [method: "get"], fn _ -> %>
-              <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Update workflow"><i class="material-icons">edit</i></button>
+              <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Update"><i class="material-icons">edit</i></button>
             <% end %>
             <%= form_for @conn, Routes.demo_path(@conn, :delete, demo), [method: :delete], fn _ -> %>
-              <button type="submit" class="btn-floating btn-flat btn-small red waves-effect tooltipped" data-position="top" data-tooltip="Delete workflow"><i class="material-icons">delete</i></button>
+              <button type="submit" class="btn-floating btn-flat btn-small red waves-effect tooltipped" data-position="top" data-tooltip="Delete"><i class="material-icons">delete</i></button>
             <% end %>
           </div>
         </div>

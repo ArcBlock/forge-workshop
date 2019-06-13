@@ -58,33 +58,37 @@
   </h2>
   <div class="page-description">
     <p>
-      The Workshop lets you create and test different types of transaction workflows and
-      authentication requirements for Forge built applications.
+      DApps Workshop is a place where you can quickly create and test prototypes of your applications.
+      Here you can see how the ABT wallet and your application will work together to finish the authentication
+      process and to process various transactions supported by Forge. You can create different application prototypes
+      to experience these two aspects separately.
     </p>
-    <p>To start, you can create:</p>
   </div>
   <div class="steps">
     <div class="step">
       <i class="material-icons step-icon">desktop_mac</i>
-      <div class="step-title">Application</div>
+      <div class="step-title">Authentication</div>
       <p class="step-description">
-        Generate and test the DID authentication protocol using different transaction types, DSA
-        Algorithms and Hash Functions.
+        Generate DIDs using different DID role types, DSA
+        algorithms and Hash functions and test the DID Authentication Protocol.
       </p>
+      <div class="summary-btn">
+        <%= link(to: Routes.did_path(@conn, :step1), class: "btn btn-outlined blue-text text-accent-2 waves-effect") do %>
+          Get started
+        <% end %>
+      </div>
     </div>
     <div class="step">
       <i class="material-icons step-icon">device_hub</i>
-      <div class="step-title">Workflow</div>
+      <div class="step-title">Transactions</div>
       <p class="step-description">
-        After you got an application, you can add workflows for it. Create DID workflows to test and
-        validate different transaction scenarios.
+        Create different types of Forge transactions and experience workflows to process these transactions in ABT Wallet.
       </p>
+      <div class="summary-btn">
+        <%= link(to: Routes.demo_path(@conn, :index), class: "btn btn-outlined blue-text text-accent-2 waves-effect") do %>
+          Get started
+        <% end %>
+      </div>
     </div>
-  </div>
-  <p class="summary-tip">Got an idea? Let’s start with creating your application.</p>
-  <div class="summary-btn">
-    <%= link(to: Routes.did_path(@conn, :step1), class: "btn btn-outlined blue-text text-accent-2 waves-effect") do %>
-      Get started
-    <% end %>
   </div>
 </div>

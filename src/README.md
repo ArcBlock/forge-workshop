@@ -1,8 +1,8 @@
-# Forge Workshop
+# DApps Workshop
 
-The Forge Workshop lets developers create and test different types of transaction workflows and DID-based authentication requirements for any Forge-built application. 
+The DApps Workshop lets developers create and test different types of transaction workflows and DID-based authentication requirements for any Forge-built application. 
 
-Today, forge Workshop includes support for:
+Today, DApps Workshop includes support for:
 
   - Trade-related transactions
   - Prebuild workflows and process/rules for all supported Tx types including multi-transaction scenarios
@@ -17,11 +17,11 @@ Today, forge Workshop includes support for:
 
 ## How to use
 
-Forge workshop is composed of two parts -- Application and Demo Cases. They are designed to let developers to experience different aspects of Forge transactions and DID Authentication protocols.
+DApps Workshop is composed of two parts -- Application and Demo Cases. They are designed to let developers to experience different aspects of Forge transactions and DID Authentication protocols.
 
 ### Application
 
-This part of Forge Workshop lets you try out how the ABT wallet and a forge-built application should interact with each other to finish the authentication process under DID Authentication Protocol. 
+This part of DApps Workshop lets you try out how the ABT wallet and a forge-built application should interact with each other to finish the authentication process under DID Authentication Protocol. 
 
   - Step 1: Choose the DID type, DSA algorithm and the Hash algorithm to generate a DID.
   - Step 2: Input the basic information of your application prototype.
@@ -31,7 +31,7 @@ This part of Forge Workshop lets you try out how the ABT wallet and a forge-buil
 
 ### Demo Cases
 
-This part of Forge Workshop lets you quickly create a prototype of a Forge application and lets you to see how the ABT wallet and your application will work together to finish various transaction workflows. 
+This part of DApps Workshop lets you quickly create a prototype of a Forge application and lets you to see how the ABT wallet and your application will work together to finish various transaction workflows. 
 
   - Step 1: Create a demo case by filling the up the following fields. Each demo case is considered as an application prototype.
       - `Name`: The name of your application.

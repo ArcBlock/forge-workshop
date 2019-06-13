@@ -7,6 +7,7 @@ defmodule ForgeWorkshopWeb.TxController do
     demo = Demo.get(demo_id)
     txs = Tx.get_all(demo_id)
     changeset = Tx.changeset(%Tx{}, %{})
+
     render(conn, "index.html",
       txs: txs,
       demo: demo,

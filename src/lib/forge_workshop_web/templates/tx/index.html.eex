@@ -1,14 +1,14 @@
 <div class="app-header">
   <h5 class="page-header" style="color:#6c6c6c; font-size: 24px;">
-    <i class="material-icons">device_hub</i>Workflow
+    <i class="material-icons">device_hub</i>Application
   </h5>
   <%= form_for @conn, Routes.demo_path(@conn, :index), [method: "get"], fn _ -> %>
-    <button type="submit" class="btn btn-outlined blue-text text-accent-2 waves-effect">Workflow List</button>
+    <button type="submit" class="btn btn-outlined blue-text text-accent-2 waves-effect">Application List</button>
   <% end %>
 </div>
 
 <div class="section">
-  <h5 class="page-header"><span class="step-badge">1</span>Workflow Details</h5>
+  <h5 class="page-header"><span class="step-badge">1</span>Application Details</h5>
   <div class="row">
     <div class="input-field col s12">
       <p class="info-text"><%= @demo.name %></p>

@@ -32,7 +32,7 @@ defmodule ForgeWorkshopWeb.DemoController do
     case Demo.insert(demo) do
       {:ok, record} ->
         conn
-        |> put_flash(:info, "Successfully created workflow. Now please add transactions.")
+        |> put_flash(:info, "Successfully created application. Now please add transactions.")
         |> redirect(to: Routes.tx_path(conn, :index, demo_id: record.id))
 
       {:error, changeset} ->
@@ -45,7 +45,7 @@ defmodule ForgeWorkshopWeb.DemoController do
     case Demo.delete(demo_id) do
       {:ok, _} ->
         conn
-        |> put_flash(:info, "Successfully deleted workflow.")
+        |> put_flash(:info, "Successfully deleted application.")
         |> redirect(to: Routes.demo_path(conn, :index))
 
       {:error, reason} ->
@@ -70,7 +70,7 @@ defmodule ForgeWorkshopWeb.DemoController do
     case apply(Repo, :update, [changeset]) do
       {:ok, _} ->
         conn
-        |> put_flash(:info, "Workflow updated.")
+        |> put_flash(:info, "Application updated.")
         |> redirect(to: Routes.demo_path(conn, :index))
 
       {:error, changeset} ->
