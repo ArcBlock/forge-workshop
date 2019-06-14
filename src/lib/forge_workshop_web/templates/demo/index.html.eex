@@ -1,11 +1,4 @@
-<div class="app-header" style="margin-top: 3rem;">
-  <h5 class="page-header" style="color:#6c6c6c; font-size: 24px;">
-    <i class="material-icons">device_hub</i>Applications for Transactions
-  </h5>
-  <%= form_for @conn, Routes.demo_path(@conn, :new), [method: "get"], fn _ -> %>
-    <button type="submit" class="btn btn-outlined blue-text text-accent-2 waves-effect">Create Application</button>
-  <% end %>
-</div>
+<%= render(ForgeWorkshopWeb.SharedView, "tabs.html", selected: "txs", conn: @conn) %>
 
 <div class="demo-cases">
   <%= for demo <- @demos do %>
@@ -38,3 +31,7 @@
     </div>
   <% end %>
 </div>
+
+<%= form_for @conn, Routes.demo_path(@conn, :new), [method: "get"], fn _ -> %>
+  <button type="submit" class="btn btn-outlined blue-text text-accent-2 waves-effect" style="margin-bottom: 3rem;">Create Application</button>
+<% end %>

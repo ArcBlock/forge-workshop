@@ -1,6 +1,8 @@
+<%= render(ForgeWorkshopWeb.SharedView, "tabs.html", selected: "auth", conn: @conn) %>
+
 <div class="app-header">
   <h5 class="page-header" style="color:#6c6c6c;">
-    <i class="material-icons">desktop_mac</i>Application for Authentication
+    Application for Authentication
   </h5>
 </div>
 

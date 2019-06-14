@@ -18,7 +18,6 @@ defmodule ForgeWorkshopWeb.DidController do
 
       state ->
         conn
-        |> put_flash(:info, "Application already created!")
         |> render("show.html", app_state: state, users: UserDb.get_all())
     end
   end
