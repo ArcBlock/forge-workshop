@@ -305,3 +305,15 @@ a {
 
 .app-header { display: flex; justify-content: space-between; }
 p.info-text { margin: 0; }
+
+.footer {
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  color: #4a4a4a;
+  font-size: 1rem;
+}
+
+.footer a {
+  color: #4a4a4a;
+}
