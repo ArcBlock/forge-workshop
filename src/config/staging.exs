@@ -8,7 +8,7 @@ use Mix.Config
 # with webpack to recompile .js and .css sources.
 config :forge_workshop, ForgeWorkshopWeb.Endpoint,
   server: true,
-  url: [host: "did-workshop.arcblock.co", port: 8807],
+  url: [host: "localhost", port: 8807],
   http: [port: 8807],
   debug_errors: true,
   check_origin: false

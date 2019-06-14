@@ -1,3 +1,6 @@
+## 0.6.1 (June 14, 2019)
+  - Fix the URL issue for staging and prod env.
+
 ## 0.6.0 (June 13, 2019)
   - chore: whole flow polish
   - chore: ignore useless fields
