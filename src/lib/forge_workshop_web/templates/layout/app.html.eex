@@ -12,8 +12,11 @@
   <body>
     <div class="header">
       <a class="brand" href="/" title="DApps Workshop Home Page">
-        <p class="brand-title">DApps Workshop</p>
-        <p class="brand-description">Create and test for Forge powered applications</p>
+        <img class="brand-logo" src="<%= Routes.static_path(@conn, "/images/logo.svg") %>" />
+        <div class="brand-text">
+          <p class="brand-title">DApps Workshop</p>
+          <p class="brand-description">Create and test for Forge powered applications</p>
+        </div>
       </a>
     </div>
 

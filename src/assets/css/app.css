@@ -15,11 +15,18 @@ a {
 @import './materialize.css';
 
 .header {
-  padding: 12px 30px;
+  padding: 1rem 2.5rem;
 }
 
 .header .brand {
   text-decoration: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.header .brand-logo {
+  margin-right: 1rem;
 }
 
 .header .brand p {
