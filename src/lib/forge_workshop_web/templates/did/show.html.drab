@@ -14,7 +14,7 @@
       </div>
       <div class="app-key">
         Application <i class="icon-did-abt"></i> DID (base58_btc encoding):
-        <p class="info-text"><%= Multibase.encode!(@app_state.did, :base58_btc) %></p>
+        <p class="info-text"><%= @app_state.did %></p>
       </div>
       <div class="app-key">
         Application Public Key (base58_btc encoding):
