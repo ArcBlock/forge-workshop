@@ -68,8 +68,8 @@
       <i class="material-icons step-icon">desktop_mac</i>
       <div class="step-title">Authentication</div>
       <p class="step-description">
-        Generate DIDs using different DID role types, DSA
-        algorithms and Hash functions and test the DID Authentication Protocol.
+        Generate <i class="icon-did-abt"></i> DIDs using different DID role types, DSA
+        algorithms and Hash functions and test the <i class="icon-did-abt"></i> DID Authentication Protocol.
       </p>
       <div class="summary-btn">
         <%= link(to: Routes.did_path(@conn, :step1), class: "btn btn-outlined blue-text text-accent-2 waves-effect") do %>

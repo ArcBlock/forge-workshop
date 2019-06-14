@@ -13,7 +13,7 @@
         </p>
       </div>
       <div class="app-key">
-        Application DID (base58_btc encoding):
+        Application <i class="icon-did-abt"></i> DID (base58_btc encoding):
         <p class="info-text"><%= Multibase.encode!(@app_state.did, :base58_btc) %></p>
       </div>
       <div class="app-key">
@@ -30,12 +30,12 @@
         <ul class="collapsible expandable">
           <%= for user <- @users do %>
           <li>
-            <div class="collapsible-header"><%= user.did %></div>
+            <div class="collapsible-header"><i class="icon-did-abt"></i> <%= user.did %></div>
             <div class="collapsible-body">
               <span>
                 <table class="striped" style="font-size: smaller; table-layout: fixed;">
                   <tr>
-                    <td style="width: 30%"> DID </td>
+                    <td style="width: 30%"><i class="icon-did-abt"></i> DID</td>
                     <td style="word-wrap: break-word;"> <%= user.did %> </td>
                   </tr>
                   <tr>

@@ -9,7 +9,7 @@
 <div class="row center-align">
   <div class="col s12 m8">
     <div class="section">
-      <h5 class="page-header"><span class="step-badge">1</span>Generate DID</h5>
+      <h5 class="page-header"><span class="step-badge">1</span>Generate <i class="icon-did-abt"></i> DID</h5>
       <%= form_for @conn, Routes.did_path(@conn, :create_did), fn f -> %>
         <div class="row">
           <div class="input-field col s12">
