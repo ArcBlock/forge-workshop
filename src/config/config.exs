@@ -61,7 +61,7 @@ config :forge_workshop,
     }
   ],
   app_info: %{
-    name: "Forge Workshop",
+    name: "DApps Workshop",
     subtitle: "Play with DID authentication protocol.",
     description:
       "A simple workshop for developers to quickly develop, design and debug the DID flow.",

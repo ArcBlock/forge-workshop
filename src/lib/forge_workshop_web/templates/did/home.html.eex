@@ -1,0 +1,93 @@
+<style>
+  .page-home {
+    width: 540px;
+    margin: 10% auto 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .page-home p {
+    margin: 0;
+    font-size: 14px;
+    color: #6e6e6e;
+    text-align: left;
+  }
+  .page-home .page-header {
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 2.7px;
+    color: #222222;
+    text-transform: uppercase;
+    margin: 0 0 1rem;
+  }
+  .page-home .page-description {
+    margin: 0 0 1rem;
+  }
+  .page-home .steps {
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .page-home .step {
+    width: 42%;
+  }
+  .page-home .step .step-icon {
+    font-size: 32px;
+    color: #4e6af6;
+  }
+  .page-home .step .step-title {
+    margin: 0.5rem 0 1rem;
+    font-size: 16px;
+    font-weight: 500;
+    color: #4e6af6;
+  }
+  .page-home .step .step-description {
+  }
+  .page-home .summary-tip {
+    margin: 2rem 0 0;
+  }
+  .page-home .summary-btn {
+    margin-top: 2rem;
+  }
+</style>
+
+<div class="page page-home">
+  <h2 class="page-header">
+    Dapps Workshop
+  </h2>
+  <div class="page-description">
+    <p>
+      DApps Workshop is a place where you can quickly create and test prototypes of your applications.
+      Here you can see how the ABT wallet and your application will work together to finish the authentication
+      process and to process various transactions supported by Forge. You can create different application prototypes
+      to experience these two aspects separately, <a href="https://docs.arcblock.io/forge/latest/tools/dapps_workshop.html">Read the Documentation Here</a>.
+    </p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <i class="material-icons step-icon">desktop_mac</i>
+      <div class="step-title">Authentication</div>
+      <p class="step-description">
+        Generate <i class="icon-did-abt"></i> DIDs using different DID role types, DSA
+        algorithms and Hash functions and test the <i class="icon-did-abt"></i> DID Authentication Protocol.
+      </p>
+      <div class="summary-btn">
+        <%= link(to: Routes.did_path(@conn, :step1), class: "btn btn-outlined blue-text text-accent-2 waves-effect") do %>
+          Get started
+        <% end %>
+      </div>
+    </div>
+    <div class="step">
+      <i class="material-icons step-icon">device_hub</i>
+      <div class="step-title">Transactions</div>
+      <p class="step-description">
+        Create different types of Forge transactions and experience workflows to process these transactions in ABT Wallet.
+      </p>
+      <div class="summary-btn">
+        <%= link(to: Routes.demo_path(@conn, :index), class: "btn btn-outlined blue-text text-accent-2 waves-effect") do %>
+          Get started
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,3 +1,12 @@
+## 0.6.0 (June 13, 2019)
+  - chore: whole flow polish
+  - chore: ignore useless fields
+  - chore: whole flow polish
+  - chore: basic workflow and tx flow
+  - chore: application create process
+  - chore: implement new home page
+  - chore: update layout header
+
 ## 0.5.2 (June 12, 2019)
   - Update the make script.
 

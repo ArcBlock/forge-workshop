@@ -1,19 +1,23 @@
+<%= render(ForgeWorkshopWeb.SharedView, "tabs.html", selected: "txs", conn: @conn) %>
+
+<h5 class="page-header">Update Transaction</h5>
+
 <div class="row">
   <div class="col s12 m3">
     <div class="section">
-      <h5 class="page-header"><i class="material-icons">info</i>Demo Detail</h5>
+      <h5 class="page-header"><i class="material-icons">info</i>Application Detail</h5>
       <div class="row">
         <div class="input-field col s12">
-          <p><%= @demo.name %></p>
+          <p class="info-text"><%= link(@demo.name, to: Routes.tx_path(@conn, :index, demo_id: @demo.id)) %></p>
           <label>Name</label>
         </div>
       </div>
-      <div class="row">
+      <!-- <div class="row">
         <div class="input-field col s12">
           <p class="info-text"><%= @demo.subtitle %></p>
           <label>Subtitle</label>
         </div>
-      </div>
+      </div> -->
       <div class="row">
         <div class="input-field col s12">
           <p class="info-text"><%= @demo.description %></p>
@@ -34,9 +38,9 @@
       </div>
     </div>
   </div>
-  <div class="col s12 m8 offset-m1">
+  <div class="col s12 m8">
     <div class="section">
-      <h5 class="page-header"><i class="material-icons">control_point</i>Add Transaction for Demo Case</h5>
+      <h5 class="page-header"><i class="material-icons">mode_edit</i>Edit Transaction</h5>
       <%= form_for @changeset, Routes.tx_path(@conn, :create), fn f -> %>
         <% init_tx_type = @changeset.data.tx_type || ""%>
         <%= text_input f, :init_tx_type, value: init_tx_type, type: "hidden" %>
@@ -242,7 +246,7 @@
 
         <div class="row">
           <div class="col s12">
-            <%= submit "Create Transaction", class: "btn btn-outlined blue-text text-accent-2 waves-effect" %>
+            <%= submit "Update Transaction", class: "btn btn-outlined blue-text text-accent-2 waves-effect" %>
           </div>
         </div>
       <% end %>

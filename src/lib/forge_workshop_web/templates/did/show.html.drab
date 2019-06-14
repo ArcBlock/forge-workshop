@@ -1,5 +1,6 @@
+<%= render(ForgeWorkshopWeb.SharedView, "tabs.html", selected: "auth", conn: @conn) %>
+
 <div class="info-panel">
-  <h5 class="page-header"><i class="material-icons">person_outline</i>Application</h5>
   <div class="row">
     <div class="col s12 m9">
       <h6 class="app-name"><%= @app_state.name %></h6>
@@ -12,8 +13,8 @@
         </p>
       </div>
       <div class="app-key">
-        Application DID (base58_btc encoding):
-        <p class="info-text"><%= Multibase.encode!(@app_state.did, :base58_btc) %></p>
+        Application <i class="icon-did-abt"></i> DID (base58_btc encoding):
+        <p class="info-text"><%= @app_state.did %></p>
       </div>
       <div class="app-key">
         Application Public Key (base58_btc encoding):
@@ -29,12 +30,12 @@
         <ul class="collapsible expandable">
           <%= for user <- @users do %>
           <li>
-            <div class="collapsible-header"><%= user.did %></div>
+            <div class="collapsible-header"><i class="icon-did-abt"></i> <%= user.did %></div>
             <div class="collapsible-body">
               <span>
                 <table class="striped" style="font-size: smaller; table-layout: fixed;">
                   <tr>
-                    <td style="width: 30%"> DID </td>
+                    <td style="width: 30%"><i class="icon-did-abt"></i> DID</td>
                     <td style="word-wrap: break-word;"> <%= user.did %> </td>
                   </tr>
                   <tr>
@@ -95,7 +96,7 @@
       </div>
       <% end %>
     </div>
-    <div class="col s12 m3">
+    <div class="col s12 m3" style="margin-top: 80px;">
       <div class="action-buttons">
         <%= form_for @conn, Routes.did_path(@conn, :reselect_claims), [method: "get"], fn _ -> %>
           <button type="submit" class="btn-floating btn-flat btn-small blue waves-effect tooltipped" data-position="top" data-tooltip="Update application claims"><i class="material-icons">edit</i></button>

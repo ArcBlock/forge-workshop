@@ -1,0 +1,20 @@
+<div class="tabs">
+  <%= if "auth" == @selected do %>
+    <%= link(to: Routes.did_path(@conn, :step1), class: "tab tab-auth tab-selected") do %>
+      <i class="material-icons">desktop_mac</i>Authentication
+    <% end %>
+  <% else %>
+    <%= link(to: Routes.did_path(@conn, :step1), class: "tab tab-auth") do %>
+      <i class="material-icons">desktop_mac</i>Authentication
+    <% end %>
+  <% end %>
+  <%= if "txs" == @selected do %>
+    <%= link(to: Routes.demo_path(@conn, :index), class: "tab tab-txs tab-selected") do %>
+      <i class="material-icons">device_hub</i>Transactions
+    <% end %>
+  <% else %>
+    <%= link(to: Routes.demo_path(@conn, :index), class: "tab tab-txs") do %>
+      <i class="material-icons">device_hub</i>Transactions
+    <% end %>
+  <% end %>
+</div>

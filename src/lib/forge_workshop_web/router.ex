@@ -16,6 +16,7 @@ defmodule ForgeWorkshopWeb.Router do
   scope "/", ForgeWorkshopWeb do
     pipe_through(:browser)
     get("/", DidController, :index)
+    get("/app", DidController, :step1)
     post("/did", DidController, :create_did)
     get("/did", DidController, :show)
     post("/did/app", DidController, :upsert_app_state)

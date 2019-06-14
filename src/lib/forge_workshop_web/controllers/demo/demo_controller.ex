@@ -1,12 +1,19 @@
 defmodule ForgeWorkshopWeb.DemoController do
   use ForgeWorkshopWeb, :controller
 
-  alias ForgeWorkshop.{Demo, Repo, Util}
+  alias ForgeWorkshop.{Demo, AppState, Repo, Util}
 
   def index(conn, _) do
+    app_state = AppState.get()
     changeset = Demo.changeset(%Demo{}, %{})
     demos = Demo.get_all()
-    render(conn, "index.html", demos: demos, changeset: changeset)
+    render(conn, "index.html", demos: demos, app_state: app_state, changeset: changeset)
+  end
+
+  def new(conn, _) do
+    app_state = AppState.get()
+    changeset = Demo.changeset(%Demo{}, %{})
+    render(conn, "new.html", app_state: app_state, changeset: changeset)
   end
 
   def create(conn, %{"demo" => demo}) do
@@ -25,7 +32,7 @@ defmodule ForgeWorkshopWeb.DemoController do
     case Demo.insert(demo) do
       {:ok, record} ->
         conn
-        |> put_flash(:info, "Successfully created demo case. Now please add transactions.")
+        |> put_flash(:info, "Successfully created application. Now please add transactions.")
         |> redirect(to: Routes.tx_path(conn, :index, demo_id: record.id))
 
       {:error, changeset} ->
@@ -38,7 +45,7 @@ defmodule ForgeWorkshopWeb.DemoController do
     case Demo.delete(demo_id) do
       {:ok, _} ->
         conn
-        |> put_flash(:info, "Successfully deleted demo.")
+        |> put_flash(:info, "Successfully deleted application.")
         |> redirect(to: Routes.demo_path(conn, :index))
 
       {:error, reason} ->
@@ -50,9 +57,10 @@ defmodule ForgeWorkshopWeb.DemoController do
   end
 
   def edit(conn, %{"id" => demo_id}) do
+    app_state = AppState.get()
     demo = apply(Repo, :get, [Demo, demo_id])
     changeset = Demo.changeset(demo)
-    render(conn, "edit.html", changeset: changeset, demo: demo)
+    render(conn, "edit.html", changeset: changeset, demo: demo, app_state: app_state)
   end
 
   def update(conn, %{"id" => demo_id, "demo" => new_demo}) do
@@ -62,7 +70,7 @@ defmodule ForgeWorkshopWeb.DemoController do
     case apply(Repo, :update, [changeset]) do
       {:ok, _} ->
         conn
-        |> put_flash(:info, "Demo updated.")
+        |> put_flash(:info, "Application updated.")
         |> redirect(to: Routes.demo_path(conn, :index))
 
       {:error, changeset} ->

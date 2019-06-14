@@ -1,19 +1,23 @@
+<%= render(ForgeWorkshopWeb.SharedView, "tabs.html", selected: "txs", conn: @conn) %>
+
+<h5 class="page-header">Play with Application</h5>
+
 <div class="row">
   <div class="col s12 m3">
     <div class="section">
-      <h5 class="page-header"><i class="material-icons">info</i>Demo Detail</h5>
+      <h5 class="page-header"><span class="step-badge">1</span>Application Detail</h5>
       <div class="row">
         <div class="input-field col s12">
-          <p><%= @demo.name %></p>
+          <p class="info-text"><%= @demo.name %></p>
           <label>Name</label>
         </div>
       </div>
-      <div class="row">
+      <!-- <div class="row">
         <div class="input-field col s12">
           <p class="info-text"><%= @demo.subtitle %></p>
           <label>Subtitle</label>
         </div>
-      </div>
+      </div> -->
       <div class="row">
         <div class="input-field col s12">
           <p class="info-text"><%= @demo.description %></p>
@@ -34,9 +38,9 @@
       </div>
     </div>
   </div>
-  <div class="col s12 m8 offset-m1">
+  <div class="col s12 m9">
     <div class="section">
-      <h5 class="page-header"><i class="material-icons">view_list</i>Transaction List</h5>
+      <h5 class="page-header"><span class="step-badge">2</span>Transactions</h5>
       <div class="txs">
         <%= for tx <- @txs do %>
           <div class="tx info-panel">
@@ -88,11 +92,237 @@
       </div>
     </div>
     <div class="row">
-      <div class="col s12">
-        <%= link(to: Routes.tx_path(@conn, :new, demo_id: @demo.id), class: "btn btn-outlined blue-text text-accent-2 waves-effect") do %>
-          Create New Transaction
-        <% end %>
+      <div class="col s12 m8">
+        <%= form_for @changeset, Routes.tx_path(@conn, :create), fn f -> %>
+        <% init_tx_type = @changeset.data.tx_type || ""%>
+        <%= text_input f, :init_tx_type, value: init_tx_type, type: "hidden" %>
+        <%= text_input f, :demo_id, value: @demo_id, type: "hidden" %>
+        <%= text_input f, :tx_id, value: @tx_id, type: "hidden" %>
+        <div class="row">
+          <div class="input-field col s12">
+            <%= text_input f, :name, placeholder: "Transaction Name", class: "form-control" %>
+            <label>Name</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <%= text_input f, :description, placeholder: "Description (will be displayed to wallet user.)" %>
+            <label>Description</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <%= select f, :tx_type, ["PokeTx", "TransferTx", "ExchangeTx", "ConsumeAssetTx", "UpdateAssetTx", [key: "Proof of Holding", value: "ProofOfHolding"]], prompt: "Choose your transaction type", id: :tx_type, value: init_tx_type %>
+            <label>Transaction Type</label>
+          </div>
+        </div>
+
+        <div class="form-group" id="PokeTx">
+          <div class="section">
+            <h7> PokeTx </h7>
+            <div class="divider"></div>
+            <br/>
+            <p style="font-size: smaller"> Poke transaction can be executed daily for each account to get some token reward. </p>
+          </div>
+        </div>
+
+        <div class="form-group" id="TransferTx">
+          <div class="section">
+            <h7> TransferTx </h7>
+            <div class="divider"></div>
+            <br/>
+            <p style="font-size: smaller"> TransferTx is single direction transaction. You can <b>either</b> give something to someone or ask something from someone. This transaction only needs the signature of sender.  </p>
+          </div>
+
+          <div class="row">
+            <div class="col s2">
+              <span style="font-size: smaller"> Offer: </span>
+            </div>
+            <div class="col s4">
+              <%= text_input f, :transfer_offer_token, placeholder: "Token amout to offer.", value: behavior_value("TransferTx_offer_token", @changeset.data) %>
+            </div>
+            <div class="col s6">
+              <%= text_input f, :transfer_offer_asset, placeholder: "Asset title to offer.", value: behavior_value("TransferTx_offer_asset", @changeset.data) %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col s2">
+              <span style="font-size: smaller"> Demand: </span>
+            </div>
+            <div class="col s4">
+              <%= text_input f, :transfer_demand_token, placeholder: "Token amout to demand.", value: behavior_value("TransferTx_demand_token", @changeset.data) %>
+            </div>
+            <div class="col s6">
+              <%= text_input f, :transfer_demand_asset, placeholder: "Asset title to demand.", value: behavior_value("TransferTx_demand_asset", @changeset.data) %>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" id="ExchangeTx">
+          <div class="section">
+            <h7> ExchangeTx </h7>
+            <div class="divider"></div>
+            <br/>
+            <p style="font-size: smaller"> ExchangeTx is two-way transaction. Both sender's and receiver's signatures are required. </p>
+          </div>
+
+          <div class="row">
+            <div class="col s2">
+              <span style="font-size: smaller"> Offer: </span>
+            </div>
+            <div class="col s4">
+              <%= text_input f, :exchange_offer_token, placeholder: "Token amout to offer.", value: behavior_value("ExchangeTx_offer_token", @changeset.data) %>
+            </div>
+            <div class="col s6">
+              <%= text_input f, :exchange_offer_asset, placeholder: "Asset title to offer.", value: behavior_value("ExchangeTx_offer_asset", @changeset.data) %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col s2">
+              <span style="font-size: smaller"> Demand: </span>
+            </div>
+            <div class="col s4">
+              <%= text_input f, :exchange_demand_token, placeholder: "Token amout to demand.", value: behavior_value("ExchangeTx_demand_token", @changeset.data) %>
+            </div>
+            <div class="col s6">
+              <%= text_input f, :exchange_demand_asset, placeholder: "Asset title to demand.", value: behavior_value("ExchangeTx_demand_asset", @changeset.data) %>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" id="ExchangeTetherTx">
+          <div class="section">
+            <h7> ExchangeTetherTx </h7>
+            <div class="divider"></div>
+            <br/>
+            <p style="font-size: smaller"> ExchangeTetherTx is for cross-chain trading. </p>
+          </div>
+
+          <div class="row">
+            <div class="col s2">
+              <span style="font-size: smaller"> Offer: </span>
+            </div>
+            <div class="col s4">
+              <%= text_input f, :exchange_tether_offer_token, placeholder: "Token amout to offer.", value: behavior_value("ExchangeTetherTx_offer_token", @changeset.data) %>
+            </div>
+            <div class="col s6">
+              <%= text_input f, :exchange_tether_offer_asset, placeholder: "Asset title to offer.", value: behavior_value("ExchangeTetherTx_offer_asset", @changeset.data) %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col s2">
+              <span style="font-size: smaller"> Demand: </span>
+            </div>
+            <div class="col s10">
+              <%= text_input f, :exchange_tether_demand_tether, placeholder: "Tether amout to demand.", value: behavior_value("ExchangeTetherTx_demand_tether", @changeset.data) %>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" id="ConsumeAssetTx">
+          <div class="section">
+            <h7> ConsumeAssetTx </h7>
+            <div class="divider"></div>
+            <br/>
+            <p style="font-size: smaller"> Once an asset is consumed, it is not transferable nor modifiable. It is valid till the expiration time, and then become invalid forever. </p>
+          </div>
+          <div class="row">
+            <div class="col s12">
+              <%= text_input f, :consume_asset, placeholder: "The title of the asset you want to consume.", value: behavior_value("ConsumeAssetTx_consume_asset", @changeset.data) %>
+            </div>
+          </div>
+          <span style="font-size: smaller">You can offer something to user after the ConsumeAssetTx is passed.</span>
+          <div class="row">
+            <div class="col s4">
+              <%= text_input f, :consume_offer_token, placeholder: "The token to offer afterwards.", value: behavior_value("ConsumeAssetTx_offer_token", @changeset.data) %>
+            </div>
+            <div class="col s8">
+              <%= text_input f, :consume_offer_asset, placeholder: "The title of the asset to offer afterwards.", value: behavior_value("ConsumeAssetTx_offer_asset", @changeset.data) %>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" id="UpdateAssetTx">
+          <div class="section">
+            <h7> UpdateAssetTx </h7>
+            <div class="divider"></div>
+            <br/>
+            <p style="font-size: smaller"> Use this transaction to update the asset content as you want. The owner's signature is required. You can type the function to update asset content in the input box bellow. The function will be called with the asset's current content, and the ouput will be the new content. Both input and output are integer. </p>
+          </div>
+          <div class="row">
+            <div class="col s4">
+              <%= text_input f, :update_asset, placeholder: "The title of asset to update.", value: behavior_value("UpdateAssetTx_update_asset", @changeset.data) %>
+            </div>
+            <div class="col s8">
+              <%= text_input f, :update_func, placeholder: "The elixir function to update content, e.g.,  fn c -> c + 1 end", value: behavior_value("UpdateAssetTx_update_function", @changeset.data) %>
+            </div>
+          </div>
+          <span style="font-size: smaller">You can offer something to user after the UpdateAssetTx is passed.</span>
+          <div class="row">
+            <div class="col s4">
+              <%= text_input f, :update_offer_token, placeholder: "The token to offer afterwards.", value: behavior_value("UpdateAssetTx_offer_token", @changeset.data) %>
+            </div>
+            <div class="col s8">
+              <%= text_input f, :update_offer_asset, placeholder: "The title of the asset to offer afterwards.", value: behavior_value("UpdateAssetTx_offer_asset", @changeset.data) %>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" id="ProofOfHolding">
+          <div class="section">
+            <h7> Proof of Holding </h7>
+            <div class="divider"></div>
+            <br/>
+            <p style="font-size: smaller"> This operation is not a transaction. It means you just want others to show you that they are in possession of a DID. The DID could be an account, an asset or even a stake. </p>
+          </div>
+          <div class="row">
+            <div class="col s6">
+              <%= text_input f, :poh_token, placeholder: "The token amout to hold.", value: behavior_value("ProofOfHolding_offer_token", @changeset.data) %>
+            </div>
+            <div class="col s6">
+              <%= text_input f, :poh_asset, placeholder: "The title of the asset to hold.", value: behavior_value("ProofOfHolding_offer_asset", @changeset.data) %>
+            </div>
+          </div>
+            <span style="font-size: smaller">You can offer something to user after the Proof of Holding is passed.</span>
+          <div class="row">
+            <div class="col s4">
+              <%= text_input f, :poh_offer_token, placeholder: "The token to offer afterwards.", value: behavior_value("ProofOfHolding_offer_token", @changeset.data) %>
+            </div>
+            <div class="col s8">
+              <%= text_input f, :poh_offer_asset, placeholder: "The title of the asset to offer afterwards.", value: behavior_value("ProofOfHolding_offer_asset", @changeset.data) %>
+            </div>
+          </div>
+        </div>
+
+        <div class="align-right">
+          <%= submit "Create Transaction", class: "btn btn-outlined blue-text text-accent-2 waves-effect" %>
+        </div>
+      <% end %>
       </div>
     </div>
   </div>
 </div>
+
+
+<script>
+function showSubForm(form_id) {
+  list = ["PokeTx", "TransferTx", "ExchangeTx", "ExchangeTetherTx", "ConsumeAssetTx", "UpdateAssetTx", "ProofOfHolding"]
+  list.forEach(function (id) {
+    if (form_id == "") {
+      $('#' + id).hide();
+    } else if (id == form_id) {
+      $('#' + id).show();
+    } else {
+      $('#' + id).hide();
+    }
+  });
+}
+
+initTxType = document.getElementById("tx_init_tx_type");
+showSubForm(initTxType.value);
+
+$('#tx_type').on('change', function() {
+  showSubForm($(this).val());
+});
+</script>

@@ -8,13 +8,16 @@ defmodule ForgeWorkshopWeb.DidController do
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
 
   def index(conn, _params) do
+    render(conn, "home.html")
+  end
+
+  def step1(conn, _params) do
     case AppState.get() do
       nil ->
         render(conn, "step1.html")
 
       state ->
         conn
-        |> put_flash(:info, "Application already created!")
         |> render("show.html", app_state: state, users: UserDb.get_all())
     end
   end

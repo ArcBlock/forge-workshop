@@ -1,7 +1,15 @@
-<div class="row">
+<%= render(ForgeWorkshopWeb.SharedView, "tabs.html", selected: "auth", conn: @conn) %>
+
+<div class="app-header">
+  <h5 class="page-header" style="color:#6c6c6c;">
+    Configure Authentication
+  </h5>
+</div>
+
+<div class="row center-align">
   <div class="col s12 m8">
     <div class="section">
-      <h5 class="page-header"><span class="step-badge">1</span>Generate Application DID</h5>
+      <h5 class="page-header"><span class="step-badge">1</span>Generate <i class="icon-did-abt"></i> DID</h5>
       <%= form_for @conn, Routes.did_path(@conn, :create_did), fn f -> %>
         <div class="row">
           <div class="input-field col s12">
@@ -21,12 +29,18 @@
             <label>Hash Function</label>
           </div>
         </div>
-        <div class="row">
+        <div class="row right-align">
           <div class="col s12">
-            <%= submit "Generate Application DID", class: "btn btn-outlined blue-text text-accent-2 waves-effect" %>
+            <%= submit "Save & Continue", class: "btn btn-outlined blue-text text-accent-2 waves-effect" %>
           </div>
         </div>
       <% end %>
+    </div>
+    <div class="section">
+      <h5 class="page-header page-header-disabled"><span class="step-badge">2</span>Configure Metadata</h5>
+    </div>
+    <div class="section">
+      <h5 class="page-header page-header-disabled"><span class="step-badge">3</span>Configure Claims</h5>
     </div>
   </div>
 </div>
