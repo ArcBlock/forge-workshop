@@ -1,7 +1,7 @@
 <style>
   .page-home {
     width: 540px;
-    margin: 15% auto 0;
+    margin: 10% auto 0;
     display: flex;
     flex-direction: column;
   }
@@ -48,13 +48,12 @@
   }
   .page-home .summary-btn {
     margin-top: 2rem;
-    text-align: right;
   }
 </style>
 
 <div class="page page-home">
   <h2 class="page-header">
-    Workshop
+    Dapps Workshop
   </h2>
   <div class="page-description">
     <p>
