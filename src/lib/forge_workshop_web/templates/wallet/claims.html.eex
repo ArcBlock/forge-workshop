@@ -1,40 +1,38 @@
+<%= render(ForgeWorkshopWeb.SharedView, "tabs.html", selected: "auth", conn: @conn) %>
+
+<h5 class="page-header">Provide Requested Info</h5>
+
 <div class="row">
   <div class="col s12 m4">
     <div class="section">
       <h5 class="page-header"><i class="material-icons">info</i>Application Meta Data</h5>
       <div class="row">
         <div class="input-field col s12">
-          <p><%= @app_info["name"] %></p>
+          <p class="info-text"><%= @app_info["name"] %></p>
           <label>Name</label>
         </div>
       </div>
       <div class="row">
         <div class="input-field col s12">
-          <p><%= @app_info["subtitle"] %></p>
-          <label>Subtitle</label>
-        </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s12">
-          <p><%= @app_info["description"] %></p>
+          <p class="info-text"><%= @app_info["description"] %></p>
           <label>Description</label>
         </div>
       </div>
       <div class="row">
         <div class="input-field col s12">
-          <p><%= @app_info["publisher"] %></p>
+          <p class="info-text"><%= @app_info["publisher"] %></p>
           <label>DID</label>
         </div>
       </div>
       <div class="row">
         <div class="input-field col s12">
-          <p><a href='<%= @app_info["copyright"] %>'><%= @app_info["copyright"] %></a></p>
+          <p class="info-text"><a href='<%= @app_info["copyright"] %>'><%= @app_info["copyright"] %></a></p>
           <label>Copyright</label>
         </div>
       </div>
       <div class="row">
         <div class="input-field col s12">
-          <p><img src='<%= Routes.static_path(@conn, @app_info["icon"]) %>' alt="" style="width: 100%" /></p>
+          <p class="info-text"><img src='<%= Routes.static_path(@conn, @app_info["icon"]) %>' alt="" style="width: 100%" /></p>
           <label>Application Icon</label>
         </div>
       </div>
