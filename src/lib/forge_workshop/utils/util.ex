@@ -24,8 +24,15 @@ defmodule ForgeWorkshop.Util do
       end
 
     case URI.parse(icon) do
-      %{host: nil} -> Routes.static_url(conn, icon)
-      _ -> icon
+      %{host: nil} ->
+        conn
+        |> Routes.static_url(icon)
+        |> URI.parse()
+        |> Map.put(:host, get_ip())
+        |> URI.to_string()
+
+      _ ->
+        icon
     end
   end
 

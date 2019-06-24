@@ -1,3 +1,6 @@
+## 0.6.2 (June 24, 2019)
+  - Fix icon URL issue.
+
 ## 0.6.1 (June 14, 2019)
   - Fix the URL issue for staging and prod env.
 
