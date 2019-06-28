@@ -4,11 +4,9 @@ defmodule ForgeWorkshop.MixProject do
   @top "../"
   @version @top |> Path.join("version") |> File.read!() |> String.trim()
   @elixir_version @top |> Path.join(".elixir_version") |> File.read!() |> String.trim()
-  @otp_version @top |> Path.join(".otp_version") |> File.read!() |> String.trim()
 
   def get_version, do: @version
   def get_elixir_version, do: @elixir_version
-  def get_otp_version, do: @otp_version
 
   def project do
     [
@@ -20,7 +18,13 @@ defmodule ForgeWorkshop.MixProject do
       build_path: Path.join(@top, "_build"),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      releases: [
+        forge_workshop: [
+          include_executables_for: [:unix],
+          applications: [runtime_tools: :permanent]
+        ]
+      ]
     ]
   end
 
@@ -29,8 +33,8 @@ defmodule ForgeWorkshop.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {ForgeWorkshop.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger],
+      mod: {ForgeWorkshop.Application, []}
     ]
   end
 
@@ -75,9 +79,6 @@ defmodule ForgeWorkshop.MixProject do
       {:recon_ex, "~> 0.9.1"},
       {:sentry, "~> 7.0"},
       {:statix, "~> 1.1"},
-
-      # deployment
-      {:distillery, "~> 2.0", runtime: false},
 
       # dev & test
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},

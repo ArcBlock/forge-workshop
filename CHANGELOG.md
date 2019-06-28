@@ -1,3 +1,9 @@
+## 0.7.0 (June 27, 2019)
+
+
+## 0.7.0 (June 27, 2019)
+  - Update elixir 1.9 mix release
+
 ## 0.6.2 (June 24, 2019)
   - Fix icon URL issue.
 
