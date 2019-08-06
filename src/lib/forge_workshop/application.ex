@@ -6,6 +6,7 @@ defmodule ForgeWorkshop.Application do
 
   def start(_type, _args) do
     read_config()
+    apply_config()
     children = get_servers()
     opts = [strategy: :one_for_one, name: ForgeWorkshop.Supervisor]
     result = Supervisor.start_link(children, opts)
@@ -89,6 +90,18 @@ defmodule ForgeWorkshop.Application do
 
   defp adjust_config("path", value), do: Path.expand(value)
   defp adjust_config(_, value), do: value
+
+  defp apply_config() do
+    config = Application.get_env(:forge_workshop, "workshop")
+    endpoint = Application.get_env(:forge_workshop, ForgeWorkshopWeb.Endpoint)
+
+    endpoint =
+      Keyword.update(endpoint, :http, [port: config["port"]], fn v ->
+        Keyword.put(v, :port, config["port"])
+      end)
+
+    Application.put_env(:forge_workshop, ForgeWorkshopWeb.Endpoint, endpoint)
+  end
 
   defp set_db() do
     db_path = Util.config(["workshop", "db"])

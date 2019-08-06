@@ -1,5 +1,5 @@
-## 0.7.0 (June 27, 2019)
-
+## 0.7.1 (Aug 6, 2019)
+  - Make the phoenix server port configurable.
 
 ## 0.7.0 (June 27, 2019)
   - Update elixir 1.9 mix release
