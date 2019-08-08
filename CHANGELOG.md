@@ -1,3 +1,6 @@
+## 0.7.2 (Aug 9, 2019)
+  - Bump deps version.
+
 ## 0.7.1 (Aug 6, 2019)
   - Make the phoenix server port configurable.
 
