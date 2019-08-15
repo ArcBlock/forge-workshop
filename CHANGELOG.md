@@ -1,3 +1,6 @@
+## 0.7.3 (Aug 14, 2019)
+  - Let config file fully control the host and port.
+
 ## 0.7.2 (Aug 9, 2019)
   - Bump deps version.
 
