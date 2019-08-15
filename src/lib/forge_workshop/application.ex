@@ -93,12 +93,20 @@ defmodule ForgeWorkshop.Application do
 
   defp apply_config() do
     config = Application.get_env(:forge_workshop, "workshop")
+    schema = config["schema"]
+    port = config["port"]
+    host = config["host"]
     endpoint = Application.get_env(:forge_workshop, ForgeWorkshopWeb.Endpoint)
+    endpoint = Keyword.put(endpoint, :url, host: host, port: port)
 
     endpoint =
-      Keyword.update(endpoint, :http, [port: config["port"]], fn v ->
-        Keyword.put(v, :port, config["port"])
-      end)
+      case schema do
+        "https" ->
+          Keyword.update(endpoint, :https, [port: port], fn v -> Keyword.put(v, :port, port) end)
+
+        "http" ->
+          Keyword.update(endpoint, :http, [port: port], fn v -> Keyword.put(v, :port, port) end)
+      end
 
     Application.put_env(:forge_workshop, ForgeWorkshopWeb.Endpoint, endpoint)
   end

@@ -1,13 +1,11 @@
 [workshop]
-path = "~/.workshop"
+path = "~/.workshop_asset"
 
-local_forge = "tcp://127.0.0.1:27210"
+local_forge = "tcp://127.0.0.1:10020"
 
 # the index db path
 # sqlite://workshop.sqlite3 or postgres://postgres:postgres@localhost:5432/workshop
 db = "sqlite://workshop.sqlite3"
 
 # The port that workshop listens on.
-schema = "http"
-host = "localhost"
 port=9309
