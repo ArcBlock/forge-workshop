@@ -8,4 +8,6 @@ local_forge = "tcp://127.0.0.1:27210"
 db = "sqlite://workshop.sqlite3"
 
 # The port that workshop listens on.
+schema = "http"
+host = "localhost"
 port=9309

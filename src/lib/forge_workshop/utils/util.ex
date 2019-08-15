@@ -43,31 +43,10 @@ defmodule ForgeWorkshop.Util do
     end
   end
 
-  def get_ip do
-    host = config([Endpoint, :url, :host])
-
-    case host do
-      h when h in [nil, "localhost", "127.0.0.1"] ->
-        {:ok, ip_list} = :inet.getif()
-        list = Enum.filter(ip_list, fn {_ip, broadcast, _netmask} -> broadcast != :undefined end)
-        result = Enum.find(list, fn {ip, _, _} -> elem(ip, 0) == 192 or elem(ip, 0) == 10 end)
-
-        {ip, _, _} =
-          case result do
-            nil -> List.first(list)
-            _ -> result
-          end
-
-        {i1, i2, i3, i4} = ip
-        "#{i1}.#{i2}.#{i3}.#{i4}"
-
-      _ ->
-        host
-    end
-  end
-
   def config([first | rest]), do: :forge_workshop |> Application.get_env(first) |> get_in(rest)
   def config(key), do: :forge_workshop |> Application.get_env(key)
+
+  def get_ip, do: config([Endpoint, :url, :host])
 
   def get_port do
     case config([ForgeWorkshopWeb.Endpoint, :http, :port]) do
