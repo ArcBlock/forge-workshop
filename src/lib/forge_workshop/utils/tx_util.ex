@@ -364,12 +364,15 @@ defmodule ForgeWorkshop.TxUtil do
   end
 
   defp get_itx_to_sign("PokeTx", _, _) do
-    state = ForgeSdk.get_forge_state()
+    %{address: address} =
+      ForgeSdk.get_forge_state()
+      |> Map.from_struct()
+      |> get_in([:account_config, "token_holder"])
 
     itx =
       apply(PokeTx, :new, [
         [
-          address: state.poke_config.address,
+          address: address,
           date: DateTime.utc_now() |> DateTime.to_date() |> Date.to_string()
         ]
       ])

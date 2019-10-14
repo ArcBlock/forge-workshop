@@ -154,7 +154,11 @@ defmodule ForgeWorkshop.WalletUtil do
   end
 
   def poke(wallet, chan \\ "") do
-    %{address: address} = ForgeSdk.get_forge_state(chan).poke_config
+    %{address: address} =
+      chan
+      |> ForgeSdk.get_forge_state()
+      |> Map.from_struct()
+      |> get_in([:account_config, "token_holder"])
 
     itx =
       apply(PokeTx, :new, [
@@ -189,9 +193,8 @@ defmodule ForgeWorkshop.WalletUtil do
       Process.sleep(number * 50)
       Enum.each(wallets, fn {w, _} -> poke(w, chan) end)
       Process.sleep(number * 50)
-      %{amount: poke_amount} = ForgeSdk.get_forge_state(chan).poke_config
+      %{tx_config: %{poke: %{amount: poke_amount}}} = ForgeSdk.get_forge_state(chan)
       itx = apply(TransferTx, :new, [[to: address, value: ForgeAbi.token_to_unit(poke_amount)]])
-
       Enum.each(wallets, fn {w, _} -> ForgeSdk.transfer(itx, wallet: w, conn: chan) end)
     end)
   end

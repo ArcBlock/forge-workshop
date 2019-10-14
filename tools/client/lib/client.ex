@@ -5,7 +5,7 @@ defmodule Client do
 
   @ed25519 %Mcrypto.Signer.Ed25519{}
   @secp256k1 %Mcrypto.Signer.Secp256k1{}
-  @localhost "localhost:4000"
+  @localhost "localhost:9309"
 
   @doc """
   options:

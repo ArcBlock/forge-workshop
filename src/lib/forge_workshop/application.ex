@@ -15,7 +15,7 @@ defmodule ForgeWorkshop.Application do
       Process.sleep(5_000)
       %{decimal: decimal} = ForgeSdk.get_forge_state().token
       Application.put_env(:forge_abi, :decimal, decimal)
-      robert = WalletUtil.get_robert()
+      WalletUtil.get_robert()
       # WalletUtil.declare_wallet(robert, "robert", "remote")
       # WalletUtil.raise_validator_power()
       # WalletUtil.declare_anchors()
