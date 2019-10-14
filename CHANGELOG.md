@@ -1,3 +1,6 @@
+## 0.8.0 (October 14, 2019)
+  - Adapt to new forge state
+
 ## 0.7.3 (Aug 14, 2019)
   - Let config file fully control the host and port.
 
