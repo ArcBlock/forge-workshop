@@ -112,7 +112,7 @@ defmodule ForgeWorkshopWeb.WithdrawerController do
       value: Util.to_token(deposit_itx.value),
       commission: Util.to_token(deposit_itx.commission),
       charge: Util.to_token(deposit_itx.charge),
-      locktime: ForgeSdk.Util.proto_to_datetime(deposit_itx.locktime)
+      locktime: ForgeSdk.display(deposit_itx.locktime)
     }
   end
 

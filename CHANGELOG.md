@@ -1,3 +1,6 @@
+## 0.8.1 (October 30, 2019)
+  - Adapt to ForgeSdk 0.40.0
+
 ## 0.8.0 (October 14, 2019)
   - Adapt to new forge state
 

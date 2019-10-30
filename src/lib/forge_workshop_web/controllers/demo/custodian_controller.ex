@@ -245,7 +245,7 @@ defmodule ForgeWorkshopWeb.CustodianController do
       commission: Util.to_token(tether_state.commission),
       charge: Util.to_token(tether_state.charge),
       target: tether_state.target,
-      locktime: ForgeSdk.Util.proto_to_datetime(tether_state.locktime),
+      locktime: ForgeSdk.display(tether_state.locktime),
       time: indexed_withdraw.time,
       withdraw_hash: indexed_withdraw.hash,
       exchange_hash: exchange_hash
