@@ -7,9 +7,7 @@ defmodule ForgeWorkshop.WalletUtil do
     HashType,
     KeyType,
     PokeTx,
-    RequestCreateTx,
     RequestCreateWallet,
-    RequestSendTx,
     RoleType,
     TransferTx,
     WalletInfo,
@@ -131,15 +129,8 @@ defmodule ForgeWorkshop.WalletUtil do
   end
 
   def declare_wallet(wallet, moniker, chan \\ "") do
-    data = apply(DeclareTx, :new, [[moniker: moniker, pk: wallet.pk, type: wallet.type]])
-    itx = ForgeAbi.encode_any!(data, "fg:t:declare")
-
-    req_create =
-      RequestCreateTx.new(from: wallet.address, itx: itx, nonce: 1, token: "", wallet: wallet)
-
-    tx = ForgeSdk.create_tx(req_create, chan)
-    req_send = RequestSendTx.new(commit: false, token: "", tx: tx, wallet: wallet)
-    ForgeSdk.send_tx(req_send, chan)
+    itx = apply(DeclareTx, :new, [[moniker: moniker]])
+    ForgeSdk.declare(itx, wallet: wallet)
   end
 
   @doc """
