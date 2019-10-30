@@ -1,18 +1,7 @@
 defmodule ForgeWorkshop.WalletUtil do
   @moduledoc false
 
-  alias ForgeAbi.{
-    DeclareTx,
-    EncodingType,
-    HashType,
-    KeyType,
-    PokeTx,
-    RequestCreateWallet,
-    RoleType,
-    TransferTx,
-    WalletInfo,
-    WalletType
-  }
+  alias ForgeAbi.{DeclareTx, PokeTx, TransferTx, WalletInfo}
 
   @anchor1 ForgeAbi.WalletInfo.new(
              sk:
@@ -107,25 +96,14 @@ defmodule ForgeWorkshop.WalletUtil do
     moniker_prefix = ForgeWorkshop.Util.config([:wallet, :moniker_prefix])
 
     for i <- 1..number do
-      {w, _} = create_wallet(chan)
+      w = create_wallet(chan)
       tx_hash = declare_wallet(w, moniker_prefix <> "#{i}", chan)
       {w, tx_hash}
     end
   end
 
   def create_wallet(chan \\ "") do
-    passphrase = ForgeWorkshop.Util.config([:wallet, :passphrase])
-
-    type =
-      WalletType.new(
-        address: EncodingType.value(:base58),
-        pk: KeyType.value(:ed25519),
-        hash: HashType.value(:sha3),
-        role: RoleType.value(:role_account)
-      )
-
-    req = RequestCreateWallet.new(moniker: "", passphrase: passphrase, type: type)
-    ForgeSdk.create_wallet(req, chan)
+    ForgeSdk.create_wallet(send: :nosend)
   end
 
   def declare_wallet(wallet, moniker, chan \\ "") do
