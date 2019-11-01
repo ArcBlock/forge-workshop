@@ -10,6 +10,7 @@ defmodule ForgeWorkshop.Application do
     children = get_servers()
     opts = [strategy: :one_for_one, name: ForgeWorkshop.Supervisor]
     result = Supervisor.start_link(children, opts)
+    ArcConfig.read_config(:forge_workshop)
 
     spawn(fn ->
       Process.sleep(5_000)
@@ -39,12 +40,7 @@ defmodule ForgeWorkshop.Application do
 
   defp get_servers() do
     env = Util.config(:env)
-
-    if env != "test" do
-      connect_local_forge()
-      connect_remote_forge()
-    end
-
+    connect_local_forge()
     get_app_servers()
   end
 
@@ -59,13 +55,13 @@ defmodule ForgeWorkshop.Application do
     register_type_urls()
   end
 
-  defp connect_remote_forge() do
-    case Util.config(["workshop", "remote_forge"]) do
-      nil -> nil
-      "" -> nil
-      remote_forge_sock -> ForgeSdk.connect(remote_forge_sock, name: "remote", default: false)
-    end
-  end
+  # defp connect_remote_forge() do
+  #   case Util.config(["workshop", "remote_forge"]) do
+  #     nil -> nil
+  #     "" -> nil
+  #     remote_forge_sock -> ForgeSdk.connect(remote_forge_sock, name: "remote", default: false)
+  #   end
+  # end
 
   def read_config() do
     filepath =

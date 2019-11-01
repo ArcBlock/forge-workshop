@@ -5,6 +5,9 @@ defmodule ForgeWorkshop.Util do
   alias ForgeWorkshopWeb.Endpoint
   alias ForgeWorkshopWeb.Router.Helpers, as: Routes
 
+  def hash(:keccak, data), do: Mcrypto.hash(%Mcrypto.Hasher.Keccak{}, data)
+  def hash(:sha3, data), do: Mcrypto.hash(%Mcrypto.Hasher.Sha3{}, data)
+
   def to_token(%ForgeAbi.BigUint{} = value),
     do: value |> ForgeAbi.Util.BigInt.to_int() |> Kernel./(ForgeAbi.one_token())
 

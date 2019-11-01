@@ -1,7 +1,8 @@
 defmodule ForgeWorkshopWeb.AuthController do
   use ForgeWorkshopWeb, :controller
 
-  alias ForgeWorkshop.{AppState, Plugs.VerifySig, UserDb, Util}
+  alias ForgeWorkshop.{AppState, UserDb, Util}
+  alias ForgeWorkshopWeb.Plugs.VerifySig
 
   plug(VerifySig when action in [:response_auth])
 

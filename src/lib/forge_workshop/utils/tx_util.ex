@@ -42,17 +42,15 @@ defmodule ForgeWorkshop.TxUtil do
     itx.locktime
   end
 
-  def assemble_sig(tx_str, sig_str) do
-    tx = tx_str |> Multibase.decode!() |> Transaction.decode()
-    sig = Multibase.decode!(sig_str)
-    %{tx | signature: sig}
+  def assemble_sig(tx_bin, sig_bin) do
+    tx = Transaction.decode(tx_bin)
+    %{tx | signature: sig_bin}
   end
 
-  def assemble_multi_sig(tx_str, sig_str) do
-    tx = tx_str |> Multibase.decode!() |> Transaction.decode()
-    sig = Multibase.decode!(sig_str)
+  def assemble_multi_sig(tx_bin, sig_bin) do
+    tx = Transaction.decode(tx_bin)
     [msig | rest] = tx.signatures
-    msig = %{msig | signature: sig}
+    msig = %{msig | signature: sig_bin}
     %{tx | signatures: [msig | rest]}
   end
 
@@ -278,8 +276,8 @@ defmodule ForgeWorkshop.TxUtil do
   end
 
   # User is always the sender.
-  defp prepare_transaction(%{tx_type: "PokeTx"}, conn) do
-    user = conn.assigns.user
+  def prepare_transaction(%{tx_type: "PokeTx"}, conn) do
+    user = conn.assigns.auth_principal
 
     "PokeTx"
     |> get_transaction_to_sign(user, nil)
@@ -287,7 +285,7 @@ defmodule ForgeWorkshop.TxUtil do
   end
 
   # User is always the sender.
-  defp prepare_transaction(%{tx_type: "TransferTx"} = tx, conn) do
+  def prepare_transaction(%{tx_type: "TransferTx"} = tx, conn) do
     robert = conn.assigns.robert
     user = conn.assigns.user
     asset = Map.get(conn.assigns, :asset)
@@ -299,7 +297,7 @@ defmodule ForgeWorkshop.TxUtil do
   end
 
   # Robert is the sender, always requires multi sig from user
-  defp prepare_transaction(%{tx_type: "ExchangeTx"} = tx, conn) do
+  def prepare_transaction(%{tx_type: "ExchangeTx"} = tx, conn) do
     robert = conn.assigns.robert
     user = conn.assigns.user
     asset = Map.get(conn.assigns, :asset)
@@ -315,7 +313,7 @@ defmodule ForgeWorkshop.TxUtil do
   end
 
   # Robert is the sender, always requires multi sig from user
-  defp prepare_transaction(%{tx_type: "ExchangeTetherTx"} = tx, conn) do
+  def prepare_transaction(%{tx_type: "ExchangeTetherTx"} = tx, conn) do
     robert = conn.assigns.robert
     user = conn.assigns.user
     deposit = conn.assigns.deposit
@@ -330,7 +328,7 @@ defmodule ForgeWorkshop.TxUtil do
   end
 
   # User is always the sender.
-  defp prepare_transaction(%{tx_type: "UpdateAssetTx"} = tx, conn) do
+  def prepare_transaction(%{tx_type: "UpdateAssetTx"} = tx, conn) do
     robert = conn.assigns.robert
     user = conn.assigns.user
     asset = Map.get(conn.assigns, :asset)
@@ -342,14 +340,14 @@ defmodule ForgeWorkshop.TxUtil do
   end
 
   # Robert is the sender, requires multi sig from user
-  defp prepare_transaction(%{tx_type: "ConsumeAssetTx"}, conn) do
+  def prepare_transaction(%{tx_type: "ConsumeAssetTx"}, conn) do
     robert = conn.assigns.robert
     user = conn.assigns.user
 
     get_transaction_to_sign("ConsumeAssetTx", robert, user)
   end
 
-  defp prepare_transaction(%{tx_type: "DepositTetherTx"}, conn) do
+  def prepare_transaction(%{tx_type: "DepositTetherTx"}, conn) do
     robert = conn.assigns.robert
     user = conn.assigns.user
     value = Map.get(conn.assigns, :deposit_value)

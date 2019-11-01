@@ -59,7 +59,8 @@ all: pre-build build post-build
 
 test:
 	@echo "Running test suites..."
-	@cd src; MIX_ENV=test mix test
+	@rm -rf ~/.workshop
+	@cd src; MIX_ENV=test mix test $(TF)
 
 doc:
 	@echo "Building the documentation..."

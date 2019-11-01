@@ -1,45 +1,44 @@
-defmodule ForgeWorkshop.Plugs.PrepareTx do
+defmodule ForgeWorkshopWeb.Plugs.PrepareTx do
   @moduledoc """
   Prepare common arguments.
   """
   import Plug.Conn
   import Phoenix.Controller
 
-  alias ForgeWorkshop.{Custodian, Tx}
+  alias ForgeWorkshop.{Demo, Tx, Util}
 
   def init(_) do
   end
 
   def call(%Plug.Conn{params: %{"id" => id}} = conn, _) do
-    case AbtDid.is_valid?(id) do
-      true ->
-        custodian = Custodian.get(id)
+    tx_id = String.to_integer(id)
 
-        conn
-        |> assign(:custodian, custodian)
-        |> assign(:tx, %{
-          tx_type: "DepositTetherTx",
-          id: custodian.address,
-          description: "You are depositing tether to #{custodian.moniker}."
-        })
+    conn =
+      case Tx.get(tx_id) do
+        nil ->
+          conn
+          |> json({:error, "Cannot find transaction."})
+          |> halt()
 
-      false ->
-        prepare_tx(conn, id)
-    end
-  end
+        tx ->
+          conn
+          |> assign(:tx, tx)
+      end
 
-  defp prepare_tx(conn, tx_id) do
-    tx_id = String.to_integer(tx_id)
+    demo = Demo.get_by_tx_id(tx_id)
+    config = ArcConfig.read_config(:forge_workshop)
+    chain_config = config["hyjal"]["chain"]
 
-    case Tx.get(tx_id) do
-      nil ->
-        conn
-        |> json({:error, "Cannot find transaction."})
-        |> halt()
+    demo_info = %{
+      app_name: demo.name,
+      app_desc: demo.description,
+      chain_host: chain_config["host"],
+      chain_port: chain_config["port"],
+      sk: Util.str_to_bin(demo.sk),
+      pk: Util.str_to_bin(demo.pk),
+      did: Util.did_to_address(demo.did)
+    }
 
-      tx ->
-        conn
-        |> assign(:tx, tx)
-    end
+    assign(conn, :demo_info, demo_info)
   end
 end

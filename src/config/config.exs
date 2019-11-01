@@ -7,6 +7,8 @@
 # General application configuration
 use Mix.Config
 
+config :hyjal, app_name: :forge_workshop
+
 config :forge_workshop, ForgeWorkshop.SqliteRepo, adapter: Sqlite.Ecto2, priv: "priv/repo"
 
 config :forge_workshop,

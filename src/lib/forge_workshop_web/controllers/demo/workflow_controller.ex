@@ -2,7 +2,7 @@ defmodule ForgeWorkshopWeb.WorkflowController do
   use ForgeWorkshopWeb, :controller
 
   alias ForgeWorkshop.{AssetUtil, Custodian, Demo, TxUtil, Util, WalletUtil}
-  alias ForgeWorkshop.Plugs.{PrepareArgs, PrepareTx, VerifySig}
+  alias ForgeWorkshopWeb.Plugs.{PrepareArgs, PrepareTx, VerifySig}
 
   alias ForgeWorkshop.Step.{
     GenOffer,
