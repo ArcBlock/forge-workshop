@@ -292,6 +292,8 @@ defmodule ForgeWorkshopWeb.TxController do
   end
 
   defp parse_token_amount(amounts) do
+    amounts
+
     Enum.map(
       amounts,
       fn

@@ -51,7 +51,9 @@ defmodule ForgeWorkshop.Application do
 
   defp connect_local_forge() do
     local_forge_sock = Util.config(["workshop", "local_forge"])
+
     ForgeSdk.connect(local_forge_sock, name: "local", default: true)
+
     register_type_urls()
   end
 
