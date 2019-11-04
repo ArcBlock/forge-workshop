@@ -6,37 +6,6 @@ defmodule ForgeWorkshopWeb.ExchangeControllerTest do
 
   @edpoint ForgeWorkshopWeb.Endpoint
 
-  # %{
-  #   "consume_asset" => "",
-  #   "consume_offer_asset" => "",
-  #   "consume_offer_token" => "",
-  #   "demo_id" => "2",
-  #   "description" => "每日签到，领取奖励",
-  #   "exchange_demand_asset" => "",
-  #   "exchange_demand_token" => "",
-  #   "exchange_offer_asset" => "",
-  #   "exchange_offer_token" => "",
-  #   "exchange_tether_demand_tether" => "",
-  #   "exchange_tether_offer_asset" => "",
-  #   "exchange_tether_offer_token" => "",
-  #   "init_tx_type" => "",
-  #   "name" => "Exchange Tx test",
-  #   "poh_asset" => "",
-  #   "poh_offer_asset" => "",
-  #   "poh_offer_token" => "",
-  #   "poh_token" => "",
-  #   "exchange_demand_asset" => "",
-  #   "exchange_demand_token" => "",
-  #   "exchange_offer_asset" => "COUPON20",
-  #   "exchange_offer_token" => "10",
-  #   "tx_id" => "",
-  #   "tx_type" => "ExchangeTx",
-  #   "update_asset" => "",
-  #   "update_func" => "",
-  #   "update_offer_asset" => "",
-  #   "update_offer_token" => ""
-  # }
-
   test "Exchnage, do not demand asset from user, all good", %{conn: conn} do
     asset_title = "COUPON20"
 
