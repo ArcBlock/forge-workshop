@@ -83,8 +83,8 @@ defmodule ForgeWorkshop.ClaimUtil do
       description: description,
       type_url: "fg:t:transaction",
       method: did_type.hash_type,
-      origin: Multibase.encode!(transaction_bin, :base58_btc),
-      digest: Multibase.encode!(digest, :base58_btc)
+      origin: transaction_bin,
+      digest: digest
     }
   end
 end
