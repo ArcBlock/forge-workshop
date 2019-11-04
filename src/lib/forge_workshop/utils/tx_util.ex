@@ -287,7 +287,7 @@ defmodule ForgeWorkshop.TxUtil do
   # User is always the sender.
   def prepare_transaction(%{tx_type: "TransferTx"} = tx, conn) do
     robert = conn.assigns.robert
-    user = conn.assigns.user
+    user = conn.assigns.auth_principal
     asset = Map.get(conn.assigns, :asset)
 
     [beh] = tx.tx_behaviors
@@ -299,7 +299,7 @@ defmodule ForgeWorkshop.TxUtil do
   # Robert is the sender, always requires multi sig from user
   def prepare_transaction(%{tx_type: "ExchangeTx"} = tx, conn) do
     robert = conn.assigns.robert
-    user = conn.assigns.user
+    user = conn.assigns.auth_principal
     asset = Map.get(conn.assigns, :asset)
 
     offer = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "offer" end)
@@ -315,7 +315,7 @@ defmodule ForgeWorkshop.TxUtil do
   # Robert is the sender, always requires multi sig from user
   def prepare_transaction(%{tx_type: "ExchangeTetherTx"} = tx, conn) do
     robert = conn.assigns.robert
-    user = conn.assigns.user
+    user = conn.assigns.auth_principal
     deposit = conn.assigns.deposit
 
     offer = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "offer" end)
@@ -330,7 +330,7 @@ defmodule ForgeWorkshop.TxUtil do
   # User is always the sender.
   def prepare_transaction(%{tx_type: "UpdateAssetTx"} = tx, conn) do
     robert = conn.assigns.robert
-    user = conn.assigns.user
+    user = conn.assigns.auth_principal
     asset = Map.get(conn.assigns, :asset)
 
     update = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "update" end)
@@ -342,7 +342,7 @@ defmodule ForgeWorkshop.TxUtil do
   # Robert is the sender, requires multi sig from user
   def prepare_transaction(%{tx_type: "ConsumeAssetTx"}, conn) do
     robert = conn.assigns.robert
-    user = conn.assigns.user
+    user = conn.assigns.auth_principal
 
     get_transaction_to_sign("ConsumeAssetTx", robert, user)
   end
