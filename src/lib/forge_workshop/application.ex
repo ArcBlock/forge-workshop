@@ -39,7 +39,6 @@ defmodule ForgeWorkshop.Application do
   end
 
   defp get_servers() do
-    env = Util.config(:env)
     connect_local_forge()
     get_app_servers()
   end

@@ -1,7 +1,7 @@
 defmodule ForgeWorkshop.Util do
   @moduledoc false
 
-  alias ForgeWorkshop.{AppState, Demo, Repo}
+  alias ForgeWorkshop.{AppState, Demo, Repo, Tx}
   alias ForgeWorkshopWeb.Endpoint
   alias ForgeWorkshopWeb.Router.Helpers, as: Routes
 
@@ -102,40 +102,46 @@ defmodule ForgeWorkshop.Util do
 
   def gen_deeplink(app_id) do
     app_state = apply(Repo, :get, [AppState, app_id])
-    do_gen_deeplink(app_state.path, app_state.pk, app_state.did, get_callback() <> "auth/")
+    do_gen_deeplink(app_state.path, get_callback() <> "auth/")
   end
 
   def gen_deeplink(demo_id, tx_id) do
     demo = apply(Repo, :get, [Demo, demo_id])
-    gen_deeplink(demo.path, demo.pk, demo.did, tx_id)
+    url = get_workflow_entrace(tx_id)
+    do_gen_deeplink(demo.path, url)
   end
 
-  def gen_deeplink(path, pk, did, tx_id) do
-    url = get_callback() <> "workflow/#{tx_id}"
-    do_gen_deeplink(path, pk, did, url)
-  end
-
-  defp do_gen_deeplink(path, pk, did, url) do
+  defp do_gen_deeplink(path, url) do
     path = String.trim_trailing(path, "/")
-
-    pk =
-      if String.valid?(pk) do
-        pk
-      else
-        Multibase.encode!(pk, :base58_btc)
-      end
-
-    did =
-      if String.starts_with?(did, "did:abt:") do
-        did
-      else
-        "did:abt:" <> did
-      end
-
     url = URI.encode_www_form(url)
-
-    "#{path}?appPk=#{pk}&appDid=#{did}&action=requestAuth&url=#{url}"
+    "#{path}?action=requestAuth&url=#{url}"
   end
+
+  def get_workflow_entrace(tx_id) do
+    tx_id
+    |> Tx.get()
+    |> do_get_workflow_entrace()
+  end
+
+  defp do_get_workflow_entrace(%{tx_type: "PokeTx", id: id}),
+    do: Routes.poke_url(Endpoint, :start, id)
+
+  defp do_get_workflow_entrace(%{tx_type: "TransferTx", id: id}),
+    do: Routes.transfer_url(Endpoint, :start, id)
+
+  defp do_get_workflow_entrace(%{tx_type: "ExchangeTx", id: id}),
+    do: Routes.exchange_url(Endpoint, :start, id)
+
+  defp do_get_workflow_entrace(%{tx_type: "ConsumeAssetTx", id: id}),
+    do: Routes.consume_asset_url(Endpoint, :start, id)
+
+  defp do_get_workflow_entrace(%{tx_type: "UpdateAssetTx", id: id}),
+    do: Routes.update_asset_url(Endpoint, :start, id)
+
+  defp do_get_workflow_entrace(%{tx_type: "ProofOfHolding", id: id}),
+    do: Routes.poh_url(Endpoint, :start, id)
+
+  defp do_get_workflow_entrace(_), do: ""
 
   def hex_to_bin("0x" <> hex), do: hex_to_bin(hex)
   def hex_to_bin(hex), do: Base.decode16!(hex, case: :mixed)

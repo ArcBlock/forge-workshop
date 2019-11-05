@@ -102,11 +102,11 @@ defmodule ForgeWorkshop.WalletUtil do
     end
   end
 
-  def create_wallet(chan \\ "") do
+  def create_wallet(_chan \\ "") do
     ForgeSdk.create_wallet(send: :nosend)
   end
 
-  def declare_wallet(wallet, moniker, chan \\ "") do
+  def declare_wallet(wallet, moniker, _chan \\ "") do
     itx = apply(DeclareTx, :new, [[moniker: moniker]])
     ForgeSdk.declare(itx, wallet: wallet)
   end
