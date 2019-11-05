@@ -2,7 +2,7 @@ defmodule ForgeWorkshopWeb.TestUtil do
   import ExUnit.Assertions
   import Phoenix.ConnTest
 
-  alias ForgeWorkshop.{Demo, Repo, Tx, Util}
+  alias ForgeWorkshop.{Demo, Tx, Util}
   alias ForgeWorkshopWeb.Router.Helpers, as: Routes
 
   @endpoint ForgeWorkshopWeb.Endpoint
