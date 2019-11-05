@@ -5,7 +5,7 @@ defmodule ForgeWorkshopWeb.PohController do
   require Logger
 
   alias ForgeWorkshopWeb.Plugs.{PrepareTx, PrepareArgs}
-  alias ForgeWorkshop.{AssetUtil, ClaimUtil, Util}
+  alias ForgeWorkshop.{AssetUtil, ClaimUtil, TxUtil, Util}
   alias Hyjal.Plugs.VerifyAuthPrincipal
   alias Hyjal.Claims.AuthPrincipal
 
@@ -75,18 +75,26 @@ defmodule ForgeWorkshopWeb.PohController do
 
   defp do_return_asset(conn, claim, poh) do
     info = conn.assigns.demo_info
+    robert = conn.assigns.robert
     user = conn.assigns.auth_principal
+    offer = Enum.find(conn.assigns.tx.tx_behaviors, fn beh -> beh.behavior == "offer" end)
 
     case AssetUtil.validate_asset(poh.asset, claim.asset, user.address) do
-      :ok -> reply_with_info(conn, :ok, info)
-      {:error, reason} -> reply_with_info(conn, :error, reason, info)
+      :ok ->
+        result = TxUtil.robert_offer(robert, user, offer)
+        reply_with_info(conn, result, info)
+
+      {:error, reason} ->
+        reply_with_info(conn, :error, reason, info)
     end
   end
 
   defp validate_token(conn, poh) do
     info = conn.assigns.demo_info
     tx = conn.assigns.tx
+    robert = conn.assigns.robert
     user = conn.assigns.auth_principal
+    offer = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "offer" end)
     account_state = ForgeSdk.get_account_state(address: user.address)
 
     cond do
@@ -113,7 +121,8 @@ defmodule ForgeWorkshopWeb.PohController do
         reply_with_info(conn, [claim], __MODULE__, :return_asset, [tx.id], info)
 
       true ->
-        reply_with_info(conn, :ok, info)
+        result = TxUtil.robert_offer(robert, user, offer)
+        reply_with_info(conn, result, info)
     end
   end
 end

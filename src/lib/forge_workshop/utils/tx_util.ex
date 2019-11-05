@@ -206,6 +206,24 @@ defmodule ForgeWorkshop.TxUtil do
     )
   end
 
+  def async_offer(_, _, _, nil), do: :ok
+
+  def async_offer({:ok, %{hash: hash}}, robert, user, offer) do
+    Task.async(fn ->
+      Process.sleep(10_000)
+      tx = ForgeSdk.get_tx(hash: hash)
+
+      if tx != nil && tx.code == 0 do
+        robert_offer(robert, user, offer.token, offer.asset)
+      end
+    end)
+  end
+
+  def async_offer(_, _, _, _), do: :ok
+
+  def robert_offer(_, _, nil), do: :ok
+  def robert_offer(robert, user, offer), do: robert_offer(robert, user, offer.token, offer.asset)
+
   def robert_offer(robert, user, token, title) do
     offer_asset = gen_asset(robert, user.address, title)
     sender = Map.merge(robert, %{token: token, asset: offer_asset})

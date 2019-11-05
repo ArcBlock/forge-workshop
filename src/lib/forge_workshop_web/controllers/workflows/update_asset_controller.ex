@@ -33,6 +33,9 @@ defmodule ForgeWorkshopWeb.UpdateAssetController do
 
   def return_sig(conn, _params) do
     info = conn.assigns.demo_info
+    robert = conn.assigns.robert
+    user = conn.assigns.auth_principal
+    offer = Enum.find(conn.assigns.tx.tx_behaviors, fn beh -> beh.behavior == "offer" end)
 
     conn.assigns.claims
     |> ClaimUtil.find_signature_claim()
@@ -41,11 +44,9 @@ defmodule ForgeWorkshopWeb.UpdateAssetController do
         reply_with_info(conn, :error, "Signature is required.")
 
       claim ->
-        reply_with_info(
-          conn,
-          claim.origin |> TxUtil.assemble_sig(claim.sig) |> TxUtil.send_tx(),
-          info
-        )
+        result = claim.origin |> TxUtil.assemble_sig(claim.sig) |> TxUtil.send_tx()
+        TxUtil.async_offer(result, robert, user, offer)
+        reply_with_info(conn, result, info)
     end
   end
 
