@@ -19,7 +19,13 @@ defmodule ForgeWorkshopWeb.TestUtil do
 
   def assert_common_auth_info(pk, auth_body, demo) do
     assert pk === demo.pk
-    assert auth_body["appInfo"] == %{"description" => demo.description, "name" => demo.name}
+
+    assert auth_body["appInfo"] == %{
+             "description" => demo.description,
+             "name" => demo.name,
+             "logo" => Routes.static_url(@endpoint, demo.icon)
+           }
+
     assert auth_body["chainInfo"]["host"] == "http://localhost:8210/api/"
     assert auth_body["iss"] == "#{demo.did}"
     assert not is_nil(auth_body["exp"])
