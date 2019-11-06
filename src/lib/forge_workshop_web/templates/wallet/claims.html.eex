@@ -20,19 +20,13 @@
       </div>
       <div class="row">
         <div class="input-field col s12">
-          <p class="info-text"><%= @app_info["publisher"] %></p>
+          <p class="info-text"><%= @app_info["app_did"] %></p>
           <label>DID</label>
         </div>
       </div>
       <div class="row">
         <div class="input-field col s12">
-          <p class="info-text"><a href='<%= @app_info["copyright"] %>'><%= @app_info["copyright"] %></a></p>
-          <label>Copyright</label>
-        </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s12">
-          <p class="info-text"><img src='<%= Routes.static_path(@conn, @app_info["icon"]) %>' alt="" style="width: 100%" /></p>
+          <p class="info-text"><img src='<%= @app_info["logo"] %>' alt="" style="width: 100%" /></p>
           <label>Application Icon</label>
         </div>
       </div>
@@ -69,7 +63,7 @@
                   <%= checkbox f, "agreement_" <> agr["meta"]["id"] %>
                   <span>
                     Agree
-                    <a href='<%= agr["uri"] %>'> <%= agr["meta"]["description"] %></a>
+                    <a href='<%= agr["uri"] %>'> <%= agr["description"] %></a>
                   </span>
                 </label>
               </div>

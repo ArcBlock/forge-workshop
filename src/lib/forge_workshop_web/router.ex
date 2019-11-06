@@ -46,6 +46,14 @@ defmodule ForgeWorkshopWeb.Router do
   scope "/workflow", ForgeWorkshopWeb do
     pipe_through(:api)
 
+    # DID auth workflow
+    # The QR code endpoint to start the swap
+    get("/auth", WkAuthController, :start)
+    # The endpoint to let user return user addr
+    post("/auth/authprincipal", WkAuthController, :auth_principal)
+    # The endpoint to let user return swap addr
+    post("/auth/returnclaims", WkAuthController, :return_claims)
+
     # Poke workflow
     # The QR code endpoint to start the swap
     get("/poke/:id/", PokeController, :start)

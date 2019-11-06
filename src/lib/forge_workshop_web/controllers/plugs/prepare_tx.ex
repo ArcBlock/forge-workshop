@@ -6,6 +6,7 @@ defmodule ForgeWorkshopWeb.Plugs.PrepareTx do
   import Phoenix.Controller
 
   alias ForgeWorkshop.{Demo, Tx, Util}
+  alias ForgeWorkshopWeb.Router.Helpers, as: Routes
 
   def init(_) do
   end
@@ -32,8 +33,8 @@ defmodule ForgeWorkshopWeb.Plugs.PrepareTx do
     demo_info = %{
       app_name: demo.name,
       app_desc: demo.description,
-      chain_host: chain_config["host"],
-      chain_port: chain_config["port"],
+      app_logo: Routes.static_url(conn, demo.icon),
+      chain_host: "#{chain_config["host"]}:#{chain_config["port"]}/api/",
       sk: Util.str_to_bin(demo.sk),
       pk: Util.str_to_bin(demo.pk),
       did: Util.did_to_address(demo.did)

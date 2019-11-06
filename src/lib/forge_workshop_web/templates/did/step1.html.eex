@@ -13,7 +13,7 @@
       <%= form_for @conn, Routes.did_path(@conn, :create_did), fn f -> %>
         <div class="row">
           <div class="input-field col s12">
-            <%= select f, :role_type, ["account", "node", "device", "application", "smart_contract", "bot", "asset", "stake", "validator", "group"], selected: "application" %>
+            <%= select f, :role_type, ["application"], selected: "application" %>
             <label>DID Type</label>
           </div>
         </div>

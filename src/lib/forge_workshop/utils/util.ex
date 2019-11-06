@@ -102,7 +102,8 @@ defmodule ForgeWorkshop.Util do
 
   def gen_deeplink(app_id) do
     app_state = apply(Repo, :get, [AppState, app_id])
-    do_gen_deeplink(app_state.path, get_callback() <> "auth/")
+    url = Routes.wk_auth_url(Endpoint, :start)
+    do_gen_deeplink(app_state.path, url)
   end
 
   def gen_deeplink(demo_id, tx_id) do
