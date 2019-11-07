@@ -1,4 +1,4 @@
-defmodule ForgeWorkshopWeb.WkAuthController do
+defmodule ForgeWorkshopWeb.AuthController do
   use ForgeWorkshopWeb, :controller
   use Hyjal, router: ForgeWorkshopWeb.Router
 
@@ -121,14 +121,12 @@ defmodule ForgeWorkshopWeb.WkAuthController do
 
   defp get_info(conn) do
     app = AppState.get()
-    config = ArcConfig.read_config(:forge_workshop)
-    chain_config = config["hyjal"]["chain"]
 
     %{
       app_name: app.name,
       app_desc: app.description,
       app_logo: Routes.static_url(conn, app.icon),
-      chain_host: "#{chain_config["host"]}:#{chain_config["port"]}/api/",
+      chain_host: Util.get_chainhost(),
       sk: Util.str_to_bin(app.sk),
       pk: Util.str_to_bin(app.pk),
       did: app.did

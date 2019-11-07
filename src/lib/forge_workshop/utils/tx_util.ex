@@ -15,23 +15,6 @@ defmodule ForgeWorkshop.TxUtil do
 
   require Logger
 
-  @hasher %Mcrypto.Hasher.Sha2{round: 1}
-
-  def get_tx_hash(%Transaction{} = tx) do
-    tx
-    |> Transaction.encode()
-    |> get_tx_hash()
-  end
-
-  def get_tx_hash(tx_bin) when is_binary(tx_bin) do
-    @hasher
-    |> Mcrypto.hash(tx_bin)
-    |> Base.encode16()
-  end
-
-  def hash(:keccak, data), do: Mcrypto.hash(%Mcrypto.Hasher.Keccak{}, data)
-  def hash(:sha3, data), do: Mcrypto.hash(%Mcrypto.Hasher.Sha3{}, data)
-
   def assemble_sig(tx_bin, sig_bin) do
     tx = Transaction.decode(tx_bin)
     %{tx | signature: sig_bin}
@@ -42,20 +25,6 @@ defmodule ForgeWorkshop.TxUtil do
     [msig | rest] = tx.signatures
     msig = %{msig | signature: sig_bin}
     %{tx | signatures: [msig | rest]}
-  end
-
-  def gen_asset(_from, _to, nil), do: nil
-  def gen_asset(_from, _to, ""), do: nil
-
-  def gen_asset(from, to, title) do
-    case AssetUtil.init_cert(from, to, title) do
-      {:error, reason} ->
-        Logger.error("Failed to create asset. Error: #{inspect(reason)}")
-        raise "Failed to create asset. Error: #{inspect(reason)}"
-
-      {_, asset_address} ->
-        asset_address
-    end
   end
 
   def sign_tx(tx, wallet) do
@@ -127,7 +96,7 @@ defmodule ForgeWorkshop.TxUtil do
   def robert_offer(robert, user, offer), do: robert_offer(robert, user, offer.token, offer.asset)
 
   def robert_offer(robert, user, token, title) do
-    offer_asset = gen_asset(robert, user.address, title)
+    offer_asset = AssetUtil.gen_asset(robert, user.address, title)
     sender = Map.merge(robert, %{token: token, asset: offer_asset})
 
     "TransferTx"
@@ -166,7 +135,7 @@ defmodule ForgeWorkshop.TxUtil do
     offer = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "offer" end)
     demand = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "demand" end)
 
-    offer_asset = gen_asset(robert, user.address, offer.asset)
+    offer_asset = AssetUtil.gen_asset(robert, user.address, offer.asset)
     sender = %{address: robert.address, pk: robert.pk, token: offer.token, asset: offer_asset}
     receiver = %{address: user.address, pk: user.pk, token: demand.token, asset: asset}
 

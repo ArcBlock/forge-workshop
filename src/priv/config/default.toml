@@ -22,5 +22,4 @@ pk = ""
 # The application chain information
 [hyjal.chain]
 # The host and port to connect to the Forge Web of tha application chain.
-host = "http://localhost"
-port = 8210
+host = "http://localhost:8210/api/"

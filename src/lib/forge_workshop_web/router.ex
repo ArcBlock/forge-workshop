@@ -35,8 +35,6 @@ defmodule ForgeWorkshopWeb.Router do
 
   scope "/api", ForgeWorkshopWeb do
     pipe_through(:api)
-    get("/auth", AuthController, :request_auth)
-    post("/auth", AuthController, :response_auth)
     get("/agreement/:id", AgreementController, :get)
 
     post("/wallet/recover", WalletController, :create_wallet)
@@ -48,11 +46,11 @@ defmodule ForgeWorkshopWeb.Router do
 
     # DID auth workflow
     # The QR code endpoint to start the swap
-    get("/auth", WkAuthController, :start)
+    get("/auth", AuthController, :start)
     # The endpoint to let user return user addr
-    post("/auth/authprincipal", WkAuthController, :auth_principal)
+    post("/auth/authprincipal", AuthController, :auth_principal)
     # The endpoint to let user return swap addr
-    post("/auth/returnclaims", WkAuthController, :return_claims)
+    post("/auth/returnclaims", AuthController, :return_claims)
 
     # Poke workflow
     # The QR code endpoint to start the swap
