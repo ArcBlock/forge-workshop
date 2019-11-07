@@ -60,6 +60,20 @@ defmodule ForgeWorkshop.AssetUtil do
     end
   end
 
+  def gen_asset(_from, _to, nil), do: nil
+  def gen_asset(_from, _to, ""), do: nil
+
+  def gen_asset(from, to, title) do
+    case init_cert(from, to, title) do
+      {:error, reason} ->
+        Logger.error("Failed to create asset. Error: #{inspect(reason)}")
+        raise "Failed to create asset. Error: #{inspect(reason)}"
+
+      {_, asset_address} ->
+        asset_address
+    end
+  end
+
   def init_cert(from, to, title) do
     cert = gen_cert(from, to, title)
     create_cert(from, cert)

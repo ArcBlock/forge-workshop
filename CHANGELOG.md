@@ -1,3 +1,6 @@
+## 0.9.0 (November 07, 2019)
+  - Migrate Workshop to latest DID protocol.
+
 ## 0.8.1 (October 30, 2019)
   - Adapt to ForgeSdk 0.40.0
 

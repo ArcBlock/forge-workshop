@@ -83,7 +83,7 @@ defmodule ForgeWorkshopWeb.WalletController do
     agreements = process_agreements(params)
     url = URI.decode_www_form(params["url"])
 
-    do_response_auth(conn, params["sk"], params["pk"], params["did"], url, %{
+    send_claims(conn, params["sk"], params["pk"], params["did"], url, %{
       requestedClaims: [profile] ++ agreements
     })
   end
@@ -110,8 +110,8 @@ defmodule ForgeWorkshopWeb.WalletController do
     did_type = %AbtDid.Type{role_type: :account, key_type: key_type, hash_type: :sha3}
     did = AbtDid.pk_to_did(did_type, pk)
 
-    %HTTPoison.Response{body: body} = HTTPoison.get!("#{url}?userDid=#{did}")
-    do_request_auth(conn, body, {sk_str, pk_str, did, url})
+    %HTTPoison.Response{body: response} = HTTPoison.get!("#{url}")
+    handle_response(conn, response, {sk_str, pk_str, did})
   rescue
     e ->
       stop(
@@ -121,43 +121,24 @@ defmodule ForgeWorkshopWeb.WalletController do
       )
   end
 
-  defp do_request_auth(conn, body, user_info) do
-    case Jason.decode!(body) do
+  defp handle_response(conn, response, user_info) do
+    case Jason.decode!(response) do
       %{"appPk" => app_pk, "authInfo" => auth_info} ->
         pk = Util.str_to_bin(app_pk)
-        do_request_auth(conn, pk, auth_info, user_info)
+        do_handle_response(conn, pk, auth_info, user_info)
 
       _ ->
         conn
-        |> put_flash(:error, body)
+        |> put_flash(:error, response)
         |> redirect(to: Routes.wallet_path(conn, :index))
         |> halt()
     end
   end
 
-  defp do_request_auth(conn, app_pk, auth_info, {sk, pk, did, url}) do
+  defp do_handle_response(conn, app_pk, auth_info, user_info) do
     if AbtDid.Signer.verify(auth_info, app_pk) do
-      body = Util.get_body(auth_info)
-
-      case Map.get(body, "requestedClaims") || [] do
-        [] ->
-          do_response_auth(conn, sk, pk, did, url)
-
-        claims ->
-          profile = claims |> Enum.filter(fn c -> c["type"] == "profile" end) |> List.first()
-          agreements = Enum.filter(claims, fn c -> c["type"] == "agreement" end)
-          app_info = Map.get(body, "appInfo", %{})
-
-          render(conn, "claims.html",
-            profile: profile,
-            agreements: agreements,
-            app_info: app_info,
-            sk: sk,
-            pk: pk,
-            did: did,
-            url: URI.encode_www_form(url)
-          )
-      end
+      auth_body = Util.get_body(auth_info)
+      handle_claim(conn, auth_body, user_info)
     else
       conn
       |> put_flash(:error, "The app pk and auth info do not match.")
@@ -166,7 +147,45 @@ defmodule ForgeWorkshopWeb.WalletController do
     end
   end
 
-  defp do_response_auth(conn, sk_str, pk, did, url, extra \\ %{}) do
+  defp handle_claim(
+         conn,
+         %{"requestedClaims" => [%{"type" => "authPrincipal"}]} = auth_body,
+         {sk, pk, did}
+       ) do
+    url = auth_body["url"]
+    send_claims(conn, sk, pk, did, url)
+  end
+
+  defp handle_claim(conn, %{"requestedClaims" => claims} = auth_body, {sk, pk, did}) do
+    profile = Enum.find(claims, fn c -> c["type"] == "profile" end)
+    agreements = Enum.filter(claims, fn c -> c["type"] == "agreement" end)
+    app_info = Map.put(auth_body["appInfo"], "app_did", auth_body["iss"])
+    url = auth_body["url"]
+
+    render(conn, "claims.html",
+      profile: profile,
+      agreements: agreements,
+      app_info: app_info,
+      sk: sk,
+      pk: pk,
+      did: did,
+      url: url
+    )
+  end
+
+  defp handle_claim(conn, %{"status" => "ok"}, _) do
+    conn
+    |> put_flash(:info, "Authentication Succeeded!")
+    |> redirect(to: Routes.did_path(conn, :show))
+  end
+
+  defp handle_claim(conn, %{"status" => "error"} = auth_body, _) do
+    conn
+    |> put_flash(:error, "Authentication failed! Error: #{auth_body["errorMessage"]}")
+    |> redirect(to: Routes.did_path(conn, :show))
+  end
+
+  defp send_claims(conn, sk_str, pk, did, url, extra \\ %{}) do
     sk = Util.str_to_bin(sk_str)
     user_info = AbtDid.Signer.gen_and_sign(did, sk, extra)
     body = %{userPk: pk, userInfo: user_info} |> Jason.encode!()
@@ -174,17 +193,7 @@ defmodule ForgeWorkshopWeb.WalletController do
     %HTTPoison.Response{body: response} =
       HTTPoison.post!(url, body, [{"content-type", "application/json"}])
 
-    case Jason.decode(response) do
-      {:ok, %{"response" => _}} ->
-        conn
-        |> put_flash(:info, "Authentication Succeeded!")
-        |> redirect(to: Routes.did_path(conn, :show))
-
-      _ ->
-        conn
-        |> put_flash(:error, "Authentication failed! Error: #{response}")
-        |> redirect(to: Routes.did_path(conn, :show))
-    end
+    handle_response(conn, response, {sk_str, pk, did})
   end
 
   defp process_agreements(params) do
@@ -202,7 +211,6 @@ defmodule ForgeWorkshopWeb.WalletController do
       agr
       |> Map.delete(:content)
       |> Map.put(:agreed, result[agr.meta.id])
-      |> Map.delete(:meta)
     end)
     |> Enum.map(fn agr ->
       case agr.agreed do
@@ -221,7 +229,7 @@ defmodule ForgeWorkshopWeb.WalletController do
         :secp256k1 -> @secp256k1
       end
 
-    digest = Util.str_to_bin(agreement.hash.digest)
+    digest = Util.str_to_bin(agreement.digest)
     sk = Util.str_to_bin(sk_str)
     sig = Mcrypto.sign!(signer, digest, sk) |> Multibase.encode!(:base58_btc)
     Map.put(agreement, :sig, sig)

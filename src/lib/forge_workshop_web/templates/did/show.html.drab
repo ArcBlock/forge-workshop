@@ -13,16 +13,16 @@
         </p>
       </div>
       <div class="app-key">
-        Application <i class="icon-did-abt"></i> DID (base58_btc encoding):
+        Application <i class="icon-did-abt"></i> DID (Bitcoin Base58 encoded):
         <p class="info-text"><%= @app_state.did %></p>
       </div>
       <div class="app-key">
-        Application Public Key (base58_btc encoding):
-        <p class="info-text"><%= Multibase.encode!(@app_state.pk, :base58_btc) %></p>
+        Application Public Key (Bitcoin Base58 encoded):
+        <p class="info-text"><%= @app_state.pk %></p>
       </div>
       <div class="app-key">
-        Application Secret Key (base58_btc encoding):
-        <p class="info-text"><%= Multibase.encode!(@app_state.sk, :base58_btc) %></p>
+        Application Secret Key (Bitcoin Base58 encoded):
+        <p class="info-text"><%= @app_state.sk %></p>
       </div>
       <%= if [] != @users do %>
       <div class="app-key">
@@ -30,17 +30,17 @@
         <ul class="collapsible expandable">
           <%= for user <- @users do %>
           <li>
-            <div class="collapsible-header"><i class="icon-did-abt"></i> <%= user.did %></div>
+            <div class="collapsible-header"><i class="icon-did-abt"></i> <%= user.address %></div>
             <div class="collapsible-body">
               <span>
                 <table class="striped" style="font-size: smaller; table-layout: fixed;">
                   <tr>
                     <td style="width: 30%"><i class="icon-did-abt"></i> DID</td>
-                    <td style="word-wrap: break-word;"> <%= user.did %> </td>
+                    <td style="word-wrap: break-word;"> <%= user.address %> </td>
                   </tr>
                   <tr>
-                    <td>Publick Key</td>
-                    <td style="word-wrap: break-word;"> <%= user.pk %> </td>
+                    <td>Public Key</td>
+                    <td style="word-wrap: break-word;"> <%= Multibase.encode!(user.pk, :base58_btc) %> </td>
                   </tr>
                   <%= for claim_id <- ForgeWorkshop.AppState.get().claims["profile"] do %>
                     <tr>
@@ -52,35 +52,35 @@
                       </td>
                     </tr>
                   <% end %>
-                  <%= for agr <- user.agreement do %>
+                  <%= for agr <- user.agreements do %>
                   <tr>
                     <td colspan="2">
                       <table style="font-size: smaller; table-layout: fixed;">
                         <tr>
                           <td style="width: 30%">Hash</td>
-                          <td style="word-wrap: break-word;"><%= agr["hash"]["digest"] %></td>
+                          <td style="word-wrap: break-word;"><%= Multibase.encode!(agr.digest, :base58_btc) %></td>
                         </tr>
                         <tr>
                           <td>URI</td>
                           <td style="word-wrap: break-word;">
-                          <% uri = agr["uri"] %>
+                          <% uri = agr.uri %>
                           <a href='<%= uri %>'><%= uri %></a>
                           </td>
                         </tr>
                         <tr>
                           <td>Agreed?</td>
                           <td style="word-wrap: break-word;">
-                            <%= if agr["agreed"] || agr["agree"] do %>
+                            <%= if agr.agreed do %>
                               true
                             <% else %>
                               false
                             <% end %>
                           </td>
                         </tr>
-                        <%= if agr["agreed"] || agr["agree"] do %>
+                        <%= if agr.agreed do %>
                         <tr>
                           <td> Signature </td>
-                          <td style="word-wrap: break-word;"> <%= agr["sig"] %> </td>
+                          <td style="word-wrap: break-word;"> <%= Multibase.encode!(agr.sig, :base58_btc) %> </td>
                         </tr>
                         <% end %>
                       </table>

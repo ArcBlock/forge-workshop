@@ -28,18 +28,6 @@ defmodule ForgeWorkshopWeb.Router do
     get("/wallet/auth", WalletController, :request_auth)
     post("/wallet/auth", WalletController, :response_auth)
 
-    get("/custodian", CustodianController, :index)
-    get("/custodian/:address/edit", CustodianController, :edit)
-    get("/custodian/:address/tethers", CustodianController, :get)
-    get("/custodian/new", CustodianController, :new)
-    post("/custodian/:address/verify", CustodianController, :verify)
-    post("/custodian/:address/approve", CustodianController, :approve)
-    post("/custodian", CustodianController, :create)
-    put("/custodian", CustodianController, :update)
-
-    get("/withdrawer", WithdrawerController, :index)
-    post("/withdrawer/:hash", WithdrawerController, :withdraw)
-
     resources("/demo", DemoController)
     resources("/tx", TxController)
     put("/tx", TxController, :create)
@@ -47,19 +35,77 @@ defmodule ForgeWorkshopWeb.Router do
 
   scope "/api", ForgeWorkshopWeb do
     pipe_through(:api)
-    get("/auth", AuthController, :request_auth)
-    post("/auth", AuthController, :response_auth)
     get("/agreement/:id", AgreementController, :get)
 
     post("/wallet/recover", WalletController, :create_wallet)
     get("/wallet/:addr", WalletController, :wallet_state)
+  end
 
-    get("/workflow/:id", WorkflowController, :request)
-    post("/workflow/account/:id", WorkflowController, :response_account)
-    post("/workflow/asset/:id", WorkflowController, :response_asset)
-    post("/workflow/sig/:id", WorkflowController, :response_sig)
-    post("/workflow/multisig/:id", WorkflowController, :response_multi_sig)
-    post("/workflow/deposit/:id", WorkflowController, :response_deposit_value)
-    post("/workflow/tether/:id", WorkflowController, :response_tether)
+  scope "/workflow", ForgeWorkshopWeb do
+    pipe_through(:api)
+
+    # DID auth workflow
+    # The QR code endpoint to start the swap
+    get("/auth", AuthController, :start)
+    # The endpoint to let user return user addr
+    post("/auth/authprincipal", AuthController, :auth_principal)
+    # The endpoint to let user return swap addr
+    post("/auth/returnclaims", AuthController, :return_claims)
+
+    # Poke workflow
+    # The QR code endpoint to start the swap
+    get("/poke/:id/", PokeController, :start)
+    # The endpoint to let user return user addr
+    post("/poke/:id/authprincipal", PokeController, :auth_principal)
+    # The endpoint to let user return swap addr
+    post("/poke/:id/returnsig", PokeController, :return_sig)
+
+    # Transfer workflow
+    # The QR code endpoint to start the swap
+    get("/transfer/:id/", TransferController, :start)
+    # The endpoint to let user return user addr
+    post("/transfer/:id/authprincipal", TransferController, :auth_principal)
+    # The endpoint to let user return swap addr
+    post("/transfer/:id/returnsig", TransferController, :return_sig)
+    # The endpoint to let user return assets
+    post("/transfer/:id/returnasset", TransferController, :return_asset)
+
+    # Exchange workflow
+    # The QR code endpoint to start the swap
+    get("/exchange/:id/", ExchangeController, :start)
+    # The endpoint to let user return user addr
+    post("/exchange/:id/authprincipal", ExchangeController, :auth_principal)
+    # The endpoint to let user return swap addr
+    post("/exchange/:id/returnsig", ExchangeController, :return_sig)
+    # The endpoint to let user return assets
+    post("/exchange/:id/returnasset", ExchangeController, :return_asset)
+
+    # UpdateAsset workflow
+    # The QR code endpoint to start the swap
+    get("/updateasset/:id/", UpdateAssetController, :start)
+    # The endpoint to let user return user addr
+    post("/updateasset/:id/authprincipal", UpdateAssetController, :auth_principal)
+    # The endpoint to let user return swap addr
+    post("/updateasset/:id/returnsig", UpdateAssetController, :return_sig)
+    # The endpoint to let user return assets
+    post("/updateasset/:id/returnasset", UpdateAssetController, :return_asset)
+
+    # ConsumeAsset workflow
+    # The QR code endpoint to start the swap
+    get("/consumeasset/:id/", ConsumeAssetController, :start)
+    # The endpoint to let user return user addr
+    post("/consumeasset/:id/authprincipal", ConsumeAssetController, :auth_principal)
+    # The endpoint to let user return swap addr
+    post("/consumeasset/:id/returnsig", ConsumeAssetController, :return_sig)
+    # The endpoint to let user return assets
+    post("/consumeasset/:id/returnasset", ConsumeAssetController, :return_asset)
+
+    # ProofOfHolding workflow
+    # The QR code endpoint to start the swap
+    get("/poh/:id/", PohController, :start)
+    # The endpoint to let user return user addr
+    post("/poh/:id/authprincipal", PohController, :auth_principal)
+    # The endpoint to let user return assets
+    post("/poh/:id/returnasset", PohController, :return_asset)
   end
 end

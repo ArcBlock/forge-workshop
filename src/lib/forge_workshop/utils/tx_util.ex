@@ -5,13 +5,9 @@ defmodule ForgeWorkshop.TxUtil do
 
   alias ForgeAbi.{
     ConsumeAssetTx,
-    DepositTetherTx,
     ExchangeInfo,
     ExchangeTx,
-    ExchangeTetherTx,
-    Multisig,
     PokeTx,
-    TetherExchangeInfo,
     Transaction,
     TransferTx,
     UpdateAssetTx
@@ -19,143 +15,16 @@ defmodule ForgeWorkshop.TxUtil do
 
   require Logger
 
-  @one_week 604_800
-  @hasher %Mcrypto.Hasher.Sha2{round: 1}
-
-  def get_tx_hash(%Transaction{} = tx) do
-    tx
-    |> Transaction.encode()
-    |> get_tx_hash()
+  def assemble_sig(tx_bin, sig_bin) do
+    tx = Transaction.decode(tx_bin)
+    %{tx | signature: sig_bin}
   end
 
-  def get_tx_hash(tx_bin) when is_binary(tx_bin) do
-    @hasher
-    |> Mcrypto.hash(tx_bin)
-    |> Base.encode16()
-  end
-
-  def hash(:keccak, data), do: Mcrypto.hash(%Mcrypto.Hasher.Keccak{}, data)
-  def hash(:sha3, data), do: Mcrypto.hash(%Mcrypto.Hasher.Sha3{}, data)
-
-  def get_locktime(deposit) do
-    itx = ForgeAbi.decode_any!(deposit.itx)
-    itx.locktime
-  end
-
-  def assemble_sig(tx_str, sig_str) do
-    tx = tx_str |> Multibase.decode!() |> Transaction.decode()
-    sig = Multibase.decode!(sig_str)
-    %{tx | signature: sig}
-  end
-
-  def assemble_multi_sig(tx_str, sig_str) do
-    tx = tx_str |> Multibase.decode!() |> Transaction.decode()
-    sig = Multibase.decode!(sig_str)
+  def assemble_multi_sig(tx_bin, sig_bin) do
+    tx = Transaction.decode(tx_bin)
     [msig | rest] = tx.signatures
-    msig = %{msig | signature: sig}
+    msig = %{msig | signature: sig_bin}
     %{tx | signatures: [msig | rest]}
-  end
-
-  # for TransferTx, UpdateAssetTx, PokeTx
-  def require_signature(conn, desc) do
-    conn.assigns.tx
-    |> prepare_transaction(conn)
-    |> do_require_signature(desc)
-  end
-
-  # For ExchangeTx, ConsumeAssetTx
-  def require_multi_sig(conn, desc) do
-    robert = conn.assigns.robert
-    user = conn.assigns.user
-    asset = Map.get(conn.assigns, :asset)
-
-    conn.assigns.tx
-    |> prepare_transaction(conn)
-    |> sign_tx(robert)
-    |> do_require_multi_sig(user, desc, asset)
-  end
-
-  def require_asset(_, nil), do: []
-  def require_asset(_, ""), do: []
-
-  def require_asset(description, asset_title) do
-    [
-      %{
-        meta: %{
-          description: description
-        },
-        type: "did",
-        did_type: "asset",
-        target: "#{asset_title}",
-        did: ""
-      }
-    ]
-  end
-
-  def require_account(description, 0) do
-    [
-      %{
-        meta: %{
-          description: description
-        },
-        type: "did",
-        did_type: "account",
-        did: ""
-      }
-    ]
-  end
-
-  def require_account(description, token) do
-    [
-      %{
-        meta: %{
-          description: description
-        },
-        type: "did",
-        did_type: "account",
-        target: token,
-        did: ""
-      }
-    ]
-  end
-
-  def require_tether(description, token) do
-    [
-      %{
-        meta: %{
-          description: description
-        },
-        type: "deposit",
-        target: token,
-        deposit: ""
-      }
-    ]
-  end
-
-  def require_deposit_value(description) do
-    [
-      %{
-        meta: %{
-          description: description
-        },
-        type: "token",
-        value: ""
-      }
-    ]
-  end
-
-  def gen_asset(_from, _to, nil), do: nil
-  def gen_asset(_from, _to, ""), do: nil
-
-  def gen_asset(from, to, title) do
-    case AssetUtil.init_cert(from, to, title) do
-      {:error, reason} ->
-        Logger.error("Failed to create asset. Error: #{inspect(reason)}")
-        raise "Failed to create asset. Error: #{inspect(reason)}"
-
-      {_, asset_address} ->
-        asset_address
-    end
   end
 
   def sign_tx(tx, wallet) do
@@ -208,8 +77,26 @@ defmodule ForgeWorkshop.TxUtil do
     )
   end
 
+  def async_offer(_, _, _, nil), do: :ok
+
+  def async_offer({:ok, %{hash: hash}}, robert, user, offer) do
+    Task.async(fn ->
+      Process.sleep(10_000)
+      tx = ForgeSdk.get_tx(hash: hash)
+
+      if tx != nil && tx.code == 0 do
+        robert_offer(robert, user, offer.token, offer.asset)
+      end
+    end)
+  end
+
+  def async_offer(_, _, _, _), do: :ok
+
+  def robert_offer(_, _, nil), do: :ok
+  def robert_offer(robert, user, offer), do: robert_offer(robert, user, offer.token, offer.asset)
+
   def robert_offer(robert, user, token, title) do
-    offer_asset = gen_asset(robert, user.address, title)
+    offer_asset = AssetUtil.gen_asset(robert, user.address, title)
     sender = Map.merge(robert, %{token: token, asset: offer_asset})
 
     "TransferTx"
@@ -218,68 +105,9 @@ defmodule ForgeWorkshop.TxUtil do
     |> send_tx()
   end
 
-  defp do_require_signature(tx, description) do
-    tx_data = Transaction.encode(tx)
-    did_type = AbtDid.get_did_type(tx.from)
-    data = hash(did_type.hash_type, tx_data)
-
-    [
-      %{
-        type: "signature",
-        meta: %{
-          description: description,
-          typeUrl: "fg:t:transaction"
-        },
-        data: Multibase.encode!(data, :base58_btc),
-        origin: Multibase.encode!(tx_data, :base58_btc),
-        method: did_type.hash_type,
-        sig: ""
-      }
-    ]
-  end
-
-  defp do_require_multi_sig(tx, user, description, asset)
-       when is_binary(asset) or is_nil(asset) do
-    msig =
-      case tx.itx.type_url do
-        "fg:t:consume_asset" ->
-          Multisig.new(
-            signer: user.address,
-            pk: user.pk,
-            data: ForgeAbi.encode_any!(asset, "fg:x:address")
-          )
-
-        _ ->
-          Multisig.new(signer: user.address, pk: user.pk)
-      end
-
-    do_require_multi_sig(tx, user, description, msig)
-  end
-
-  defp do_require_multi_sig(tx, user, description, %Multisig{} = msig) do
-    tx1 = %{tx | signatures: [msig | tx.signatures]}
-    tx_data = Transaction.encode(tx1)
-    did_type = AbtDid.get_did_type(user.address)
-    data = hash(did_type.hash_type, tx_data)
-
-    [
-      %{
-        type: "signature",
-        meta: %{
-          description: description,
-          typeUrl: "fg:t:transaction"
-        },
-        data: Multibase.encode!(data, :base58_btc),
-        origin: Multibase.encode!(tx_data, :base58_btc),
-        method: did_type.hash_type,
-        sig: ""
-      }
-    ]
-  end
-
   # User is always the sender.
-  defp prepare_transaction(%{tx_type: "PokeTx"}, conn) do
-    user = conn.assigns.user
+  def prepare_transaction(%{tx_type: "PokeTx"}, conn) do
+    user = conn.assigns.auth_principal
 
     "PokeTx"
     |> get_transaction_to_sign(user, nil)
@@ -287,9 +115,9 @@ defmodule ForgeWorkshop.TxUtil do
   end
 
   # User is always the sender.
-  defp prepare_transaction(%{tx_type: "TransferTx"} = tx, conn) do
+  def prepare_transaction(%{tx_type: "TransferTx"} = tx, conn) do
     robert = conn.assigns.robert
-    user = conn.assigns.user
+    user = conn.assigns.auth_principal
     asset = Map.get(conn.assigns, :asset)
 
     [beh] = tx.tx_behaviors
@@ -299,40 +127,25 @@ defmodule ForgeWorkshop.TxUtil do
   end
 
   # Robert is the sender, always requires multi sig from user
-  defp prepare_transaction(%{tx_type: "ExchangeTx"} = tx, conn) do
+  def prepare_transaction(%{tx_type: "ExchangeTx"} = tx, conn) do
     robert = conn.assigns.robert
-    user = conn.assigns.user
+    user = conn.assigns.auth_principal
     asset = Map.get(conn.assigns, :asset)
 
     offer = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "offer" end)
     demand = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "demand" end)
 
-    offer_asset = gen_asset(robert, user.address, offer.asset)
+    offer_asset = AssetUtil.gen_asset(robert, user.address, offer.asset)
     sender = %{address: robert.address, pk: robert.pk, token: offer.token, asset: offer_asset}
     receiver = %{address: user.address, pk: user.pk, token: demand.token, asset: asset}
 
     get_transaction_to_sign("ExchangeTx", sender, receiver)
   end
 
-  # Robert is the sender, always requires multi sig from user
-  defp prepare_transaction(%{tx_type: "ExchangeTetherTx"} = tx, conn) do
-    robert = conn.assigns.robert
-    user = conn.assigns.user
-    deposit = conn.assigns.deposit
-
-    offer = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "offer" end)
-
-    offer_asset = gen_asset(robert, user.address, offer.asset)
-    sender = %{address: robert.address, pk: robert.pk, token: offer.token, asset: offer_asset}
-    receiver = %{address: user.address, pk: user.pk, deposit: deposit}
-
-    get_transaction_to_sign("ExchangeTetherTx", sender, receiver)
-  end
-
   # User is always the sender.
-  defp prepare_transaction(%{tx_type: "UpdateAssetTx"} = tx, conn) do
+  def prepare_transaction(%{tx_type: "UpdateAssetTx"} = tx, conn) do
     robert = conn.assigns.robert
-    user = conn.assigns.user
+    user = conn.assigns.auth_principal
     asset = Map.get(conn.assigns, :asset)
 
     update = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "update" end)
@@ -342,25 +155,11 @@ defmodule ForgeWorkshop.TxUtil do
   end
 
   # Robert is the sender, requires multi sig from user
-  defp prepare_transaction(%{tx_type: "ConsumeAssetTx"}, conn) do
+  def prepare_transaction(%{tx_type: "ConsumeAssetTx"}, conn) do
     robert = conn.assigns.robert
-    user = conn.assigns.user
+    user = conn.assigns.auth_principal
 
     get_transaction_to_sign("ConsumeAssetTx", robert, user)
-  end
-
-  defp prepare_transaction(%{tx_type: "DepositTetherTx"}, conn) do
-    robert = conn.assigns.robert
-    user = conn.assigns.user
-    value = Map.get(conn.assigns, :deposit_value)
-    custodian = conn.assigns.custodian
-
-    receiver =
-      custodian
-      |> Map.put(:withdrawer, robert.address)
-      |> Map.put(:deposit_value, value)
-
-    get_transaction_to_sign("DepositTetherTx", user, receiver, "remote")
   end
 
   defp get_itx_to_sign("PokeTx", _, _) do
@@ -404,37 +203,6 @@ defmodule ForgeWorkshop.TxUtil do
 
     itx = apply(ExchangeTx, :new, [[receiver: r, sender: s, to: receiver.address]])
     ForgeAbi.encode_any!(itx, "fg:t:exchange")
-  end
-
-  defp get_itx_to_sign("DepositTetherTx", _sender, receiver) do
-    block_time = ForgeSdk.get_chain_info("remote").block_time
-
-    args = [
-      value: to_tba(receiver.deposit_value),
-      commission: to_tba(receiver.deposit_value * receiver.commission / 100),
-      charge: to_tba(receiver.deposit_value * receiver.charge / 100),
-      target: ForgeSdk.get_chain_info().network,
-      withdrawer: receiver.withdrawer,
-      locktime: %{block_time | seconds: block_time.seconds + @one_week}
-    ]
-
-    itx = apply(DepositTetherTx, :new, [args])
-    ForgeAbi.encode_any!(itx, "fg:t:deposit_tether")
-  end
-
-  defp get_itx_to_sign("ExchangeTetherTx", sender, receiver) do
-    s =
-      apply(ExchangeInfo, :new, [[assets: to_assets(sender.asset), value: to_tba(sender.token)]])
-
-    locktime = get_locktime(receiver.deposit)
-    expired_at = %{locktime | seconds: locktime.seconds - 7200}
-
-    r = apply(TetherExchangeInfo, :new, [[deposit: receiver.deposit, value: to_tba(nil)]])
-
-    args = [receiver: r, sender: s, to: receiver.address, expired_at: expired_at]
-    itx = apply(ExchangeTetherTx, :new, [args])
-
-    ForgeAbi.encode_any!(itx, "fg:t:exchange_tether")
   end
 
   defp get_itx_to_sign("UpdateAssetTx", sender, receiver) do

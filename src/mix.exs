@@ -39,7 +39,7 @@ defmodule ForgeWorkshop.MixProject do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(env) when env in [:dev, :test], do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
@@ -67,31 +67,18 @@ defmodule ForgeWorkshop.MixProject do
       {:drab, "~> 0.10"},
 
       # ArcBlock
+      {:hyjal, git: "git@github.com:ArcBlock/Hyjal.git"},
+      # {:hyjal, path: "../../Hyjal"},
       {:abt_did_elixir, "~> 0.3"},
       # {:abt_did_elixir, path: "../abt-did-elixir"},
       {:forge_sdk, "~> 0.40"},
       # {:forge_sdk, path: "../../forge-elixir-sdk", override: true},
 
-      # utility tools for error logs and metrics
-      {:ex_datadog_plug, "~> 0.5.0"},
-      {:logger_sentry, "~> 0.2"},
-      {:recon, "~> 2.3"},
-      {:recon_ex, "~> 0.9.1"},
-      {:sentry, "~> 7.0"},
-      {:statix, "~> 1.1"},
-
       # dev & test
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
-      {:ex_doc, "~> 0.19", only: [:dev, :test], runtime: false},
-      {:excheck, "~> 0.6", only: :test, runtime: false},
-      {:triq, "~> 1.3", only: :test, runtime: false},
 
       # test only
-      {:ex_machina, "~> 2.2", only: [:dev, :test]},
-      {:faker, "~> 0.11", only: [:dev, :test]},
-      {:mock, "~> 0.3", only: [:dev, :test]},
-      {:excoveralls, "~> 0.10", only: [:dev, :test]}
+      {:mock, "~> 0.3", only: [:dev, :test]}
     ]
   end
 end

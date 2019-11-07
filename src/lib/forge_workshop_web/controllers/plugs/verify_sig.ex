@@ -1,4 +1,4 @@
-defmodule ForgeWorkshop.Plugs.VerifySig do
+defmodule ForgeWorkshopWeb.Plugs.VerifySig do
   @moduledoc false
 
   import Plug.Conn

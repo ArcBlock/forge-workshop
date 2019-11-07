@@ -1,4 +1,4 @@
-defmodule ForgeWorkshop.Plugs.PrepareArgs do
+defmodule ForgeWorkshopWeb.Plugs.PrepareArgs do
   @moduledoc """
   Prepare common arguments.
   """

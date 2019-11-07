@@ -10,4 +10,16 @@ db = "sqlite://workshop.sqlite3"
 # The port that workshop listens on.
 schema = "http"
 host = "localhost"
-port=9309
+port = 9309
+
+[hyjal.application]
+name = ""
+description = ""
+did = ""
+sk = ""
+pk = ""
+
+# The application chain information
+[hyjal.chain]
+# The host and port to connect to the Forge Web of tha application chain.
+host = "http://localhost:8210/api/"

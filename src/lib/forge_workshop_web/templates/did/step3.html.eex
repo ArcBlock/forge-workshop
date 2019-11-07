@@ -36,7 +36,7 @@
             <div>
               <label>
                 <%= checkbox f, "agreement_" <> meta.id %>
-                <span><%= meta.description %></span>
+                <span><%= agr.description %></span>
               </label>
             </div>
           <% end %>

@@ -1,12 +1,14 @@
 defmodule ForgeWorkshop.Application do
   @moduledoc false
 
-  alias ForgeWorkshop.{Repo, SqliteRepo, UserDb, Util, WalletUtil, WorkshopAsset}
+  alias ForgeWorkshop.{Repo, SqliteRepo, UserDb, WalletUtil, WorkshopAsset}
   alias ForgeWorkshopWeb.Endpoint
 
   def start(_type, _args) do
+    ArcConfig.read_config(:forge_workshop)
     read_config()
-    apply_config()
+    apply_endpoint_config()
+    connect_local_forge()
     children = get_servers()
     opts = [strategy: :one_for_one, name: ForgeWorkshop.Supervisor]
     result = Supervisor.start_link(children, opts)
@@ -16,9 +18,6 @@ defmodule ForgeWorkshop.Application do
       %{decimal: decimal} = ForgeSdk.get_forge_state().token
       Application.put_env(:forge_abi, :decimal, decimal)
       WalletUtil.get_robert()
-      # WalletUtil.declare_wallet(robert, "robert", "remote")
-      # WalletUtil.raise_validator_power()
-      # WalletUtil.declare_anchors()
     end)
 
     result
@@ -38,33 +37,15 @@ defmodule ForgeWorkshop.Application do
   end
 
   defp get_servers() do
-    env = Util.config(:env)
-
-    if env != "test" do
-      connect_local_forge()
-      connect_remote_forge()
-    end
-
-    get_app_servers()
-  end
-
-  defp get_app_servers() do
     repo = set_db()
     [Endpoint, UserDb, repo]
   end
 
   defp connect_local_forge() do
-    local_forge_sock = Util.config(["workshop", "local_forge"])
+    config = ArcConfig.read_config(:forge_workshop)
+    local_forge_sock = config["workshop"]["local_forge"]
     ForgeSdk.connect(local_forge_sock, name: "local", default: true)
     register_type_urls()
-  end
-
-  defp connect_remote_forge() do
-    case Util.config(["workshop", "remote_forge"]) do
-      nil -> nil
-      "" -> nil
-      remote_forge_sock -> ForgeSdk.connect(remote_forge_sock, name: "remote", default: false)
-    end
   end
 
   def read_config() do
@@ -91,11 +72,12 @@ defmodule ForgeWorkshop.Application do
   defp adjust_config("path", value), do: Path.expand(value)
   defp adjust_config(_, value), do: value
 
-  defp apply_config() do
-    config = Application.get_env(:forge_workshop, "workshop")
-    schema = config["schema"]
-    port = config["port"]
-    host = config["host"]
+  defp apply_endpoint_config() do
+    config = ArcConfig.read_config(:forge_workshop)
+    schema = config["workshop"]["schema"]
+    port = config["workshop"]["port"]
+    host = config["workshop"]["host"]
+
     endpoint = Application.get_env(:forge_workshop, ForgeWorkshopWeb.Endpoint)
     endpoint = Keyword.put(endpoint, :url, host: host, port: port)
 
@@ -112,7 +94,8 @@ defmodule ForgeWorkshop.Application do
   end
 
   defp set_db() do
-    db_path = Util.config(["workshop", "db"])
+    config = ArcConfig.read_config(:forge_workshop)
+    db_path = config["workshop"]["db"]
 
     case db_path do
       "sqlite://" <> _ ->
