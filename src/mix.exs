@@ -71,7 +71,7 @@ defmodule ForgeWorkshop.MixProject do
       # {:hyjal, path: "../../Hyjal"},
       {:abt_did_elixir, "~> 0.3"},
       # {:abt_did_elixir, path: "../abt-did-elixir"},
-      {:forge_sdk, "~> 0.40"},
+      {:forge_sdk, "~> 1.0"},
       # {:forge_sdk, path: "../../forge-elixir-sdk", override: true},
 
       # dev & test

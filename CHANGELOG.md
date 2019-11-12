@@ -1,3 +1,6 @@
+## 1.0.0 (November 12, 2019)
+  - release 1.0.0
+
 ## 0.9.0 (November 07, 2019)
   - Migrate Workshop to latest DID protocol.
 
