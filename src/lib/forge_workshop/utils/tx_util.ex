@@ -93,6 +93,7 @@ defmodule ForgeWorkshop.TxUtil do
   def async_offer(_, _, _, _), do: :ok
 
   def robert_offer(_, _, nil), do: :ok
+  def robert_offer(_, _, %{asset: nil, token: nil}), do: :ok
   def robert_offer(robert, user, offer), do: robert_offer(robert, user, offer.token, offer.asset)
 
   def robert_offer(robert, user, token, title) do

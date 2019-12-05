@@ -23,7 +23,6 @@ build:
 	@echo "Building the software..."
 	@rm -rf _build/dev/lib/forge_workshop
 	@make format
-	@cd tools/client; mix compile; mix format;
 
 format:
 	@cd src; mix compile; mix format;

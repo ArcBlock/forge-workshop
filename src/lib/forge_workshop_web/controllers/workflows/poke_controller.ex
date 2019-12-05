@@ -15,7 +15,7 @@ defmodule ForgeWorkshopWeb.PokeController do
   @impl AuthFlow
   def start(conn, _params) do
     tx = conn.assigns.tx
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     claim = %AuthPrincipal{description: "Please set the authentication principal."}
     reply_with_info(conn, [claim], __MODULE__, :auth_principal, [tx.id], info)
   end
@@ -25,12 +25,12 @@ defmodule ForgeWorkshopWeb.PokeController do
     claim =
       ClaimUtil.gen_signature_claim(conn, "Please confirm this poke by signing the transaction.")
 
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     reply_with_info(conn, [claim], __MODULE__, :return_sig, [conn.assigns.tx.id], info)
   end
 
   def return_sig(conn, _params) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
 
     conn.assigns.claims
     |> ClaimUtil.find_signature_claim()

@@ -120,16 +120,7 @@ defmodule ForgeWorkshopWeb.AuthController do
   end
 
   defp get_info(conn) do
-    app = AppState.get()
-
-    %{
-      app_name: app.name,
-      app_desc: app.description,
-      app_logo: Routes.static_url(conn, app.icon),
-      chain_host: Util.get_chainhost(),
-      sk: Util.str_to_bin(app.sk),
-      pk: Util.str_to_bin(app.pk),
-      did: app.did
-    }
+    demo = AppState.get()
+    Util.get_hyjal_info(conn, demo)
   end
 end

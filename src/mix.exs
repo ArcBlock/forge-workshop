@@ -68,10 +68,11 @@ defmodule ForgeWorkshop.MixProject do
 
       # ArcBlock
       {:hyjal, git: "git@github.com:ArcBlock/Hyjal.git"},
-      # {:hyjal, path: "../../Hyjal"},
       {:abt_did_elixir, "~> 0.3"},
+      {:forge_sdk, "1.0.1-p1", override: true},
+
+      # {:hyjal, path: "../../Hyjal"},
       # {:abt_did_elixir, path: "../abt-did-elixir"},
-      {:forge_sdk, "~> 1.0"},
       # {:forge_sdk, path: "../../forge-elixir-sdk", override: true},
 
       # dev & test

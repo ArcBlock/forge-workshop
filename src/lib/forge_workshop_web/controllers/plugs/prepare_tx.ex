@@ -38,6 +38,8 @@ defmodule ForgeWorkshopWeb.Plugs.PrepareTx do
       did: Util.did_to_address(demo.did)
     }
 
-    assign(conn, :demo_info, demo_info)
+    conn
+    |> assign(:demo_info, demo_info)
+    |> assign(:hyjal_info, Util.get_hyjal_info(conn, demo))
   end
 end

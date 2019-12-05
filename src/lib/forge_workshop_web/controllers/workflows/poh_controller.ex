@@ -15,7 +15,7 @@ defmodule ForgeWorkshopWeb.PohController do
 
   @impl AuthFlow
   def start(conn, _params) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     tx = conn.assigns.tx
     poh = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "poh" end)
 
@@ -36,7 +36,7 @@ defmodule ForgeWorkshopWeb.PohController do
 
   @impl AuthFlow
   def auth_principal(conn, _params) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     tx = conn.assigns.tx
     poh = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "poh" end)
 
@@ -53,7 +53,7 @@ defmodule ForgeWorkshopWeb.PohController do
   end
 
   def return_asset(conn, _params) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     tx = conn.assigns.tx
     poh = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "poh" end)
 
@@ -74,7 +74,7 @@ defmodule ForgeWorkshopWeb.PohController do
   end
 
   defp do_return_asset(conn, claim, poh) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     robert = conn.assigns.robert
     user = conn.assigns.auth_principal
     offer = Enum.find(conn.assigns.tx.tx_behaviors, fn beh -> beh.behavior == "offer" end)
@@ -90,7 +90,7 @@ defmodule ForgeWorkshopWeb.PohController do
   end
 
   defp validate_token(conn, poh) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     tx = conn.assigns.tx
     robert = conn.assigns.robert
     user = conn.assigns.auth_principal

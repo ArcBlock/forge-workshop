@@ -15,7 +15,7 @@ defmodule ForgeWorkshopWeb.UpdateAssetController do
 
   @impl AuthFlow
   def start(conn, _params) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     tx = conn.assigns.tx
     claim = %AuthPrincipal{description: "Please set the authentication principal."}
     reply_with_info(conn, [claim], __MODULE__, :auth_principal, [tx.id], info)
@@ -23,7 +23,7 @@ defmodule ForgeWorkshopWeb.UpdateAssetController do
 
   @impl AuthFlow
   def auth_principal(conn, _params) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     tx = conn.assigns.tx
     tx_behaviors = tx.tx_behaviors
     update = Enum.find(tx_behaviors, fn beh -> beh.behavior == "update" end)
@@ -32,7 +32,7 @@ defmodule ForgeWorkshopWeb.UpdateAssetController do
   end
 
   def return_sig(conn, _params) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     robert = conn.assigns.robert
     user = conn.assigns.auth_principal
     offer = Enum.find(conn.assigns.tx.tx_behaviors, fn beh -> beh.behavior == "offer" end)
@@ -51,7 +51,7 @@ defmodule ForgeWorkshopWeb.UpdateAssetController do
   end
 
   def return_asset(conn, _params) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     tx = conn.assigns.tx
     update = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "update" end)
 
@@ -72,7 +72,7 @@ defmodule ForgeWorkshopWeb.UpdateAssetController do
   end
 
   defp do_return_asset(conn, claim, update) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     user = conn.assigns.auth_principal
 
     case AssetUtil.validate_asset(update.asset, claim.asset, user.address) do
@@ -87,7 +87,7 @@ defmodule ForgeWorkshopWeb.UpdateAssetController do
   end
 
   defp require_multi_sig(conn) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
 
     claim =
       ClaimUtil.gen_signature_claim(

@@ -4,6 +4,7 @@ defmodule ForgeWorkshop.Util do
   alias ForgeWorkshop.{AppState, Demo, Repo, Tx}
   alias ForgeWorkshopWeb.Endpoint
   alias ForgeWorkshopWeb.Router.Helpers, as: Routes
+  alias Hyjal.{Info, AppInfo, ChainInfo}
 
   def hash(:keccak, data), do: Mcrypto.hash(%Mcrypto.Hasher.Keccak{}, data)
   def hash(:sha3, data), do: Mcrypto.hash(%Mcrypto.Hasher.Sha3{}, data)
@@ -96,4 +97,20 @@ defmodule ForgeWorkshop.Util do
   def empty?(nil), do: true
   def empty?(""), do: true
   def empty?(_), do: false
+
+  def get_hyjal_info(conn, demo) do
+    %Info{
+      app_info: %AppInfo{
+        name: demo.name,
+        description: demo.description,
+        logo: ForgeWorkshopWeb.Router.Helpers.static_url(conn, demo.icon),
+        sk: str_to_bin(demo.sk),
+        pk: str_to_bin(demo.pk),
+        did: did_to_address(demo.did)
+      },
+      chain_info: %ChainInfo{
+        host: get_chainhost()
+      }
+    }
+  end
 end

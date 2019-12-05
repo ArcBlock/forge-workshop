@@ -16,7 +16,7 @@ defmodule ForgeWorkshopWeb.TransferController do
   @impl AuthFlow
   def start(conn, _params) do
     tx = conn.assigns.tx
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     claim = %AuthPrincipal{description: "Please set the authentication principal."}
     reply_with_info(conn, [claim], __MODULE__, :auth_principal, [tx.id], info)
   end
@@ -24,7 +24,7 @@ defmodule ForgeWorkshopWeb.TransferController do
   @impl AuthFlow
   def auth_principal(conn, _params) do
     tx = conn.assigns.tx
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     robert = conn.assigns.robert
     user = conn.assigns.auth_principal
     [beh] = tx.tx_behaviors
@@ -46,7 +46,7 @@ defmodule ForgeWorkshopWeb.TransferController do
   end
 
   def return_sig(conn, _params) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
 
     conn.assigns.claims
     |> ClaimUtil.find_signature_claim()
@@ -64,7 +64,7 @@ defmodule ForgeWorkshopWeb.TransferController do
   end
 
   def return_asset(conn, _params) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     [beh] = conn.assigns.tx.tx_behaviors
 
     conn.assigns.claims
@@ -84,7 +84,7 @@ defmodule ForgeWorkshopWeb.TransferController do
   end
 
   defp do_return_asset(conn, claim) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     user = conn.assigns.auth_principal
     [beh] = conn.assigns.tx.tx_behaviors
 
@@ -100,7 +100,7 @@ defmodule ForgeWorkshopWeb.TransferController do
   end
 
   defp require_sig(conn) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
 
     claim =
       ClaimUtil.gen_signature_claim(

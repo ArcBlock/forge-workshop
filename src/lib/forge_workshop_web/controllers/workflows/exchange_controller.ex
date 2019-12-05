@@ -15,7 +15,7 @@ defmodule ForgeWorkshopWeb.ExchangeController do
 
   @impl AuthFlow
   def start(conn, _params) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     tx = conn.assigns.tx
     claim = %AuthPrincipal{description: "Please set the authentication principal."}
     reply_with_info(conn, [claim], __MODULE__, :auth_principal, [tx.id], info)
@@ -25,7 +25,7 @@ defmodule ForgeWorkshopWeb.ExchangeController do
   def auth_principal(conn, _params) do
     tx = conn.assigns.tx
     tx_behaviors = tx.tx_behaviors
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
 
     demand = Enum.find(tx_behaviors, fn beh -> beh.behavior == "demand" end)
 
@@ -42,7 +42,7 @@ defmodule ForgeWorkshopWeb.ExchangeController do
   end
 
   def return_sig(conn, _params) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
 
     conn.assigns.claims
     |> ClaimUtil.find_signature_claim()
@@ -60,7 +60,7 @@ defmodule ForgeWorkshopWeb.ExchangeController do
   end
 
   def return_asset(conn, _params) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     tx = conn.assigns.tx
     demand = Enum.find(tx.tx_behaviors, fn beh -> beh.behavior == "demand" end)
 
@@ -81,7 +81,7 @@ defmodule ForgeWorkshopWeb.ExchangeController do
   end
 
   defp do_return_asset(conn, claim, demand) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
     user = conn.assigns.auth_principal
 
     case AssetUtil.validate_asset(demand.asset, claim.asset, user.address) do
@@ -96,7 +96,7 @@ defmodule ForgeWorkshopWeb.ExchangeController do
   end
 
   defp require_multi_sig(conn) do
-    info = conn.assigns.demo_info
+    info = conn.assigns.hyjal_info
 
     claim =
       ClaimUtil.gen_multi_sig_claim(

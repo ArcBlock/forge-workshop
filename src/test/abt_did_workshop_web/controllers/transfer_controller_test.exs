@@ -75,6 +75,7 @@ defmodule ForgeWorkshopWeb.TransferControllerTest do
       })
 
     wallet = ForgeSdk.create_wallet(moniker: "alice", commit: true)
+    Process.sleep(3000)
 
     # Step 1, wallet scans the QR code
     %{"appPk" => pk, "authInfo" => auth_info} =
