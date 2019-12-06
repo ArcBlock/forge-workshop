@@ -1,4 +1,7 @@
 ## 1.0.1-p1 (December 04, 2019)
+  - Release 1.0.2
+
+## 1.0.1-p1 (December 04, 2019)
   - Use new version of Hyjal
   - Bump up version.
 
