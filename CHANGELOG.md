@@ -1,3 +1,6 @@
+## 1.0.6 (January 07, 2020)
+  - release 1.0.6
+
 ## 1.0.1-p1 (December 04, 2019)
   - Release 1.0.2
 
