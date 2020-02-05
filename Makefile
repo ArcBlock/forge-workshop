@@ -17,6 +17,8 @@ $(TARGETS):
 	@mkdir -p $(REL_DIR)
 	@cd src/assets; npm install; npm run deploy
 	@cd src; mix phx.digest
+	@cd src; mix local.hex --force
+	@cd src; mix deps.get
 	@rm -rf _build/staging/rel/$(BUILD_NAME); cd src; MIX_ENV=staging mix release; cd ..; tar zcf $(REL_DIR)/$(BUILD_NAME)_$@_amd64.tgz -C _build/staging/rel/$(BUILD_NAME) .
 
 build:

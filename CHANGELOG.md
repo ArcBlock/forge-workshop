@@ -1,3 +1,6 @@
+## 1.0.9-p3 (February 05, 2020)
+  - fix mix.deps get issue
+
 ## 1.0.6 (January 07, 2020)
   - release 1.0.6
 
